@@ -27,6 +27,13 @@ if(NOT TARGET tinyxml2 AND NOT TARGET tinyxml2::tinyxml2)
         GIT_TAG        10.0.0
     )
     set(tinyxml2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+    # Always static, like Mc3 itself. Without this the choice flipped between
+    # configures of the root project: Manifold's option(BUILD_SHARED_LIBS ... ON)
+    # puts BUILD_SHARED_LIBS=ON in the cache on the first configure, AFTER this
+    # file ran, so tinyxml2 was static on a fresh build tree and shared on every
+    # reconfigure -- and the installed mc3tomcb (no RUNPATH) then failed to
+    # start in clean_room_cli_release_smoke for want of libtinyxml2.so.10.
+    set(tinyxml2_SHARED_LIBS OFF)
     FetchContent_MakeAvailable(tinyxml2)
 endif()
 # Alias so Mc3 can always link tinyxml2::tinyxml2 regardless of where the target came from
@@ -136,13 +143,14 @@ else()
 endif()
 
 # SYS-W11-05: Mc3 is shipped as a genuinely relocatable static package.  The
-# parser's tinyxml2 dependency is normally supplied by the current build (by
-# SharpRuntime in the full editor, or by FetchContent in a standalone Mc3
-# build).  When that dependency is a concrete local target, install it beside
-# Mc3 so an external consumer does not need the parent editor checkout.  The
-# only public header it exposes is tinyxml2.h, so replacing its build-tree
-# include path with a build/install pair is safe and keeps the export free of
-# an absolute sibling-repository path.
+# parser's tinyxml2 dependency is normally supplied by the current build
+# (FetchContent above, or a parent project's own tinyxml2 target -- never
+# sharp-runtime's vendored copy, which lives in its own namespace).  When that
+# dependency is a concrete local target, install it beside Mc3 so an external
+# consumer does not need the parent editor checkout.  The only public header
+# it exposes is tinyxml2.h, so replacing its build-tree include path with a
+# build/install pair is safe and keeps the export free of an absolute
+# sibling-repository path.
 set(MC3_BUNDLE_TINYXML2 OFF)
 if(TARGET tinyxml2)
     set(MC3_BUNDLE_TINYXML2 ON)
