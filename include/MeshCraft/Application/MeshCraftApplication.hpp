@@ -33,6 +33,7 @@
 #include <Microsoft/Xna/Framework/Audio/SoundEffectInstance.hpp>
 #include <Microsoft/Xna/Framework/Game.hpp>
 #include <Microsoft/Xna/Framework/GameTime.hpp>
+#include <Microsoft/Xna/Framework/GraphicsDeviceManager.hpp>
 #include <Microsoft/Xna/Framework/Graphics/RenderTarget2D.hpp>
 #include <Microsoft/Xna/Framework/Graphics/ShaderEffect.hpp>
 #include <Microsoft/Xna/Framework/Graphics/SpriteBatch.hpp>
@@ -118,6 +119,12 @@ protected:
     void EndDraw() override;
 
 private:
+    // Owns the window/back-buffer policy (see initWindowAndGraphics()). First
+    // member, so it is destroyed last -- after everything that draws with the
+    // device it configures.
+    std::unique_ptr<Microsoft::Xna::Framework::GraphicsDeviceManager> graphics_;
+    void initWindowAndGraphics();
+
     // Scene data
     Mc3::Mc3Document document_;
     std::filesystem::path currentFile_;

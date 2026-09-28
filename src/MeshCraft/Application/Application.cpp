@@ -56,32 +56,41 @@ using namespace Microsoft::Xna::Framework::Graphics;
 // Construction
 // ---------------------------------------------------------------------------
 
-namespace {
+// Called by every constructor, before Run() creates the device.
+void MeshCraftApplication::initWindowAndGraphics() {
+    graphics_ = std::make_unique<GraphicsDeviceManager>(this);
 
-// The editor needs HiDef: its ImGui and SSAO passes use separate alpha blend
-// factors, and SceneRenderer uses 32-bit index buffers. CNA enforces XNA's Reach rules
-// (SOFTWARE-212), and a Game with no GraphicsDeviceManager -- this one, whose
-// back buffer follows the window instead of a preferred size -- keeps Game's
-// own device at Reach: CNA::ProjectGraphicsProfileEXT is only read by
-// GraphicsDeviceManager. Must run before LoadContent() creates any resource.
-void requestHiDefProfile(Game& game) {
-    game.getGraphicsDeviceProperty().SetGraphicsProfileEXT(GraphicsProfile::HiDef);
-}
+    // HiDef: the ImGui and SSAO passes use separate alpha blend factors and
+    // SceneRenderer uses 32-bit index buffers, which CNA refuses under Reach,
+    // XNA's default profile (SOFTWARE-212).
+    graphics_->setGraphicsProfileProperty(GraphicsProfile::HiDef);
 
-} // namespace
+    // An editor window: the user sizes it, and the back buffer is the window,
+    // pixel for pixel. CNA's default presentation (Letterbox) keeps the
+    // preferred back-buffer size and scales it into the window instead, and an
+    // XNA game window is not resizable unless it asks.
+    graphics_->setPreferredPresentationModeProperty(PresentationMode::NativeBackBuffer);
+    getWindowProperty().setAllowUserResizingProperty(true);
 
-MeshCraftApplication::MeshCraftApplication() {
-    requestHiDefProfile(*this);
+    // --screenshot, --export and --benchmark keep 800x480: the headless
+    // regression tests sample fixed pixel positions of that frame.
+    const bool automatedRun = !autoScreenshotPath_.empty() || !autoExportPath_.empty() ||
+                              benchmarkProgress_.enabled();
+    graphics_->setPreferredBackBufferWidthProperty(automatedRun ? 800 : 1280);
+    graphics_->setPreferredBackBufferHeightProperty(automatedRun ? 480 : 720);
+
     getWindowProperty().setTitleProperty("Mesh Craft");
     setIsMouseVisibleProperty(true);
+}
+
+MeshCraftApplication::MeshCraftApplication() {
+    initWindowAndGraphics();
 }
 
 MeshCraftApplication::MeshCraftApplication(std::filesystem::path filePath)
     : currentFile_(std::move(filePath))
 {
-    requestHiDefProfile(*this);
-    getWindowProperty().setTitleProperty("Mesh Craft");
-    setIsMouseVisibleProperty(true);
+    initWindowAndGraphics();
 }
 
 MeshCraftApplication::MeshCraftApplication(std::filesystem::path filePath, std::string screenshotPath)
@@ -89,9 +98,7 @@ MeshCraftApplication::MeshCraftApplication(std::filesystem::path filePath, std::
     , autoScreenshotPath_(std::move(screenshotPath))
     , autoScreenshotCountdown_(120)
 {
-    requestHiDefProfile(*this);
-    getWindowProperty().setTitleProperty("Mesh Craft");
-    setIsMouseVisibleProperty(true);
+    initWindowAndGraphics();
 }
 
 MeshCraftApplication::MeshCraftApplication(std::filesystem::path filePath, std::string screenshotPath,
@@ -102,7 +109,7 @@ MeshCraftApplication::MeshCraftApplication(std::filesystem::path filePath, std::
     , autoExportPath_(std::move(exportPath))
     , autoExportCountdown_(autoExportPath_.empty() ? 0 : 2)
 {
-    requestHiDefProfile(*this);
+    initWindowAndGraphics();
     // Test-only hooks: Bloom and SSAO are UI-menu-only toggles with no CLI/
     // scene-file equivalent. Keep their force switches independent so each
     // headless regression test exercises only the effect it intends to cover.
@@ -119,17 +126,13 @@ MeshCraftApplication::MeshCraftApplication(std::filesystem::path filePath, std::
     if (std::getenv("MESHCRAFT_TEST_FORCE_SHADOWDEBUG")) {
         shadowDebugEnabled_ = true;
     }
-    getWindowProperty().setTitleProperty("Mesh Craft");
-    setIsMouseVisibleProperty(true);
 }
 
 MeshCraftApplication::MeshCraftApplication(std::filesystem::path filePath, bool benchmarkMode)
     : currentFile_(std::move(filePath))
     , benchmarkProgress_(benchmarkMode)
 {
-    requestHiDefProfile(*this);
-    getWindowProperty().setTitleProperty("Mesh Craft");
-    setIsMouseVisibleProperty(true);
+    initWindowAndGraphics();
 }
 
 // ---------------------------------------------------------------------------
