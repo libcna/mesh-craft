@@ -5,6 +5,10 @@ endif()
 set(_mc_package_prefix "${MC_PACKAGE_BUILD_DIR}/package-consumer-release-prefix")
 set(_mc_package_build "${MC_PACKAGE_BUILD_DIR}/package-consumer-release-build")
 
+# `cmake --install` never wipes its destination; a file left by an earlier
+# configuration could otherwise stand in for one this install failed to ship.
+file(REMOVE_RECURSE "${_mc_package_prefix}")
+
 execute_process(
     COMMAND "${CMAKE_COMMAND}" --install "${MC_PACKAGE_BUILD_DIR}"
             --prefix "${_mc_package_prefix}" --component release

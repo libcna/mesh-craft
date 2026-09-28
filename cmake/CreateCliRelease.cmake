@@ -9,6 +9,12 @@ set(_mc_release_prefix "${MC_RELEASE_BUILD_DIR}/meshcraft-cli-release-prefix")
 set(_mc_release_archive
     "${MC_RELEASE_BUILD_DIR}/MeshCraft-${MC_RELEASE_VERSION}-${MC_RELEASE_SYSTEM}-cli.tar.gz")
 
+# Start from an empty staging prefix: `cmake --install` never wipes its
+# destination, so anything an earlier configuration installed here (a
+# library since made static, a renamed target's archive) would otherwise
+# ride along into the archive and its SHA256SUMS.txt.
+file(REMOVE_RECURSE "${_mc_release_prefix}")
+
 execute_process(
     COMMAND "${CMAKE_COMMAND}" --install "${MC_RELEASE_BUILD_DIR}"
             --prefix "${_mc_release_prefix}" --component release
@@ -30,12 +36,8 @@ endforeach()
 # consumer (or CI) can verify the archive's contents weren't corrupted or
 # tampered with in transit, independent of trusting the archive tool itself.
 # sha256sum-compatible format ("<hash>  <relative-path>") so `sha256sum -c`
-# verifies it directly on Linux/macOS. Remove any manifest left behind by a
-# PREVIOUS run of this script first: `cmake --install` never wipes the
-# destination, so a stale SHA256SUMS.txt would otherwise be picked up by the
-# glob below with its OLD content's hash, then get overwritten by this run's
-# real manifest -- a self-referential mismatch on every second run.
-file(REMOVE "${_mc_release_prefix}/SHA256SUMS.txt")
+# verifies it directly on Linux/macOS. The prefix was emptied above, so no
+# SHA256SUMS.txt from a previous run can be hashed into this one.
 file(GLOB_RECURSE _mc_release_files LIST_DIRECTORIES false RELATIVE "${_mc_release_prefix}"
      "${_mc_release_prefix}/*")
 list(SORT _mc_release_files)
