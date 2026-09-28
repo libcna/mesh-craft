@@ -1,4 +1,10 @@
-#include <MeshCraft/EditorAlgorithms.hpp>
+#include <MeshCraft/EditorCommandAlgorithms.hpp>
+#include <MeshCraft/EditorEventAlgorithms.hpp>
+#include <MeshCraft/EditorPersistenceAlgorithms.hpp>
+#include <MeshCraft/EditorPreferencesAlgorithms.hpp>
+#include <MeshCraft/EditorSelectionAlgorithms.hpp>
+#include <MeshCraft/EditorTransformAlgorithms.hpp>
+#include <MeshCraft/EditorUtilityAlgorithms.hpp>
 #include <MeshCraft/Renderer/CsgCacheAlg.hpp>
 
 #include <MeshCraft/Mc3/Mc3Document.hpp>

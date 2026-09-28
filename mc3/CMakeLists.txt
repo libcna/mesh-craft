@@ -521,13 +521,15 @@ if(BUILD_TESTING)
         target_link_options(mc3_json_libfuzzer PRIVATE -fsanitize=fuzzer,address,undefined)
     endif()
 
-    # editor_commands_test pulls in MeshCraft/EditorAlgorithms.hpp from the
-    # MeshCraft editor's public include dir, which lives at the repo root
-    # (include/) — outside the mc3/ subtree. Only build it when those
+    # editor_commands_test pulls in the MeshCraft/Editor*Algorithms.hpp headers
+    # from the MeshCraft editor's public include dir, which lives at the repo
+    # root (include/) — outside the mc3/ subtree. Only build it when those
     # headers are available (i.e. as part of the root MeshCraft project)
-    # so mc3 stays buildable standalone.
+    # so mc3 stays buildable standalone. (This probed EditorAlgorithms.hpp
+    # until that header was split in SYS-W3-05, which silently dropped the
+    # test from every build.)
     set(MC3_EDITOR_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
-    if(EXISTS "${MC3_EDITOR_INCLUDE_DIR}/MeshCraft/EditorAlgorithms.hpp")
+    if(EXISTS "${MC3_EDITOR_INCLUDE_DIR}/MeshCraft/EditorCommandAlgorithms.hpp")
         add_executable(mc3_commands_test
             test/editor_commands_test.cpp
             "${CMAKE_SOURCE_DIR}/src/MeshCraft/Editor/SelectionManager.cpp"
