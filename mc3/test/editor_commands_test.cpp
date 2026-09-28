@@ -2003,8 +2003,8 @@ static void testExportSubtreeTemplateIncludesDependentMaterialsAndTextures()
     // uses for every committed fixture. Degrades to a SKIP (not a failure)
     // if python3/lxml aren't available in this environment, mirroring
     // validate_xsd.py's own "lxml missing" diagnostic (STAB-0015).
-    auto xsdPath = std::filesystem::path(__FILE__).parent_path().parent_path() / "mc3.xsd";
-    auto validatorPath = std::filesystem::path(__FILE__).parent_path().parent_path().parent_path()
+    auto xsdPath = std::filesystem::path(MC3_TEST_SOURCE_DIR).parent_path() / "mc3.xsd";
+    auto validatorPath = std::filesystem::path(MC3_TEST_SOURCE_DIR).parent_path().parent_path()
                           / "test" / "validate_xsd.py";
     bool lxmlAvailable = std::system("python3 -c \"import lxml\" > /dev/null 2>&1") == 0;
     if (!lxmlAvailable || !std::filesystem::exists(xsdPath) || !std::filesystem::exists(validatorPath)) {

@@ -239,6 +239,13 @@ if(BUILD_TESTING)
 
     add_executable(mc3_roundtrip_test test/roundtrip_test.cpp)
     target_link_libraries(mc3_roundtrip_test PRIVATE Mc3)
+    # The tests locate committed fixtures (golden/, mc3.xsd) through this
+    # absolute path rather than __FILE__: ccache with CCACHE_BASEDIR set
+    # rewrites the source path to one relative to the build root, so __FILE__
+    # becomes "../mc3/test/..." and resolves against the test's own
+    # WORKING_DIRECTORY (build/mc3) to a directory that does not exist.
+    target_compile_definitions(mc3_roundtrip_test PRIVATE
+        MC3_TEST_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/test")
 
     # Pass features.mc3.xml path so the test can exercise the full parser
     # CMAKE_SOURCE_DIR is the top-level project root (may differ from mc3/ source dir)
@@ -530,6 +537,9 @@ if(BUILD_TESTING)
         )
         target_link_libraries(mc3_commands_test PRIVATE Mc3)
         target_compile_features(mc3_commands_test PRIVATE cxx_std_23)
+        # Same reason as mc3_roundtrip_test above: not __FILE__.
+        target_compile_definitions(mc3_commands_test PRIVATE
+            MC3_TEST_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/test")
         add_test(NAME mc3_commands COMMAND mc3_commands_test)
         set_tests_properties(mc3_commands PROPERTIES TIMEOUT 15 LABELS "commands")
     else()

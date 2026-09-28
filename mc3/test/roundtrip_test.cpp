@@ -3589,7 +3589,7 @@ static void testGoldenFileBasicScene() {
     produced.close();
     removeTestFile(p);
 
-    auto goldenPath = std::filesystem::path(__FILE__).parent_path() / "golden" / "basic_scene.mc3.xml";
+    auto goldenPath = std::filesystem::path(MC3_TEST_SOURCE_DIR) / "golden" / "basic_scene.mc3.xml";
     std::ifstream golden(goldenPath);
     CHECK(golden.good(), "golden file: basic_scene.mc3.xml exists and opens");
     if (!golden.good()) return;

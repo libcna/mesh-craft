@@ -142,6 +142,12 @@ if(BUILD_TESTING)
         test/mcb_roundtrip_test.cpp
     )
     target_link_libraries(mcb_roundtrip_test PRIVATE Mcb)
+    # The test finds ../../test/house.mc3.xml through this absolute path, not
+    # __FILE__: ccache with CCACHE_BASEDIR set makes __FILE__ relative to the
+    # build root, which then resolves against WORKING_DIRECTORY (build/mcb)
+    # to a file that does not exist.
+    target_compile_definitions(mcb_roundtrip_test PRIVATE
+        MCB_TEST_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/test")
     add_test(NAME mcb_roundtrip COMMAND mcb_roundtrip_test)
     set_tests_properties(mcb_roundtrip PROPERTIES TIMEOUT 30 LABELS "format")
 

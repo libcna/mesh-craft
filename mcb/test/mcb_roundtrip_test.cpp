@@ -1308,7 +1308,7 @@ static void testHugeCollectionCountRejectedCleanly() {
 }
 
 static void testFileSizeSmallerThanXml() {
-    const auto xmlPath = std::filesystem::path(__FILE__).parent_path() / ".." / ".." / "test" / "house.mc3.xml";
+    const auto xmlPath = std::filesystem::path(MCB_TEST_SOURCE_DIR) / ".." / ".." / "test" / "house.mc3.xml";
     std::error_code ec;
     const auto xmlSize = std::filesystem::file_size(xmlPath, ec);
     CHECK(!ec, "file-size: test/house.mc3.xml exists and is readable");
