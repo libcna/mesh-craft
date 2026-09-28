@@ -1349,13 +1349,12 @@ void MeshCraftApplication::drawSkybox(const Matrix& view, float fovDegrees, floa
     SamplerState skyboxSampler = SamplerState::LinearWrap;
     skyboxSampler.setAddressVProperty(TextureAddressMode::Clamp);
     // The viewport is already set to the clipped 3D-viewport rectangle by
-    // Draw() before this call; SpriteBatch's custom-effect draws only size
-    // their projection to a bound RenderTarget2D, not a custom Viewport, so
-    // (like AUD-084's Bloom composite pass) the destRect for this
-    // backbuffer-targeted draw must be window-absolute.
+    // Draw() before this call. As in XNA, SpriteBatch sizes its projection to
+    // GraphicsDevice.Viewport, so sprite coordinates are viewport-local: the
+    // quad that fills the viewport starts at (0,0), not at the viewport's
+    // window position (which would be applied twice).
     const auto& vp = gd.getViewportProperty();
-    const Rectangle screenRect(vp.getXProperty(), vp.getYProperty(),
-                               vp.getWidthProperty(), vp.getHeightProperty());
+    const Rectangle screenRect(0, 0, vp.getWidthProperty(), vp.getHeightProperty());
     spriteBatch_->Begin(SpriteSortMode::Deferred, BlendState::Opaque,
                         &skyboxSampler, nullptr, nullptr, &*skyboxFx_);
     spriteBatch_->Draw(*skyboxTex_, screenRect, Color::White);
@@ -1406,14 +1405,12 @@ void MeshCraftApplication::applyBloom(
     }
 
     // Pass 5: additive composite onto viewport area in the default framebuffer.
-    // Unlike the RT-bound blur passes above, EasyGLSpriteBatchBackend::FlushBatch()
-    // sizes its projection to the *window* whenever no RenderTarget2D is bound --
-    // it does not honor a custom GraphicsDevice.Viewport in that case -- so the
-    // destRect here must be given in window-absolute coordinates (vx,viewY,vw,vh),
-    // not RT-local (0,0,vw,vh).
+    // As in XNA, SpriteBatch sizes its projection to GraphicsDevice.Viewport,
+    // so with the viewport placed at (vx,viewY) the destRect is viewport-local
+    // (0,0,vw,vh); window-absolute coordinates would offset it a second time.
     gd.SetRenderTarget(nullptr);
     gd.setViewportProperty(Viewport(vx, viewY, vw, vh));
-    const Rectangle screenRect(vx, viewY, vw, vh);
+    const Rectangle screenRect(0, 0, vw, vh);
     bloomCompositeFx_->Apply();
     bloomCompositeFx_->SetUniformFloat("u_strength", bloomStrength_);
     spriteBatch_->Begin(SpriteSortMode::Deferred, BlendState::Additive,
@@ -1454,8 +1451,10 @@ void MeshCraftApplication::applySsao(
     if (!ssaoDepthRt_ || !ssaoRt_ || !ssaoBlurRt_ || !ssaoFx_ || !ssaoBlurFx_ || !ssaoCompositeFx_ ||
         vw <= 0 || vh <= 0 || !sceneRenderer_) return;
     auto& gd = getGraphicsDeviceProperty();
+    // Every pass below draws with a viewport of exactly vw x vh -- an RT's own,
+    // or the 3D-viewport rectangle for the composite -- and SpriteBatch
+    // coordinates are viewport-local, so one rectangle serves them all.
     const Rectangle targetRect(0, 0, vw, vh);
-    const Rectangle screenRect(vx, viewY, vw, vh);
 
     // Pass 1: redraw scene geometry with a depth-writing ShaderEffect into a
     // color target. This is the CNA-supported replacement for reading the
@@ -1498,7 +1497,7 @@ void MeshCraftApplication::applySsao(
     ssaoCompositeFx_->Apply();
     ssaoCompositeFx_->SetUniformFloat("u_strength", ssaoStrength_);
     spriteBatch_->Begin(SpriteSortMode::Deferred, multiply, nullptr, nullptr, nullptr, &*ssaoCompositeFx_);
-    spriteBatch_->Draw(*ssaoBlurRt_, screenRect, Color::White);
+    spriteBatch_->Draw(*ssaoBlurRt_, targetRect, Color::White);
     spriteBatch_->End();
     gd.SetDepthTestEnabled(true);
     gd.setViewportProperty(Viewport(0, 0, cachedScreenW_, cachedScreenH_));
