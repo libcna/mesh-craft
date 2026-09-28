@@ -11,10 +11,11 @@ covered by `plan.md`'s `AUD-###`/`SYS-W7-##` rows. This is specifically about
 editor UI gaps: format features that parse/round-trip correctly but have no
 interactive editing surface, or have one that's incomplete.
 
-One exception to that scope is recorded deliberately: the
-"Backend gap" section immediately below documents a CNA Vulkan renderer defect
-found while qualifying the VULKAN backend. It is kept here so it is not lost,
-and is marked as out-of-scope where it appears.
+Two exceptions to that scope are recorded deliberately, so they are not lost,
+and are marked as out-of-scope where they appear: the "Backend gap" section
+immediately below documents a CNA Vulkan renderer defect found while
+qualifying the VULKAN backend, and the "Display gap" section after it
+documents why the editor's text is not sharp on fractionally scaled desktops.
 
 Findings are grouped by severity: **still-open total gaps** (zero UI,
 XML-hand-edit only) first, then **still-open partial gaps** (UI exists but
@@ -139,6 +140,93 @@ For the record, so the scope of this defect is not overstated:
   message. That is a separate, already-documented limitation
   (`supportsTextShaderEffectsAlg()` in `include/MeshCraft/GraphicsBackendCheck.hpp`),
   not part of this defect.
+
+---
+
+## Display gap: editor text is soft and small on fractionally scaled desktops
+
+*Scope note: like the section above, this is outside mc3 format coverage. It is
+partly a **CNA-side** gap (no way for a game to ask for a high-pixel-density
+window) and partly missing work in MeshCraft (no DPI handling at all). Nothing
+here is fixed yet.*
+
+Reported 2026-09-28 by the owner: on GNOME 48 (mutter 48.7, Wayland session),
+two 2560x1440 monitors at 125 % fractional scaling (2048x1152 logical each),
+the ImGui interface "looks shrunk, or somehow visually lower quality".
+
+### What happens
+
+- **MeshCraft has no DPI handling.** ImGui uses its built-in font
+  (ProggyClean, 13 px, a bitmap-style face), the ImGui style is unscaled, and
+  the editor's own layout numbers (`kLeftPanelW`, `kRightPanelW`, `kStatusH`,
+  `kTimelineH` in `MeshCraftApplication.hpp`) are plain pixels.
+- **CNA never asks for a high-pixel-density window for OpenGL.**
+  `GraphicsDevice` sets `WindowDescription::highDpi` from
+  `GraphicsRendererDescriptor::wantsHighDpi`, which is `true` only for the
+  Metal family; EasyGL (MeshCraft's default backend) leaves it `false`, so the
+  SDL window never gets `SDL_WINDOW_HIGH_PIXEL_DENSITY`. There is no public or
+  CNAEXT API for a game to request it.
+- **So at 125 % the compositor enlarges the finished frame.** The window renders
+  at its logical size and mutter scales it up by 1.25. The UI has the right
+  physical size, but every glyph of a 13 px bitmap-style font is resampled by a
+  non-integer factor, and the text looks soft and blurry.
+- **The path the frame takes changed in August.** Since CNA `ccf8486a1`
+  (2026-08-23) the vendored SDL 3.5.0 is built with its Wayland driver, and SDL
+  prefers Wayland whenever the compositor offers `wp_fifo_v1`, which mutter 48
+  does. MeshCraft therefore now runs as a native Wayland client. Before that
+  commit the cached SDL build held only the X11 driver, so the June screenshot
+  (`mesh_craft_screenshot.png`) went through Xwayland. Both paths upscale a
+  non-high-density window, but they need not look identical.
+  **It has not been confirmed** whether the owner's "shrunk" is this
+  upscaling, or the relative size of the 13 px UI in the now larger 1280x720
+  window (see `141553e`). A quick comparison is `SDL_VIDEO_DRIVER=x11
+  build/MeshCraft` (the June path) against plain `build/MeshCraft`.
+
+### How to fix it (proposal)
+
+Sharp text at 125 % needs both halves: a window whose back buffer has one pixel
+per physical pixel, and an ImGui drawn for that density.
+
+1. **CNA: let a game ask for a high-pixel-density window.** The decision must be
+   known before the window exists, and CNA creates `Game`'s window in `Game`'s
+   constructor, before any `GraphicsDeviceManager`. A preference on the manager
+   therefore arrives too late. A project-level CNAEXT declaration in the shape
+   of `CNA::ProjectGraphicsProfileEXT` would work: `GraphicsDevice` would OR it
+   into `description.highDpi`. The alternative is to set `wantsHighDpi` for the
+   EasyGL family outright, which changes every CNA game on a scaled display.
+   CNA already models the difference between window units and drawable pixels
+   (`RendererSurfaceInfo::drawableSize` / `displayScale`,
+   `IPlatformWindow::GetDisplayScale()`), and `PlatformEvent::DisplayScaleChanged`
+   exists. This is a CNA change and the owner's decision.
+2. **MeshCraft: draw ImGui for the display's scale.**
+   - Read the scale with `SDL_GetWindowDisplayScale()` on the SDL window
+     MeshCraft already hands to `ImGui_ImplSDL3_InitForOther()`. Build the font
+     at 13 x scale px (`ImFontConfig::SizePixels` with `AddFontDefault()`, or
+     a real TTF such as those Dear ImGui ships in `misc/fonts`: Roboto,
+     DroidSans, Karla, Cousine). Call
+     `ImGui::GetStyle().ScaleAllSizes(scale)`. Redo both on
+     `SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED` (moving between monitors). Dear
+     ImGui 1.92 reworked fonts so that they can be resized without rebuilding
+     the atlas, which would make this simpler; MeshCraft pins 1.91.6.
+   - Keep one unit for everything that addresses the back buffer. With a
+     high-density window, `ImGui_ImplSDL3` reports `io.DisplaySize` in logical
+     units and `io.DisplayFramebufferScale` = pixels / logical units.
+     `MeshCraftApplication::Draw()` currently takes `io.DisplaySize` as "the
+     screen size" for the CNA viewport, the scissor rectangle and the 3D view
+     rectangle, which is only right at scale 1. Those must use
+     `DisplaySize x DisplayFramebufferScale`. `ImGuiRenderer` already multiplies
+     its clip rectangles by `FramebufferScale`, so ImGui itself needs no change
+     there.
+   - Scale `kLeftPanelW`/`kRightPanelW`/`kStatusH`/`kTimelineH` by the same
+     factor, and check that CNA's mouse coordinates (used for picking and the
+     gizmo) are in the same units as the 3D view rectangle afterwards.
+   - `--screenshot` output then has pixel dimensions. The headless tests run at
+     scale 1 and are unaffected, but a golden image taken on a scaled display
+     would not match.
+3. **Testing.** mutter's fractional scaling cannot be reproduced headlessly on
+   the build machine. A private Weston with `--scale=2` exercises the same code
+   paths with an integer factor. The final check is on the real 125 % desktop,
+   where text should be as sharp as in any native GTK application.
 
 ---
 
