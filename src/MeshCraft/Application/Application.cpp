@@ -55,7 +55,22 @@ using namespace Microsoft::Xna::Framework::Graphics;
 // Construction
 // ---------------------------------------------------------------------------
 
+namespace {
+
+// The editor needs HiDef: its ImGui and SSAO passes use separate alpha blend
+// factors, and SceneRenderer uses 32-bit index buffers. CNA enforces XNA's Reach rules
+// (SOFTWARE-212), and a Game with no GraphicsDeviceManager -- this one, whose
+// back buffer follows the window instead of a preferred size -- keeps Game's
+// own device at Reach: CNA::ProjectGraphicsProfileEXT is only read by
+// GraphicsDeviceManager. Must run before LoadContent() creates any resource.
+void requestHiDefProfile(Game& game) {
+    game.getGraphicsDeviceProperty().SetGraphicsProfileEXT(GraphicsProfile::HiDef);
+}
+
+} // namespace
+
 MeshCraftApplication::MeshCraftApplication() {
+    requestHiDefProfile(*this);
     getWindowProperty().setTitleProperty("Mesh Craft");
     setIsMouseVisibleProperty(true);
 }
@@ -63,6 +78,7 @@ MeshCraftApplication::MeshCraftApplication() {
 MeshCraftApplication::MeshCraftApplication(std::filesystem::path filePath)
     : currentFile_(std::move(filePath))
 {
+    requestHiDefProfile(*this);
     getWindowProperty().setTitleProperty("Mesh Craft");
     setIsMouseVisibleProperty(true);
 }
@@ -72,6 +88,7 @@ MeshCraftApplication::MeshCraftApplication(std::filesystem::path filePath, std::
     , autoScreenshotPath_(std::move(screenshotPath))
     , autoScreenshotCountdown_(120)
 {
+    requestHiDefProfile(*this);
     getWindowProperty().setTitleProperty("Mesh Craft");
     setIsMouseVisibleProperty(true);
 }
@@ -84,6 +101,7 @@ MeshCraftApplication::MeshCraftApplication(std::filesystem::path filePath, std::
     , autoExportPath_(std::move(exportPath))
     , autoExportCountdown_(autoExportPath_.empty() ? 0 : 2)
 {
+    requestHiDefProfile(*this);
     // Test-only hooks: Bloom and SSAO are UI-menu-only toggles with no CLI/
     // scene-file equivalent. Keep their force switches independent so each
     // headless regression test exercises only the effect it intends to cover.
@@ -108,6 +126,7 @@ MeshCraftApplication::MeshCraftApplication(std::filesystem::path filePath, bool 
     : currentFile_(std::move(filePath))
     , benchmarkProgress_(benchmarkMode)
 {
+    requestHiDefProfile(*this);
     getWindowProperty().setTitleProperty("Mesh Craft");
     setIsMouseVisibleProperty(true);
 }
