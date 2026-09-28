@@ -5,6 +5,7 @@
 #include "MeshCraft/EditorTransformAlgorithms.hpp"
 #include "MeshCraft/GraphicsBackendCheck.hpp"
 #include "MeshCraft/MeshCraftPrivate.hpp"
+#include "MeshCraft/SceneSemanticsAlgorithms.hpp"
 
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
@@ -428,9 +429,12 @@ void MeshCraftApplication::EndDraw() {
         std::cout << "[CsgCache] evaluations: " << sceneRenderer_->csgCacheEvaluationCount() << "\n";
         std::cout << "[CsgCache] size: " << sceneRenderer_->csgMeshCacheSize() << "\n";
         if (!document_.objects.empty()) {
-            std::cout << "[LOD] level=" << sceneRenderer_->lastLodLevel(document_.objects.front()->id) << "\n";
-            if (const auto assetLod = sceneRenderer_->lastAssetLodSelection(
-                    document_.objects.front()->id)) {
+            // SceneRenderer records both LOD maps under the object's stable
+            // identity (its id, else its name), so an id-less object -- like
+            // lod_near/lod_far's sphere -- is only found by that same key.
+            const std::string frontIdentity = stableObjectIdentityKeyAlg(*document_.objects.front());
+            std::cout << "[LOD] level=" << sceneRenderer_->lastLodLevel(frontIdentity) << "\n";
+            if (const auto assetLod = sceneRenderer_->lastAssetLodSelection(frontIdentity)) {
                 std::cout << "[AssetLOD] tier=" << assetLodTierNameAlg(assetLod->tier)
                           << " culled=" << (assetLod->culled ? 1 : 0)
                           << " definition=" << assetLod->definitionId
