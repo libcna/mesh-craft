@@ -209,8 +209,8 @@ set(CNA_ENABLE_NET OFF CACHE BOOL "" FORCE)
 # Update the two *_VERIFIED_SHA values below after re-running `ctest` against
 # a newer sibling checkout and confirming it still passes.
 # -----------------------------------------------------------------------------
-set(MESHCRAFT_CNA_VERIFIED_SHA "d0c21ee613ebd8f8b0055f7868103dd5c5c30fc7")
-set(MESHCRAFT_SHARP_RUNTIME_VERIFIED_SHA "5cdaafb2bace46dce5393da21dad9ff9f8ad3c58")
+set(MESHCRAFT_CNA_VERIFIED_SHA "1ca684199f9bbf56c522a4f0d4e13446d4bae7e1")
+set(MESHCRAFT_SHARP_RUNTIME_VERIFIED_SHA "fc033a0e8541a81498c4a496f56a0f59475c6e34")
 
 function(meshcraft_check_sibling_revision name path expected_sha)
     if(EXISTS "${path}/.git")
