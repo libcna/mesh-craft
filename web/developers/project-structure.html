@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Project Structure — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../users/index.html" class="">Users</a><a href="../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="index.html">Overview</a>
+      <a href="getting-started.html">Getting Started</a>
+      <a href="build.html">Build &amp; Run</a>
+      <a href="project-structure.html" class="active">Project Structure</a>
+      <a href="architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="modules/index.html">All Modules</a>
+      <a href="modules/mc3-library.html">MC3 Library</a>
+      <a href="modules/mc3togltf.html">mc3togltf</a>
+      <a href="modules/editor.html">Editor</a>
+      <a href="modules/renderer.html">Renderer</a>
+      <a href="modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="classes/index.html">All Classes</a>
+      <a href="classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="classes/Mc3Document.html">Mc3Document</a>
+      <a href="classes/Mc3Object.html">Mc3Object</a>
+      <a href="classes/SceneRenderer.html">SceneRenderer</a>
+      <a href="classes/EditorCamera.html">EditorCamera</a>
+      <a href="classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="api/mc3-format.html">MC3 Format</a>
+      <a href="api/mc3-objects.html">Object Types</a>
+      <a href="api/mc3-materials.html">Materials &amp; Textures</a>
+      <a href="api/mc3-animation.html">Animation</a>
+      <a href="api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="tutorials/index.html">All Tutorials</a>
+      <a href="tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="tutorials/loading-scene.html">Loading a Scene</a>
+      <a href="tutorials/csg-operations.html">CSG Operations</a>
+      <a href="tutorials/export-gltf.html">Export to glTF/GLB</a>
+      <a href="tutorials/animation.html">Keyframe Animation</a>
+      <a href="tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="internals/index.html">Overview</a>
+      <a href="internals/data-flow.html">Data Flow</a>
+      <a href="internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="internals/csg-engine.html">CSG Engine</a>
+      <a href="internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="index.html">Developers</a><span class="sep">/</span><span>Project Structure</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Project Structure</h1>
+      <p class="subtitle">A guide to every directory and file in the mesh-craft repository.</p>
+    </div>
+
+    <h2>Top-Level Layout</h2>
+    <pre><code>mesh-craft/
+├── CMakeLists.txt          Root build script
+├── README.md               Project overview
+├── PLAN.md                 Feature plan and status tracker
+├── NEXT.md                 Handoff document / current state
+├── LICENSE                 MIT license
+├── imgui.ini               ImGui window layout (auto-generated)
+├── build-web.sh            Emscripten build convenience script
+│
+├── src/                    Application source (MeshCraft editor)
+├── include/                Public headers
+├── mc3/                    Pure-C++ MC3 format sublibrary
+├── mc3togltf/              Standalone MC3→glTF/GLB CLI converter
+├── Mc3Format/              Format specification (Markdown)
+├── cmake/                  CMake helper scripts
+├── test/                   Test scenes and smoke test
+│
+└── cmake-build-debug/      Generated: debug build output (gitignored)</code></pre>
+
+    <h2>Source Directory: <code>src/</code></h2>
+    <p>Contains all C++ source files for the editor application.</p>
+    <pre><code>src/MeshCraft/
+├── main.cpp                         Entry point — creates MeshCraftApplication
+├── MeshCraftApplication.cpp         Main class: game loop, UI, scene state
+│
+├── Editor/
+│   ├── EditorCamera.cpp             Orbit/pan/zoom camera model
+│   ├── EditorTool.cpp               Tool state helpers
+│   ├── EditorViewport.cpp           Viewport rect helpers
+│   ├── SelectionManager.cpp         Selection tracking (multi-select)
+│   └── TransformGizmo.cpp           Gizmo drag state and axis enum
+│
+├── Renderer/
+│   ├── GridRenderer.cpp             XYZ infinite grid (line primitives)
+│   └── SceneRenderer.cpp            Full scene rendering + CSG + gizmos
+│
+├── Scene/
+│   ├── PropertiesPanel.cpp          Right panel: name, transform, material
+│   └── SceneHierarchyPanel.cpp      Left panel: recursive object tree
+│
+└── Ui/
+    └── BitmapFont.cpp               5×7 bitmap font (96 ASCII chars)</code></pre>
+
+    <h2>Include Directory: <code>include/</code></h2>
+    <p>Public headers. Organized to mirror the <code>src/</code> structure.</p>
+    <pre><code>include/MeshCraft/
+├── MeshCraftApplication.hpp
+├── Editor/
+│   ├── EditorCamera.hpp
+│   ├── EditorTool.hpp
+│   ├── EditorViewport.hpp
+│   ├── SelectionManager.hpp
+│   └── TransformGizmo.hpp
+├── Renderer/
+│   ├── GridRenderer.hpp
+│   └── SceneRenderer.hpp
+├── Scene/
+│   ├── PropertiesPanel.hpp
+│   └── SceneHierarchyPanel.hpp
+└── Ui/
+    └── BitmapFont.hpp</code></pre>
+
+    <h2>MC3 Sublibrary: <code>mc3/</code></h2>
+    <p>Pure C++ library — <strong>no graphics dependency</strong>. Builds as <code>libMc3.a</code>. Shared between the editor and <code>mc3togltf</code>.</p>
+    <pre><code>mc3/
+├── CMakeLists.txt          Builds: Mc3 static library + mc3_roundtrip tests
+├── MC3_FORMAT.md           Authoritative format spec v0.3
+├── mc3.xsd                 XML Schema Definition (v0.3)
+│
+├── include/MeshCraft/Mc3/
+│   ├── Mc3Document.hpp      Top-level scene container
+│   ├── Mc3Object.hpp        Scene graph node (ObjectType enum + data)
+│   ├── Mc3Transform.hpp     Position / rotation / scale / pivot
+│   ├── Mc3Primitive.hpp     Primitive shape params (box/sphere/etc.)
+│   ├── Mc3Extrude.hpp       Extrude cross-section + path params
+│   ├── Mc3CsgOperation.hpp  CSG boolean operation type
+│   ├── Mc3Material.hpp      PBR material (baseColor, roughness, …)
+│   ├── Mc3Texture.hpp       Texture definition (uri, wrap, filter)
+│   ├── Mc3Light.hpp         Light types and params
+│   ├── Mc3Camera.hpp        Camera types and params
+│   ├── Mc3Environment.hpp   Background + fog
+│   ├── Mc3Deform.hpp        Geometry-level deform scale
+│   └── Mc3Animation.hpp     Action / Channel / Keyframe types
+│
+└── src/
+    ├── Mc3Document.cpp
+    ├── Mc3Object.cpp
+    ├── Mc3Primitive.cpp
+    ├── Mc3Material.cpp
+    ├── Mc3Texture.cpp
+    ├── Mc3Animation.cpp
+    ├── Mc3CsgOperation.cpp
+    ├── Mc3XmlParser.hpp / .cpp   tinyxml2-based XML → data model
+    ├── Mc3XmlWriter.hpp / .cpp   data model → XML
+    └── MathUtils.hpp             Inline math utilities
+
+mc3/test/
+    └── roundtrip_test.cpp       114 XML round-trip assertions (CTest)</code></pre>
+
+    <h2>Converter: <code>mc3togltf/</code></h2>
+    <p>Standalone CLI tool — parses MC3 XML and writes glTF 2.0 JSON or GLB. Has its own CMake build separate from the main editor.</p>
+    <pre><code>mc3togltf/
+├── CMakeLists.txt
+├── src/
+│   ├── main.cpp             CLI entry point
+│   ├── Mc3XmlParser.hpp/.cpp  XML parser (copy from mc3/)
+│   ├── GltfExporter.hpp/.cpp  glTF/GLB writer (geometry + animation)
+│   ├── MeshBuilder.hpp/.cpp   Mesh tessellation from MC3 objects
+│   └── MathUtils.hpp
+└── test/
+    └── gltf_test.py         Python test: 38 assertions on output GLTFs</code></pre>
+
+    <h2>Format Specification: <code>Mc3Format/</code></h2>
+    <p>Markdown documentation for the MC3 format. Not part of the build — this is the human-readable spec that informed the implementation.</p>
+    <pre><code>Mc3Format/
+├── README.md
+├── purpose-and-goals.md
+├── top-level-structure.md
+├── coordinates-and-units.md
+├── environment.md
+├── lights.md
+├── cameras.md
+├── versioning.md
+├── best-practices.md
+├── future-extensions.md
+├── objects/
+│   ├── README.md, primitives.md, extrude.md, groups-and-hierarchy.md
+│   ├── csg.md, definitions-and-instances.md, pivots.md, states.md
+│   ├── collision.md, areas.md
+├── materials/
+│   ├── materials.md, textures.md, uv-mapping.md
+├── actions/
+│   ├── README.md, action-types.md, triggers.md
+├── implementation/
+│   ├── cpp-mapping.md, importer-behavior.md, minimal-implementation-order.md
+└── examples/
+    ├── minimal-example.md, complete-house.md</code></pre>
+
+    <h2>Test Data: <code>test/</code></h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><code>house.mc3.xml</code></td><td>Simple house: group, primitives, materials — used by smoke test</td></tr>
+          <tr><td><code>garden_house.mc3.xml</code></td><td>More complex house with garden</td></tr>
+          <tr><td><code>features.mc3.xml</code></td><td>All MC3 features: lights, cameras, env, extrude, CSG, instances — v0.3 animation</td></tr>
+          <tr><td><code>animation_test.mc3.xml</code></td><td>Animation demo: Bounce (cubic), Spin (linear), Flash (step), Pulse (cubic)</td></tr>
+          <tr><td><code>csg_test.mc3.xml</code></td><td>CSG operations: box−sphere, two spheres, box∩sphere</td></tr>
+          <tr><td><code>mesh_test.mc3.xml</code></td><td>External OBJ mesh loading test</td></tr>
+          <tr><td><code>obj-test.mc3.xml</code></td><td>OBJ import test</td></tr>
+          <tr><td><code>*.gltf / *.glb / *.bin</code></td><td>Reference exports for comparison</td></tr>
+          <tr><td><code>meshes/teapot_minimal.obj</code></td><td>Minimal OBJ mesh for viewport testing</td></tr>
+          <tr><td><code>smoke_test.sh</code></td><td>Bash script that runs the editor and checks screenshot size</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>CMake Helpers: <code>cmake/</code></h2>
+    <pre><code>cmake/
+└── web/
+    └── pre.js    Emscripten pre-JS: mounts IndexedDB filesystem (IDBFS)</code></pre>
+
+    <h2>Generated Directories (gitignored)</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Directory</th><th>Contents</th></tr></thead>
+        <tbody>
+          <tr><td><code>cmake-build-debug/</code></td><td>Debug build: <code>MeshCraft</code> binary, ninja files, CNA/ImGui/Manifold build artifacts</td></tr>
+          <tr><td><code>cmake-build-release/</code></td><td>Release build</td></tr>
+          <tr><td><code>cmake-build-web/</code></td><td>Emscripten build: <code>MeshCraft.html</code>, <code>.wasm</code>, <code>.js</code></td></tr>
+          <tr><td><code>mc3togltf/build/</code></td><td>mc3togltf standalone build: <code>mc3togltf</code> binary</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>IDE Configuration: <code>.idea/</code></h2>
+    <p>JetBrains CLion project files. The project name is <code>mesh-craft</code>. The <code>workspace.xml</code> stores run configurations and build tool settings.</p>
+
+    <div class="page-nav">
+      <a href="build.html" class="prev">Build &amp; Run</a>
+      <a href="architecture.html" class="next">Architecture</a>
+    </div>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Rendering Pipeline — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section"><div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a><a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a><a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a><a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a><a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a><a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a><a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a><a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a><a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Internals</div>
+      <a href="index.html">Overview</a><a href="data-flow.html">Data Flow</a>
+      <a href="rendering-pipeline.html" class="active">Rendering Pipeline</a>
+      <a href="csg-engine.html">CSG Engine</a><a href="undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Internals</a><span class="sep">/</span><span>Rendering Pipeline</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Rendering Pipeline</h1>
+      <p class="subtitle">How <code>SceneRenderer</code> traverses the scene graph, builds GPU geometry, applies transforms, and produces the viewport image each frame.</p>
+    </div>
+
+    <h2>Graphics Stack</h2>
+    <p>MeshCraft renders via <strong>OpenGL ES 3.2</strong> (the default EASYGL backend). The dependency chain is:</p>
+    <pre class="arch-diagram">
+MeshCraft
+  └── CNA (XNA-like C++ framework)
+        └── EasyGL (OpenGL ES 3.2 abstraction)
+              └── SDL3 (window + context creation)
+    </pre>
+    <p>Alternative backends (SDL_RENDERER, BGFX, VULKAN) are selectable at CMake configure time via <code>-DGRAPHICS_BACKEND=...</code> but are less tested than EASYGL.</p>
+
+    <h2>Per-Frame Draw Call Sequence</h2>
+    <pre class="arch-diagram">
+MeshCraftApplication::Draw()
+  │
+  ├─ SceneRenderer::beginFrame(camera)
+  │    └─ clear color+depth buffer
+  │    └─ upload view/projection matrices to shader UBOs
+  │
+  ├─ SceneRenderer::drawScene(document, camera, animOverrides)
+  │    └─ traverse scene graph (recursive DFS)
+  │         For each Mc3Object:
+  │           1. compute world transform (with anim override if present)
+  │           2. resolve mesh:
+  │              a. CSG → evaluate Manifold (cached)
+  │              b. Mesh (.obj) → cached RenderMesh from tinyobjloader
+  │              c. Primitive → cached unit mesh (box/sphere/…)
+  │              d. Group/Instance → recurse into children
+  │           3. upload mesh to GPU if not cached
+  │           4. bind material uniforms
+  │           5. glDrawElements(TRIANGLES)
+  │
+  ├─ SceneRenderer::drawWireOverlay(selection)
+  │    └─ re-draw selected object(s) in wireframe with line shader
+  │
+  ├─ SceneRenderer::drawGrid()
+  │    └─ draw reference grid using GridRenderer
+  │
+  └─ ImGui::Render()
+       └─ draw all editor panels on top
+    </pre>
+
+    <h2>Transform Computation</h2>
+    <p>For each object, the world transform matrix is assembled as:</p>
+    <pre><code>M = T(position + pivot) × R_x(rotation.x) × R_y(rotation.y) × R_z(rotation.z)
+          × S(scale) × T(-pivot)</code></pre>
+    <p>Where:</p>
+    <ul>
+      <li><code>T</code> = translation matrix</li>
+      <li><code>R_x/y/z</code> = rotation matrices for Euler angles (XYZ order, degrees)</li>
+      <li><code>S</code> = scale matrix</li>
+      <li><code>pivot</code> = local pivot offset</li>
+    </ul>
+    <p>If an <code>AnimOverride</code> exists for this object's name, the override's position/rotation/scale fields replace the corresponding fields from <code>Mc3Object.transform</code> before the matrix is computed. Fields not present in the override come from the static transform.</p>
+
+    <h2>Mesh Cache</h2>
+    <p>The renderer maintains three caches, all keyed by <code>Mc3Object*</code>:</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Cache map</th><th>Key</th><th>Value</th><th>Invalidated when</th></tr></thead>
+      <tbody>
+        <tr><td><code>renderMeshCache_</code></td><td><code>Mc3Object*</code></td><td><code>RenderMesh</code> (VAO+VBO on GPU)</td><td>undo push (new document → new pointers)</td></tr>
+        <tr><td><code>csgCache_</code></td><td><code>Mc3Object*</code></td><td>Manifold result mesh</td><td>undo push</td></tr>
+        <tr><td><code>objFileCache_</code></td><td><code>std::string</code> (file path)</td><td><code>RenderMesh</code></td><td>not invalidated (files are read-only)</td></tr>
+      </tbody>
+    </table></div>
+    <p>Unit meshes (box, sphere, cylinder, cone, plane) are generated once at renderer startup as geometry and stored in <code>unitMeshes_</code>. They are reused for all primitives of the same type — the only difference between two boxes is the model matrix passed to the shader.</p>
+
+    <h2>Primitive Tessellation</h2>
+    <p>Each primitive type is tessellated on the CPU into a triangle list at startup:</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Type</th><th>Geometry method</th><th>Configurable segments</th></tr></thead>
+      <tbody>
+        <tr><td>Box / Cube</td><td>6 quads (12 triangles)</td><td>No</td></tr>
+        <tr><td>Sphere</td><td>UV sphere, latitude × longitude rings</td><td><code>segments</code> attribute</td></tr>
+        <tr><td>Cylinder</td><td>Cylinder body + top/bottom caps</td><td><code>segments</code> attribute</td></tr>
+        <tr><td>Cone</td><td>Cone body + bottom cap</td><td><code>segments</code> attribute</td></tr>
+        <tr><td>Plane</td><td>2 triangles</td><td>No</td></tr>
+        <tr><td>Extrude</td><td>Cross-section extruded along path, capped</td><td>Path/cross-section <code>segments</code></td></tr>
+      </tbody>
+    </table></div>
+    <p>All primitive vertices include position, normal, and UV coordinates. The shader receives these via a single interleaved VAO.</p>
+
+    <h2>Shader Architecture</h2>
+    <p>MeshCraft uses a small set of GLSL ES 3.00 shaders:</p>
+    <ul>
+      <li><strong>PBR mesh shader</strong> — Blinn-Phong approximation of PBR (roughness + metallic inputs). Supports up to 1 directional light + 1 ambient. Reads <code>baseColor</code>, <code>roughness</code>, <code>metallic</code> uniforms. Texture sampling is optional — a white fallback is used when no texture is bound.</li>
+      <li><strong>Wireframe shader</strong> — flat-colour line shader for selection highlights and grid.</li>
+      <li><strong>Grid shader</strong> — infinite-grid technique drawing a full-screen quad with screen-space distance fade.</li>
+    </ul>
+
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <p>The lighting model is a simplified PBR approximation, not physically correct. It is suitable for scene preview but output does not match a path-traced or full PBR renderer. The exporter (<code>mc3togltf</code>) outputs standard glTF PBR material parameters, which will render correctly in compliant viewers regardless of how they look in the MeshCraft editor viewport.</p>
+      </div>
+    </div>
+
+    <h2>Selection Highlight</h2>
+    <p>After the main opaque pass, selected objects are re-drawn with a slight scale (1.02×) using the wireframe shader and <code>GL_LINES</code>. This produces an outline effect without a stencil buffer. The selection set is stored in <code>MeshCraftApplication::selectedObjects_</code> (a vector of <code>Mc3Object*</code>).</p>
+
+    <h2>Web / Emscripten Rendering</h2>
+    <p>The Emscripten build uses the same EASYGL/OpenGL ES 3.2 path via WebGL 2.0. Frame delivery is handled by <code>emscripten_set_main_loop()</code> instead of a blocking while loop. File access uses IDBFS (IndexedDB) for persistent storage.</p>
+
+    <div class="page-nav">
+      <a href="data-flow.html" class="prev">Data Flow</a>
+      <a href="csg-engine.html" class="next">CSG Engine</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Animation Reference — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section"><div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a><a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a><a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a><a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Format Reference</div>
+      <a href="mc3-format.html">MC3 Format</a><a href="mc3-objects.html">Object Types</a>
+      <a href="mc3-materials.html">Materials &amp; Textures</a>
+      <a href="mc3-animation.html" class="active">Animation</a>
+      <a href="mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a><a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a><a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a><a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="mc3-format.html">Format</a><span class="sep">/</span><span>Animation</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Animation Reference</h1>
+      <p class="subtitle">The <code>&lt;actions&gt;</code> section — keyframe animation for MC3 scenes.</p>
+    </div>
+
+    <h2>Overview</h2>
+    <p>MeshCraft supports keyframe animations via named <strong>actions</strong>. Each action contains <strong>channels</strong>, and each channel animates one scalar property of one named object over time using <strong>keyframes</strong>.</p>
+
+    <h2>Complete Example</h2>
+    <pre><code>&lt;<span class="tag">actions</span>&gt;
+  &lt;<span class="tag">action</span> <span class="atr">name</span>=<span class="val">"Bounce"</span> <span class="atr">duration</span>=<span class="val">"2.0"</span> <span class="atr">loop</span>=<span class="val">"true"</span>&gt;
+    &lt;<span class="tag">channel</span> <span class="atr">target</span>=<span class="val">"BouncingBox"</span> <span class="atr">property</span>=<span class="val">"position.y"</span>&gt;
+      &lt;<span class="tag">keyframe</span> <span class="atr">time</span>=<span class="val">"0.0"</span> <span class="atr">value</span>=<span class="val">"0.0"</span> <span class="atr">interp</span>=<span class="val">"cubic"</span>&gt;
+        &lt;<span class="tag">handle_left</span>  <span class="atr">dt</span>=<span class="val">"-0.2"</span> <span class="atr">dv</span>=<span class="val">"0.0"</span>/&gt;
+        &lt;<span class="tag">handle_right</span> <span class="atr">dt</span>=<span class="val">" 0.2"</span> <span class="atr">dv</span>=<span class="val">"2.0"</span>/&gt;
+      &lt;/<span class="tag">keyframe</span>&gt;
+      &lt;<span class="tag">keyframe</span> <span class="atr">time</span>=<span class="val">"1.0"</span> <span class="atr">value</span>=<span class="val">"3.0"</span> <span class="atr">interp</span>=<span class="val">"cubic"</span>&gt;
+        &lt;<span class="tag">handle_left</span>  <span class="atr">dt</span>=<span class="val">"-0.2"</span> <span class="atr">dv</span>=<span class="val">"2.0"</span>/&gt;
+        &lt;<span class="tag">handle_right</span> <span class="atr">dt</span>=<span class="val">" 0.2"</span> <span class="atr">dv</span>=<span class="val">"-2.0"</span>/&gt;
+      &lt;/<span class="tag">keyframe</span>&gt;
+      &lt;<span class="tag">keyframe</span> <span class="atr">time</span>=<span class="val">"2.0"</span> <span class="atr">value</span>=<span class="val">"0.0"</span> <span class="atr">interp</span>=<span class="val">"linear"</span>/&gt;
+    &lt;/<span class="tag">channel</span>&gt;
+  &lt;/<span class="tag">action</span>&gt;
+
+  &lt;<span class="tag">action</span> <span class="atr">name</span>=<span class="val">"Spin"</span> <span class="atr">duration</span>=<span class="val">"3.0"</span> <span class="atr">loop</span>=<span class="val">"true"</span>&gt;
+    &lt;<span class="tag">channel</span> <span class="atr">target</span>=<span class="val">"SpinningSphere"</span> <span class="atr">property</span>=<span class="val">"rotation.y"</span>&gt;
+      &lt;<span class="tag">keyframe</span> <span class="atr">time</span>=<span class="val">"0.0"</span>  <span class="atr">value</span>=<span class="val">"0.0"</span>   <span class="atr">interp</span>=<span class="val">"linear"</span>/&gt;
+      &lt;<span class="tag">keyframe</span> <span class="atr">time</span>=<span class="val">"3.0"</span>  <span class="atr">value</span>=<span class="val">"360.0"</span> <span class="atr">interp</span>=<span class="val">"linear"</span>/&gt;
+    &lt;/<span class="tag">channel</span>&gt;
+  &lt;/<span class="tag">action</span>&gt;
+
+  &lt;<span class="tag">action</span> <span class="atr">name</span>=<span class="val">"Flash"</span> <span class="atr">duration</span>=<span class="val">"2.0"</span> <span class="atr">loop</span>=<span class="val">"true"</span>&gt;
+    &lt;<span class="tag">channel</span> <span class="atr">target</span>=<span class="val">"FadingPlane"</span> <span class="atr">property</span>=<span class="val">"visible"</span>&gt;
+      &lt;<span class="tag">keyframe</span> <span class="atr">time</span>=<span class="val">"0.0"</span> <span class="atr">value</span>=<span class="val">"1.0"</span> <span class="atr">interp</span>=<span class="val">"step"</span>/&gt;
+      &lt;<span class="tag">keyframe</span> <span class="atr">time</span>=<span class="val">"0.5"</span> <span class="atr">value</span>=<span class="val">"0.0"</span> <span class="atr">interp</span>=<span class="val">"step"</span>/&gt;
+      &lt;<span class="tag">keyframe</span> <span class="atr">time</span>=<span class="val">"1.0"</span> <span class="atr">value</span>=<span class="val">"1.0"</span> <span class="atr">interp</span>=<span class="val">"step"</span>/&gt;
+    &lt;/<span class="tag">channel</span>&gt;
+  &lt;/<span class="tag">action</span>&gt;
+&lt;/<span class="tag">actions</span>&gt;</code></pre>
+
+    <h2>action attributes</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>name</code></td><td>string</td><td>—</td><td>Unique clip name</td></tr>
+        <tr><td><code>duration</code></td><td>float</td><td><code>1.0</code></td><td>Clip length in seconds</td></tr>
+        <tr><td><code>loop</code></td><td>boolean</td><td><code>false</code></td><td>Loop when end is reached</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>channel attributes</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>target</code></td><td>Name of the scene object (<code>Mc3Object.name</code>) to animate.</td></tr>
+        <tr><td><code>property</code></td><td>Which property to animate (see table below).</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>keyframe attributes</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>time</code></td><td>float</td><td>Time in seconds (keyframes sorted ascending on load)</td></tr>
+        <tr><td><code>value</code></td><td>float</td><td>Property value at this time</td></tr>
+        <tr><td><code>interp</code></td><td><code>linear</code>|<code>step</code>|<code>cubic</code></td><td>Interpolation <em>to the next keyframe</em></td></tr>
+      </tbody>
+    </table></div>
+    <p>For <code>interp="cubic"</code>, optional child elements specify tangent handles (offsets from the keyframe's (time, value)):</p>
+    <pre><code>&lt;<span class="tag">handle_left</span>  <span class="atr">dt</span>=<span class="val">"-0.2"</span> <span class="atr">dv</span>=<span class="val">"0.0"</span>/&gt;   <span class="cmt">&lt;!-- in-tangent --&gt;</span>
+&lt;<span class="tag">handle_right</span> <span class="atr">dt</span>=<span class="val">" 0.2"</span> <span class="atr">dv</span>=<span class="val">"1.5"</span>/&gt;   <span class="cmt">&lt;!-- out-tangent --&gt;</span></code></pre>
+
+    <h2>Animatable Properties</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Property name</th><th>Unit</th><th>glTF export</th></tr></thead>
+      <tbody>
+        <tr><td><code>position.x/y/z</code></td><td>world units</td><td>translation VEC3</td></tr>
+        <tr><td><code>rotation.x/y/z</code></td><td>degrees</td><td>quaternion VEC4</td></tr>
+        <tr><td><code>scale.x/y/z</code></td><td>factor</td><td>scale VEC3</td></tr>
+        <tr><td><code>visible</code></td><td>0=false, ≥0.5=true</td><td><em>not exported</em></td></tr>
+        <tr><td><code>deform.x/y/z</code></td><td>factor</td><td><em>not exported</em></td></tr>
+        <tr><td><code>material.baseColor.r/g/b/a</code></td><td>0–1</td><td><em>not exported</em></td></tr>
+        <tr><td><code>material.roughness</code></td><td>0–1</td><td><em>not exported</em></td></tr>
+        <tr><td><code>material.metallic</code></td><td>0–1</td><td><em>not exported</em></td></tr>
+        <tr><td><code>material.emissive.r/g/b</code></td><td>0–1</td><td><em>not exported</em></td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>glTF Export Notes</h2>
+    <ul>
+      <li>Position, rotation, and scale channels are exported as glTF <code>animations[]</code>.</li>
+      <li>Per-component channels (e.g., <code>position.y</code> only) are merged into VEC3/VEC4; non-animated components fall back to the base transform value.</li>
+      <li>Cubic Bézier channels are sampled at 30 fps and exported as <code>LINEAR</code> interpolation (glTF has no native cubic Bézier).</li>
+      <li><code>visible</code>, <code>deform.*</code>, and <code>material.*</code> channels have no glTF equivalent and are silently skipped.</li>
+    </ul>
+
+    <div class="page-nav">
+      <a href="mc3-materials.html" class="prev">Materials &amp; Textures</a>
+      <a href="../tutorials/index.html" class="next">Tutorials</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

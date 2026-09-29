@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Class Reference — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="index.html" class="active">All Classes</a>
+      <a href="MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="Mc3Document.html">Mc3Document</a><a href="Mc3Object.html">Mc3Object</a>
+      <a href="SceneRenderer.html">SceneRenderer</a><a href="EditorCamera.html">EditorCamera</a>
+      <a href="Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a><a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a><a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a><a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a><a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a><a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><span>Class Reference</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Class Reference</h1>
+      <p class="subtitle">Important public classes, structs, and enums in MeshCraft.</p>
+    </div>
+
+    <h2>Application</h2>
+    <div class="card-grid">
+      <a href="MeshCraftApplication.html" class="card">
+        <div class="card-icon">🎮</div>
+        <div class="card-title">MeshCraftApplication</div>
+        <div class="card-desc">Central class. CNA Game subclass. Owns all editor state, coordinates Update/Draw, hosts ImGui UI.</div>
+      </a>
+    </div>
+
+    <h2>Scene Data (mc3 library)</h2>
+    <div class="card-grid">
+      <a href="Mc3Document.html" class="card">
+        <div class="card-icon">📄</div>
+        <div class="card-title">Mc3Document</div>
+        <div class="card-desc">Top-level scene container: objects, materials, textures, lights, cameras, definitions, actions.</div>
+      </a>
+      <a href="Mc3Object.html" class="card">
+        <div class="card-icon">📦</div>
+        <div class="card-title">Mc3Object</div>
+        <div class="card-desc">Scene graph node. Holds ObjectType, transform, material reference, optional shape data, and children.</div>
+      </a>
+      <a href="Mc3Animation.html" class="card">
+        <div class="card-icon">🎞️</div>
+        <div class="card-title">Mc3Animation</div>
+        <div class="card-desc">Mc3Action, Mc3Channel, Mc3Keyframe — the keyframe animation data model and evaluator.</div>
+      </a>
+    </div>
+
+    <h2>Renderer</h2>
+    <div class="card-grid">
+      <a href="SceneRenderer.html" class="card">
+        <div class="card-icon">🖼️</div>
+        <div class="card-title">SceneRenderer</div>
+        <div class="card-desc">Renders the full MC3 scene: unit meshes, CSG evaluation, textures, gizmos, wireframe overlay.</div>
+      </a>
+    </div>
+
+    <h2>Editor</h2>
+    <div class="card-grid">
+      <a href="EditorCamera.html" class="card">
+        <div class="card-icon">📷</div>
+        <div class="card-title">EditorCamera</div>
+        <div class="card-desc">Orbit/pan/zoom/focus camera model. Produces view + projection matrices and screen-ray directions for picking.</div>
+      </a>
+    </div>
+
+    <h2>All Data Types (Quick Reference)</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Type</th><th>Namespace</th><th>File</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><code>MeshCraftApplication</code></td><td><code>MeshCraft</code></td><td><code>include/MeshCraft/MeshCraftApplication.hpp</code></td><td>Main application class</td></tr>
+          <tr><td><code>Mc3Document</code></td><td><code>MeshCraft::Mc3</code></td><td><code>mc3/include/…/Mc3Document.hpp</code></td><td>Scene data root</td></tr>
+          <tr><td><code>Mc3Object</code></td><td><code>MeshCraft::Mc3</code></td><td><code>mc3/include/…/Mc3Object.hpp</code></td><td>Scene graph node</td></tr>
+          <tr><td><code>ObjectType</code></td><td><code>MeshCraft::Mc3</code></td><td><code>Mc3Object.hpp</code></td><td>Enum of all object types</td></tr>
+          <tr><td><code>Mc3Transform</code></td><td><code>MeshCraft::Mc3</code></td><td><code>Mc3Transform.hpp</code></td><td>Position/rotation/scale/pivot</td></tr>
+          <tr><td><code>Mc3Primitive</code></td><td><code>MeshCraft::Mc3</code></td><td><code>Mc3Primitive.hpp</code></td><td>Shape params (box/sphere/etc.)</td></tr>
+          <tr><td><code>Mc3Extrude</code></td><td><code>MeshCraft::Mc3</code></td><td><code>Mc3Extrude.hpp</code></td><td>Extrude cross-section + path</td></tr>
+          <tr><td><code>Mc3Material</code></td><td><code>MeshCraft::Mc3</code></td><td><code>Mc3Material.hpp</code></td><td>PBR material</td></tr>
+          <tr><td><code>Mc3Texture</code></td><td><code>MeshCraft::Mc3</code></td><td><code>Mc3Texture.hpp</code></td><td>Texture definition</td></tr>
+          <tr><td><code>Mc3Light</code></td><td><code>MeshCraft::Mc3</code></td><td><code>Mc3Light.hpp</code></td><td>Light types</td></tr>
+          <tr><td><code>Mc3Camera</code></td><td><code>MeshCraft::Mc3</code></td><td><code>Mc3Camera.hpp</code></td><td>Camera types</td></tr>
+          <tr><td><code>Mc3Environment</code></td><td><code>MeshCraft::Mc3</code></td><td><code>Mc3Environment.hpp</code></td><td>Background + fog</td></tr>
+          <tr><td><code>Mc3Action</code></td><td><code>MeshCraft::Mc3</code></td><td><code>Mc3Animation.hpp</code></td><td>Animation clip</td></tr>
+          <tr><td><code>Mc3Channel</code></td><td><code>MeshCraft::Mc3</code></td><td><code>Mc3Animation.hpp</code></td><td>Per-property animation channel</td></tr>
+          <tr><td><code>Mc3Keyframe</code></td><td><code>MeshCraft::Mc3</code></td><td><code>Mc3Animation.hpp</code></td><td>Time/value/interpolation</td></tr>
+          <tr><td><code>SceneRenderer</code></td><td><code>MeshCraft::Renderer</code></td><td><code>include/…/Renderer/SceneRenderer.hpp</code></td><td>3D viewport renderer</td></tr>
+          <tr><td><code>AnimOverride</code></td><td><code>MeshCraft::Renderer</code></td><td><code>SceneRenderer.hpp</code></td><td>Per-object animation override</td></tr>
+          <tr><td><code>RenderMesh</code></td><td><code>MeshCraft::Renderer</code></td><td><code>SceneRenderer.hpp</code></td><td>VB+IB pair for a mesh</td></tr>
+          <tr><td><code>EditorCamera</code></td><td><code>MeshCraft::Editor</code></td><td><code>include/…/Editor/EditorCamera.hpp</code></td><td>Orbit camera</td></tr>
+          <tr><td><code>SelectionManager</code></td><td><code>MeshCraft::Editor</code></td><td><code>SelectionManager.hpp</code></td><td>Selection tracking</td></tr>
+          <tr><td><code>TransformGizmo</code></td><td><code>MeshCraft::Editor</code></td><td><code>TransformGizmo.hpp</code></td><td>Gizmo mode + drag state</td></tr>
+          <tr><td><code>ActiveTool</code></td><td><code>MeshCraft</code></td><td><code>MeshCraftApplication.hpp</code></td><td>Enum: Select/Move/Rotate/Scale/Add*</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

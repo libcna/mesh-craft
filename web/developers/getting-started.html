@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Getting Started — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../assets/style.css"/>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <a href="index.html">
+      <div class="logo-icon">M</div>
+      <div class="logo-text">
+        <span class="logo-name">Mesh Craft</span>
+        <span class="logo-sub">Developer Docs</span>
+      </div>
+    </a>
+  </div>
+    <div class="section-switch"><a href="../users/index.html" class="">Users</a><a href="../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="index.html">Overview</a>
+      <a href="getting-started.html" class="active">Getting Started</a>
+      <a href="build.html">Build &amp; Run</a>
+      <a href="project-structure.html">Project Structure</a>
+      <a href="architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="modules/index.html">All Modules</a>
+      <a href="modules/mc3-library.html">MC3 Library</a>
+      <a href="modules/mc3togltf.html">mc3togltf</a>
+      <a href="modules/editor.html">Editor</a>
+      <a href="modules/renderer.html">Renderer</a>
+      <a href="modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="classes/index.html">All Classes</a>
+      <a href="classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="classes/Mc3Document.html">Mc3Document</a>
+      <a href="classes/Mc3Object.html">Mc3Object</a>
+      <a href="classes/SceneRenderer.html">SceneRenderer</a>
+      <a href="classes/EditorCamera.html">EditorCamera</a>
+      <a href="classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="api/mc3-format.html">MC3 Format</a>
+      <a href="api/mc3-objects.html">Object Types</a>
+      <a href="api/mc3-materials.html">Materials &amp; Textures</a>
+      <a href="api/mc3-animation.html">Animation</a>
+      <a href="api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="tutorials/index.html">All Tutorials</a>
+      <a href="tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="tutorials/loading-scene.html">Loading a Scene</a>
+      <a href="tutorials/csg-operations.html">CSG Operations</a>
+      <a href="tutorials/export-gltf.html">Export to glTF/GLB</a>
+      <a href="tutorials/animation.html">Keyframe Animation</a>
+      <a href="tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="internals/index.html">Overview</a>
+      <a href="internals/data-flow.html">Data Flow</a>
+      <a href="internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="internals/csg-engine.html">CSG Engine</a>
+      <a href="internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License
+  </div>
+</aside>
+
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb">
+      <a href="index.html">Developers</a>
+      <span class="sep">/</span>
+      <span>Getting Started</span>
+    </div>
+    <div class="topbar-search">
+      <input type="search" id="searchInput" placeholder="Search docs… (/)"/>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Getting Started</h1>
+      <p class="subtitle">From zero to a running MeshCraft editor in minutes.</p>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <p>This page builds MeshCraft <strong>from source</strong> — it's for contributors. If someone already built the editor for you and you just want to learn how to use it, skip straight to <a href="../users/index.html">the Users section</a>.</p>
+      </div>
+    </div>
+
+    <h2>Prerequisites</h2>
+
+    <h3>Sibling Repositories</h3>
+    <p>These two repos must exist <em>next to</em> <code>mesh-craft/</code>:</p>
+    <ul>
+      <li><strong>cna</strong> — XNA-like C++ runtime (SDL3 + OpenGL ES 3.2)</li>
+      <li><strong>sharp-runtime</strong> — C++ math and system layer</li>
+    </ul>
+
+    <h3>Compiler</h3>
+    <p>MeshCraft requires a C++23-capable compiler:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Compiler</th><th>Minimum Version</th></tr></thead>
+        <tbody>
+          <tr><td>GCC</td><td>13+</td></tr>
+          <tr><td>Clang</td><td>16+</td></tr>
+          <tr><td>MSVC</td><td>2022 (17.6+)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Build Tools</h3>
+    <ul>
+      <li><strong>CMake 3.21</strong> or newer</li>
+      <li><strong>Ninja</strong> (recommended) or GNU Make</li>
+      <li><strong>Git</strong> (for cloning sibling repositories)</li>
+      <li><strong>Python 3</strong> (for running the glTF test suite — optional)</li>
+    </ul>
+
+    <h3>System Libraries (Linux)</h3>
+    <pre><code>sudo apt install libgles2-mesa-dev libgl-dev libsdl3-dev</code></pre>
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <p>The exact packages depend on how CNA resolves SDL3 and OpenGL. SDL3 may also be fetched and built by CNA's own CMakeLists.txt.</p>
+      </div>
+    </div>
+
+    <h2>Cloning the Repositories</h2>
+    <p>MeshCraft depends on two sibling repositories that must exist <em>next to</em> the <code>mesh-craft</code> directory:</p>
+    <pre><code>mkdir openeggbert && cd openeggbert
+
+git clone https://github.com/openeggbert/cna
+git clone https://github.com/openeggbert/sharp-runtime
+git clone https://github.com/openeggbert/mesh-craft
+
+ls
+<span class="cmt"># cna  sharp-runtime  mesh-craft</span></code></pre>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>Directory layout is strict</strong>
+        <p>CMakeLists.txt uses <code>add_subdirectory(../cna CNA_dep)</code>. If the sibling repos are not at the expected relative paths, the build will fail immediately with a CMake error.</p>
+      </div>
+    </div>
+
+    <h2>Configuring and Building</h2>
+    <pre><code>cd mesh-craft
+
+<span class="cmt"># Configure</span>
+cmake -S . -B cmake-build-debug
+
+<span class="cmt"># Build everything: editor + mc3togltf + mc3tomcb (all CPU cores)</span>
+ninja -C cmake-build-debug</code></pre>
+
+    <p>The first build downloads ImGui, Manifold, and tinyobjloader via CMake's <code>FetchContent</code>. This requires internet access. Subsequent builds use the cached downloads.</p>
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <p>If you add new <code>.cpp</code> files after the initial configure, run <code>cmake -S . -B cmake-build-debug -DFETCHCONTENT_UPDATES_DISCONNECTED=ON</code> to re-scan the source tree.</p>
+      </div>
+    </div>
+
+    <h2>Running the Editor</h2>
+    <pre><code><span class="cmt"># Open an empty new scene</span>
+./cmake-build-debug/MeshCraft
+
+<span class="cmt"># Open an existing test scene</span>
+./cmake-build-debug/MeshCraft test/house.mc3.xml
+
+<span class="cmt"># Auto-screenshot mode (exits after ~2 s — useful for CI)</span>
+./cmake-build-debug/MeshCraft test/house.mc3.xml --screenshot /tmp/editor.ppm</code></pre>
+
+    <h2>Keyboard Shortcuts</h2>
+
+    <h3>File Operations</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><code>Ctrl+N</code></td><td>New scene</td></tr>
+          <tr><td><code>Ctrl+O</code></td><td>Open file (in-editor dialog)</td></tr>
+          <tr><td><code>Ctrl+S</code></td><td>Save</td></tr>
+          <tr><td><code>Ctrl+Shift+S</code></td><td>Save As</td></tr>
+          <tr><td><code>Ctrl+E</code></td><td>Export to GLB (via mc3togltf)</td></tr>
+          <tr><td><code>F11</code></td><td>Save screenshot to <code>screenshot.ppm</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Edit Operations</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><code>Ctrl+Z</code></td><td>Undo (up to 20 steps)</td></tr>
+          <tr><td><code>Ctrl+Y</code></td><td>Redo</td></tr>
+          <tr><td><code>Ctrl+D</code></td><td>Duplicate selection</td></tr>
+          <tr><td><code>Ctrl+A</code></td><td>Select all objects (or all children in group)</td></tr>
+          <tr><td><code>Ctrl+G</code></td><td>Group selected objects</td></tr>
+          <tr><td><code>Ctrl+Shift+G</code></td><td>Ungroup selected group</td></tr>
+          <tr><td><code>Ctrl+X / C / V</code></td><td>Cut / Copy / Paste</td></tr>
+          <tr><td><code>Delete</code></td><td>Delete selected objects</td></tr>
+          <tr><td><code>Ctrl+Up / Down</code></td><td>Reorder selected object among its siblings in hierarchy</td></tr>
+          <tr><td><code>Ctrl+Shift+P</code></td><td>Copy properties from active object to all selected</td></tr>
+          <tr><td><code>P</code></td><td>Select parent of currently selected object</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Transform Tools</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><code>Q</code></td><td>Select tool (no gizmo)</td></tr>
+          <tr><td><code>G</code></td><td>Move (Translate) gizmo</td></tr>
+          <tr><td><code>R</code></td><td>Rotate gizmo</td></tr>
+          <tr><td><code>S</code></td><td>Scale gizmo</td></tr>
+          <tr><td><code>Shift</code> (hold while dragging)</td><td>Vertex snap — snap position to nearest vertex of another object</td></tr>
+          <tr><td><code>Ctrl</code> (hold during rotate)</td><td>Angle snap — lock rotation to 15°/45°/90° increments</td></tr>
+          <tr><td><code>Arrow keys</code></td><td>Nudge selected object ±0.1 units on X/Y axis</td></tr>
+          <tr><td><code>Page Up / Page Down</code></td><td>Nudge selected object ±0.1 units on Z axis</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Viewport</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><code>F</code></td><td>Focus camera on selection (reset view if nothing selected)</td></tr>
+          <tr><td><code>Alt+W</code></td><td>Toggle full-scene wireframe overlay</td></tr>
+          <tr><td><code>B</code></td><td>Toggle bounding box display around selected objects</td></tr>
+          <tr><td>Viewport overlay buttons</td><td>Click Front / Top / Right / Perspective icons to snap to preset camera views</td></tr>
+          <tr><td>Ortho/Persp button (toolbar)</td><td>Toggle orthographic ↔ perspective projection</td></tr>
+          <tr><td>World/Local button (toolbar)</td><td>Toggle gizmo between world-space and local-space axes</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Add Primitives</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><code>F1</code></td><td>Add Box</td></tr>
+          <tr><td><code>F2</code></td><td>Add Sphere</td></tr>
+          <tr><td><code>F3</code></td><td>Add Cylinder</td></tr>
+          <tr><td><code>F4</code></td><td>Add Cone</td></tr>
+          <tr><td><code>F5</code></td><td>Add Plane</td></tr>
+          <tr><td>Menu: Add → Primitive</td><td>Torus, Capsule, Disk, Grid, Ico-sphere, Extrude, CSG Union/Difference/Intersection</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Animation &amp; Tools</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><code>Ctrl+T</code></td><td>Toggle timeline panel</td></tr>
+          <tr><td><code>Space</code></td><td>Play / pause animation</td></tr>
+          <tr><td><code>K</code></td><td>Insert keyframe for selected object at current time</td></tr>
+          <tr><td><code>Ctrl+P</code></td><td>Open Command Palette (search objects and commands)</td></tr>
+          <tr><td><code>M</code></td><td>Activate Measurement Tool (click two points to show distance)</td></tr>
+          <tr><td><code>F5</code></td><td>Enter / exit first-person Walk Mode</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Walk Mode Controls (while active)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Input</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><code>W / A / S / D</code> or Arrow keys</td><td>Move forward / left / back / right</td></tr>
+          <tr><td>Mouse move</td><td>Look around (yaw + pitch)</td></tr>
+          <tr><td><code>Ctrl</code></td><td>Jump</td></tr>
+          <tr><td><code>Esc</code> or "Exit Walk Mode" HUD button</td><td>Return to editor</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Camera Controls</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Input</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td>Middle-mouse drag</td><td>Orbit</td></tr>
+          <tr><td>Right-mouse drag</td><td>Pan</td></tr>
+          <tr><td>Scroll wheel</td><td>Zoom in/out</td></tr>
+          <tr><td><code>F</code></td><td>Focus on selection (reset view if nothing selected)</td></tr>
+          <tr><td>Numpad 1</td><td>Front view (yaw=0°, pitch=0°)</td></tr>
+          <tr><td>Numpad 3</td><td>Right view (yaw=90°, pitch=0°)</td></tr>
+          <tr><td>Numpad 5</td><td>Back view (yaw=180°, pitch=0°)</td></tr>
+          <tr><td>Numpad 7</td><td>Top view (yaw=0°, pitch≈84°)</td></tr>
+          <tr><td>Numpad 9</td><td>Bottom view (yaw=0°, pitch≈−84°)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>CLI Tools</h2>
+    <p>Both converter tools are built as part of the top-level build (<code>ninja -C cmake-build-debug</code>) and land in <code>cmake-build-debug/</code>:</p>
+
+    <h3>mc3togltf — Export to glTF/GLB</h3>
+    <pre><code><span class="cmt"># Export scene to GLB</span>
+./cmake-build-debug/mc3togltf/mc3togltf test/house.mc3.xml /tmp/house.glb
+
+<span class="cmt"># Export with approximate CSG (children exported as separate meshes)</span>
+./cmake-build-debug/mc3togltf/mc3togltf --allow-approximate-csg scene.mc3.xml out.glb</code></pre>
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <p>By default, any scene containing CSG nodes (<code>&lt;union&gt;</code>, <code>&lt;difference&gt;</code>, <code>&lt;intersection&gt;</code>) causes mc3togltf to exit with an error. Pass <code>--allow-approximate-csg</code> to export children as separate meshes instead (geometrically incorrect but useful for review).</p>
+      </div>
+    </div>
+
+    <h3>mc3tomcb — Convert to/from MCB Binary</h3>
+    <p>MCB is a compact binary format (<code>.mcb</code>) for fast runtime loading. The converter works in both directions:</p>
+    <pre><code><span class="cmt"># XML → MCB (for runtime use)</span>
+./cmake-build-debug/mc3tomcb/mc3tomcb scene.mc3.xml scene.mcb
+
+<span class="cmt"># MCB → XML (to inspect or edit a binary scene)</span>
+./cmake-build-debug/mc3tomcb/mc3tomcb scene.mcb scene.mc3.xml</code></pre>
+
+    <h2>Running the Tests</h2>
+    <pre><code>ctest --test-dir cmake-build-debug -V</code></pre>
+    <p>This runs two test suites:</p>
+    <ol>
+      <li><strong>smoke_test</strong> — launches the editor with <code>test/house.mc3.xml</code>, takes a screenshot, and verifies the file is ≥ 1 MB.</li>
+      <li><strong>mc3_roundtrip</strong> — 114 XML round-trip checks covering all MC3 field types and animation data.</li>
+    </ol>
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <p>If the smoke test fails with a display error, set <code>DISPLAY=:0</code> or use a virtual framebuffer (<code>Xvfb</code>) for headless CI environments.</p>
+      </div>
+    </div>
+
+    <h2>Next Steps</h2>
+    <div class="card-grid">
+      <a href="tutorials/minimal-example.html" class="card">
+        <div class="card-icon">📖</div>
+        <div class="card-title">Minimal Scene Tutorial</div>
+        <div class="card-desc">Create your first MC3 scene from scratch.</div>
+      </a>
+      <a href="api/mc3-format.html" class="card">
+        <div class="card-icon">📜</div>
+        <div class="card-title">MC3 Format Reference</div>
+        <div class="card-desc">Full XML schema reference for .mc3.xml files.</div>
+      </a>
+      <a href="architecture.html" class="card">
+        <div class="card-icon">🏛️</div>
+        <div class="card-title">Architecture</div>
+        <div class="card-desc">How the editor's subsystems are organized.</div>
+      </a>
+    </div>
+
+    <div class="page-nav">
+      <a href="index.html" class="prev">Overview</a>
+      <a href="build.html" class="next">Build &amp; Run</a>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/script.js"></script>
+</body>
+</html>

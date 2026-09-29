@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>MC3 Library — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a>
+      <a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a>
+      <a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="index.html">All Modules</a>
+      <a href="mc3-library.html" class="active">MC3 Library</a>
+      <a href="mc3togltf.html">mc3togltf</a>
+      <a href="editor.html">Editor</a>
+      <a href="renderer.html">Renderer</a>
+      <a href="scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a>
+      <a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a>
+      <a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a>
+      <a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a>
+      <a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a>
+      <a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a>
+      <a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a>
+      <a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a>
+      <a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a>
+      <a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a>
+      <a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Modules</a><span class="sep">/</span><span>MC3 Library</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>MC3 Library (<code>mc3/</code>)</h1>
+      <p class="subtitle">Pure-C++ scene data model, XML parser, XML writer, and animation system. No graphics dependency.</p>
+    </div>
+
+    <h2>Purpose</h2>
+    <p>
+      The <code>mc3/</code> directory builds as a static library (<code>libMc3.a</code>) that is shared between the
+      MeshCraft editor and the <code>mc3togltf</code> converter. It has <strong>no dependency on CNA, OpenGL, SDL, or ImGui</strong> — it is a pure data + I/O library.
+    </p>
+
+    <h2>Key Files</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>File</th><th>Role</th></tr></thead>
+        <tbody>
+          <tr><td><code>include/MeshCraft/Mc3/Mc3Document.hpp</code></td><td>Top-level scene container. Holds all objects, materials, textures, lights, cameras, definitions, and actions.</td></tr>
+          <tr><td><code>include/MeshCraft/Mc3/Mc3Object.hpp</code></td><td>Single scene graph node. Has <code>ObjectType</code> enum and optional primitive/extrude/CSG data + children.</td></tr>
+          <tr><td><code>include/MeshCraft/Mc3/Mc3Transform.hpp</code></td><td>Position / rotation (XYZ Euler, degrees) / scale / pivot.</td></tr>
+          <tr><td><code>include/MeshCraft/Mc3/Mc3Primitive.hpp</code></td><td>Shape parameters for box, sphere, cylinder, cone, plane.</td></tr>
+          <tr><td><code>include/MeshCraft/Mc3/Mc3Extrude.hpp</code></td><td>Cross-section and path types for extrude objects.</td></tr>
+          <tr><td><code>include/MeshCraft/Mc3/Mc3Material.hpp</code></td><td>PBR material: baseColor, roughness, metallic, emissive, texture slots.</td></tr>
+          <tr><td><code>include/MeshCraft/Mc3/Mc3Texture.hpp</code></td><td>Texture definition: uri, wrap modes, filter, color space.</td></tr>
+          <tr><td><code>include/MeshCraft/Mc3/Mc3Light.hpp</code></td><td>Ambient / Directional / Point / Spot light types.</td></tr>
+          <tr><td><code>include/MeshCraft/Mc3/Mc3Camera.hpp</code></td><td>Perspective / orthographic camera with position, target, FOV.</td></tr>
+          <tr><td><code>include/MeshCraft/Mc3/Mc3Animation.hpp</code></td><td>Action / Channel / Keyframe types, interpolation modes, <code>evaluateChannel()</code>.</td></tr>
+          <tr><td><code>src/Mc3XmlParser.hpp/.cpp</code></td><td>Reads <code>.mc3.xml</code> into the data model using tinyxml2.</td></tr>
+          <tr><td><code>src/Mc3XmlWriter.hpp/.cpp</code></td><td>Serializes the data model back to XML (used by Save/Save As).</td></tr>
+          <tr><td><code>src/MathUtils.hpp</code></td><td>Inline helpers: degree/radian conversion, vector normalization.</td></tr>
+          <tr><td><code>mc3.xsd</code></td><td>XML Schema Definition for the MC3 format v0.3.</td></tr>
+          <tr><td><code>MC3_FORMAT.md</code></td><td>Authoritative format specification (version 0.3).</td></tr>
+          <tr><td><code>test/roundtrip_test.cpp</code></td><td>114 assertions that verify every field round-trips through XML without loss.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Data Model Hierarchy</h2>
+    <pre><code><span class="cls">Mc3Document</span>
+├── version: string  (e.g. "0.3")
+├── model: string    (scene name)
+├── unit: string     (e.g. "meter")
+├── sourcePath: filesystem::path
+│
+├── environment: optional&lt;<span class="cls">Mc3Environment</span>&gt;
+│   └── background (color, texture), fog (mode, color, start, end, density)
+│
+├── lights: vector&lt;<span class="cls">Mc3Light</span>&gt;
+│   └── type (Ambient/Directional/Point/Spot), name, color, brightness, ...
+│
+├── cameras: vector&lt;<span class="cls">Mc3Camera</span>&gt;
+│   └── type, name, position, target, fov, near, far, ...
+│
+├── textures: map&lt;string, <span class="cls">Mc3Texture</span>&gt;
+│   └── uri, wrapU, wrapV, filter, colorSpace, mipMaps
+│
+├── materials: map&lt;string, <span class="cls">Mc3Material</span>&gt;
+│   └── baseColor[4], roughness, metallic, emissive[3], texture slots, alphaMode
+│
+├── definitions: map&lt;string, shared_ptr&lt;<span class="cls">Mc3Object</span>&gt;&gt;
+│
+├── objects: vector&lt;shared_ptr&lt;<span class="cls">Mc3Object</span>&gt;&gt;
+│   └── (scene graph roots)
+│
+└── actions: map&lt;string, <span class="cls">Mc3Action</span>&gt;
+    └── duration, loop, channels (target + property + keyframes)
+
+<span class="cls">Mc3Object</span>
+├── type: ObjectType   (Box, Sphere, Cylinder, Cone, Plane, Mesh,
+│                       Extrude, Group, Instance, Union,
+│                       Difference, Intersection, Area)
+├── name, id, material (IDREF)
+├── transform: <span class="cls">Mc3Transform</span>  (position, rotation[XYZ Euler °], scale, pivot)
+├── deform: optional&lt;<span class="cls">Mc3Deform</span>&gt;
+├── primitive: optional&lt;<span class="cls">Mc3Primitive</span>&gt;
+├── extrude:   optional&lt;<span class="cls">Mc3Extrude</span>&gt;
+├── csgOperation: optional&lt;<span class="cls">Mc3CsgOperation</span>&gt;
+├── isCutter: bool
+├── definition: string  (type == Instance)
+├── meshSource: string  (type == Mesh)
+├── visible, collision, tags
+└── children: vector&lt;shared_ptr&lt;<span class="cls">Mc3Object</span>&gt;&gt;</code></pre>
+
+    <h2>XML Parsing</h2>
+    <p><code>Mc3XmlParser</code> uses <strong>tinyxml2</strong>. It parses the document top-down:</p>
+    <ol>
+      <li>Reads root <code>&lt;mc3&gt;</code> attributes (version, model, unit, rotation_units, euler_order)</li>
+      <li>Reads each top-level section: <code>&lt;environment&gt;</code>, <code>&lt;lights&gt;</code>, <code>&lt;cameras&gt;</code>, <code>&lt;textures&gt;</code>, <code>&lt;materials&gt;</code>, <code>&lt;definitions&gt;</code>, <code>&lt;objects&gt;</code>, <code>&lt;actions&gt;</code></li>
+      <li>Each object element is parsed recursively, building the child tree</li>
+      <li>Sets <code>Mc3Document.sourcePath</code> to the directory of the XML file (used for resolving relative texture/mesh paths)</li>
+    </ol>
+
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <p>The <code>mc3togltf/</code> converter has its own <em>copy</em> of the XML parser (<code>mc3togltf/src/Mc3XmlParser.*</code>) rather than linking the <code>mc3/</code> library. This keeps the converter self-contained. If you change the MC3 format, update both parsers.</p>
+      </div>
+    </div>
+
+    <h2>Animation System</h2>
+    <p>Defined in <code>Mc3Animation.hpp</code>:</p>
+    <ul>
+      <li><strong><code>Mc3Action</code></strong> — a named clip with a duration, loop flag, and list of channels.</li>
+      <li><strong><code>Mc3Channel</code></strong> — animates one <code>AnimatedProperty</code> of one named object.</li>
+      <li><strong><code>Mc3Keyframe</code></strong> — time, value, interpolation mode, and optional Bézier tangent handles.</li>
+      <li><strong><code>evaluateChannel(ch, time)</code></strong> — evaluates a channel at a given time using the correct interpolation (Step, Linear, or Cubic Bézier).</li>
+    </ul>
+    <p>See <a href="../api/mc3-animation.html">Animation API Reference</a> for the full list of animatable properties.</p>
+
+    <h2>Known Limitations</h2>
+    <div class="callout todo">
+      <span class="callout-icon">📋</span>
+      <div class="callout-body">
+        <strong>Areas still needing work</strong>
+        <ul>
+          <li>UV mapping (<code>&lt;uv_mapping&gt;</code>) is parsed but not yet fully wired into the editor UI (noted as TODO in <code>Mc3Object.hpp</code>).</li>
+          <li>Object states (<code>&lt;states&gt;</code>) are defined in the format spec but not yet in the C++ data model.</li>
+          <li>Action triggers (<code>&lt;triggers&gt;</code>) are spec'd but not implemented.</li>
+          <li>The <code>Mc3Document::version</code> field defaults to "0.1" even though the active format is v0.3 — needs updating.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Related Pages</h2>
+    <ul>
+      <li><a href="../classes/Mc3Document.html">Mc3Document class reference</a></li>
+      <li><a href="../classes/Mc3Object.html">Mc3Object class reference</a></li>
+      <li><a href="../classes/Mc3Animation.html">Mc3Animation class reference</a></li>
+      <li><a href="../api/mc3-format.html">MC3 Format Reference</a></li>
+    </ul>
+
+    <div class="page-nav">
+      <a href="index.html" class="prev">All Modules</a>
+      <a href="mc3togltf.html" class="next">mc3togltf</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

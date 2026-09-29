@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Build &amp; Run — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../users/index.html" class="">Users</a><a href="../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="index.html">Overview</a>
+      <a href="getting-started.html">Getting Started</a>
+      <a href="build.html" class="active">Build &amp; Run</a>
+      <a href="project-structure.html">Project Structure</a>
+      <a href="architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="modules/index.html">All Modules</a>
+      <a href="modules/mc3-library.html">MC3 Library</a>
+      <a href="modules/mc3togltf.html">mc3togltf</a>
+      <a href="modules/editor.html">Editor</a>
+      <a href="modules/renderer.html">Renderer</a>
+      <a href="modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="classes/index.html">All Classes</a>
+      <a href="classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="classes/Mc3Document.html">Mc3Document</a>
+      <a href="classes/Mc3Object.html">Mc3Object</a>
+      <a href="classes/SceneRenderer.html">SceneRenderer</a>
+      <a href="classes/EditorCamera.html">EditorCamera</a>
+      <a href="classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="api/mc3-format.html">MC3 Format</a>
+      <a href="api/mc3-objects.html">Object Types</a>
+      <a href="api/mc3-materials.html">Materials &amp; Textures</a>
+      <a href="api/mc3-animation.html">Animation</a>
+      <a href="api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="tutorials/index.html">All Tutorials</a>
+      <a href="tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="tutorials/loading-scene.html">Loading a Scene</a>
+      <a href="tutorials/csg-operations.html">CSG Operations</a>
+      <a href="tutorials/export-gltf.html">Export to glTF/GLB</a>
+      <a href="tutorials/animation.html">Keyframe Animation</a>
+      <a href="tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="internals/index.html">Overview</a>
+      <a href="internals/data-flow.html">Data Flow</a>
+      <a href="internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="internals/csg-engine.html">CSG Engine</a>
+      <a href="internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="index.html">Developers</a><span class="sep">/</span><span>Build &amp; Run</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Build &amp; Run</h1>
+      <p class="subtitle">CMake configuration, graphics backends, build commands, and troubleshooting.</p>
+    </div>
+
+    <h2>Graphics Backend Selection</h2>
+    <p>MeshCraft uses the <strong>CNA</strong> framework which supports multiple rendering backends. Select one at configure time:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Backend</th><th>CMake Flag</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><strong>EASYGL</strong> (default)</td><td><code>-DMESH_CRAFT_GRAPHICS_BACKEND=EASYGL</code></td><td>OpenGL ES 3.2 via EasyGL. Default for Linux desktop and Emscripten/WASM.</td></tr>
+          <tr><td><strong>SDL_RENDERER</strong></td><td><code>-DMESH_CRAFT_GRAPHICS_BACKEND=SDL_RENDERER</code></td><td>SDL2D renderer. Forced for Android. Easier setup, no OpenGL required.</td></tr>
+          <tr><td><strong>BGFX</strong></td><td><code>-DMESH_CRAFT_GRAPHICS_BACKEND=BGFX</code></td><td>Cross-platform via BGFX. Needs verification.</td></tr>
+          <tr><td><strong>VULKAN</strong></td><td><code>-DMESH_CRAFT_GRAPHICS_BACKEND=VULKAN</code></td><td>Planned. Needs verification.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Desktop Build (Linux)</h2>
+    <pre><code><span class="cmt"># Configure</span>
+cmake -S . -B cmake-build-debug \
+      -DCMAKE_BUILD_TYPE=Debug \
+      -DMESH_CRAFT_GRAPHICS_BACKEND=EASYGL \
+      -DFETCHCONTENT_UPDATES_DISCONNECTED=ON   <span class="cmt"># skip update checks if offline</span>
+
+<span class="cmt"># Build</span>
+cmake --build cmake-build-debug --target MeshCraft -- -j$(nproc)
+
+<span class="cmt"># Run</span>
+./cmake-build-debug/MeshCraft test/house.mc3.xml</code></pre>
+
+    <h2>SDL_RENDERER Backend</h2>
+    <pre><code>cmake -S . -B build-sdl -DMESH_CRAFT_GRAPHICS_BACKEND=SDL_RENDERER
+cmake --build build-sdl --target MeshCraft -- -j$(nproc)
+./build-sdl/MeshCraft</code></pre>
+
+    <h2>Web / WASM Build (Emscripten)</h2>
+    <p>MeshCraft ships a convenience script <code>build-web.sh</code> for Emscripten builds.</p>
+    <pre><code><span class="cmt"># Activate the Emscripten SDK first:</span>
+source /path/to/emsdk/emsdk_env.sh
+
+<span class="cmt"># Build</span>
+./build-web.sh
+
+<span class="cmt"># Serve locally</span>
+cd cmake-build-web
+python3 -m http.server 8080
+<span class="cmt"># Open: http://localhost:8080/MeshCraft.html</span></code></pre>
+    <p>The web build uses the <strong>EASYGL</strong> backend (WebGL 2) and preloads test files at <code>/test</code>. The <code>cmake/web/pre.js</code> script mounts IDBFS at <code>/home/user</code> for persistent storage across reloads.</p>
+
+    <h2>Release Build</h2>
+    <pre><code>cmake -S . -B cmake-build-release \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DMESH_CRAFT_GRAPHICS_BACKEND=EASYGL
+
+cmake --build cmake-build-release --target MeshCraft -- -j$(nproc)</code></pre>
+
+    <h2>Building mc3togltf Separately</h2>
+    <p>The <code>mc3togltf</code> converter is a standalone binary (no graphics deps). It must be built separately and placed at <code>mc3togltf/build/mc3togltf</code> for the <strong>File → Export GLB</strong> menu item to work.</p>
+    <pre><code>cmake -S mc3togltf -B mc3togltf/build -DCMAKE_BUILD_TYPE=Release
+cmake --build mc3togltf/build --parallel
+
+<span class="cmt"># Usage</span>
+./mc3togltf/build/mc3togltf input.mc3.xml output.glb
+./mc3togltf/build/mc3togltf input.mc3.xml output.gltf</code></pre>
+
+    <h2>Testing</h2>
+    <pre><code><span class="cmt"># Run all tests</span>
+ctest --test-dir cmake-build-debug -V
+
+<span class="cmt"># Individual test</span>
+ctest --test-dir cmake-build-debug -V -R smoke_test
+ctest --test-dir cmake-build-debug -V -R mc3_roundtrip</code></pre>
+    <p>Tests only run on UNIX (not Android or Emscripten). They require the <code>MESH_CRAFT_BUILD_TESTING</code> CMake option (enabled by default when <code>BUILD_TESTING=ON</code>).</p>
+
+    <h2>Known Build Workaround</h2>
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>CNA Object File Timestamp Issue</strong>
+        <p>When CNA headers are newer than compiled object files, Ninja recompiles CNA, which may fail due to private-constructor errors in recent CNA commits. Apply this touch workaround before each build when CNA sources have changed:</p>
+        <pre><code>find cmake-build-debug/CNA_dep/CMakeFiles -name "*.o" -exec touch {} \;
+find /path/to/cna/include -name "*.hpp" -exec touch {} \;
+touch cmake-build-debug/CNA_dep/SHARP_RUNTIME/libSHARP_RUNTIME.a
+touch cmake-build-debug/CNA_dep/libCNA.a</code></pre>
+        <p>This is a known ongoing limitation. The plain <code>touch</code> on the <code>.a</code> files alone is no longer sufficient — both the <code>.o</code> files and the CNA headers must be touched.</p>
+      </div>
+    </div>
+
+    <h2>Common Build Problems</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Problem</th><th>Cause</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr><td>CMake can't find <code>../cna</code></td><td>Sibling repos not cloned</td><td>Clone <code>cna</code>, <code>sharp-runtime</code>, and <code>nova-3d</code> next to <code>mesh-craft</code></td></tr>
+          <tr><td><code>tinyxml2</code> duplicate target</td><td>sharp-runtime also bundles tinyxml2</td><td>mc3/CMakeLists.txt already has a guard — ensure it creates the <code>tinyxml2::tinyxml2</code> alias</td></tr>
+          <tr><td>No display / segfault on server</td><td>No X11 or Wayland display</td><td>Use Xvfb: <code>Xvfb :99 &amp; DISPLAY=:99 ./MeshCraft …</code></td></tr>
+          <tr><td>FetchContent fails</td><td>No internet in CI</td><td>Add <code>-DFETCHCONTENT_UPDATES_DISCONNECTED=ON</code> and pre-populate the CMake cache</td></tr>
+          <tr><td><code>GLESv2</code> not found</td><td>Missing OpenGL ES dev packages</td><td><code>sudo apt install libgles2-mesa-dev</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Auto-Screenshot Mode</h2>
+    <p>For CI or headless testing, the <code>--screenshot &lt;path.ppm&gt;</code> flag makes the editor render one frame and exit:</p>
+    <pre><code>./cmake-build-debug/MeshCraft test/house.mc3.xml --screenshot /tmp/out.ppm
+<span class="cmt"># MeshCraft renders for ~2 seconds then exits, writing a PPM screenshot</span></code></pre>
+
+    <div class="page-nav">
+      <a href="getting-started.html" class="prev">Getting Started</a>
+      <a href="project-structure.html" class="next">Project Structure</a>
+    </div>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+</body>
+</html>

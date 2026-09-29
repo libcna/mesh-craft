@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Exporting Your Scene — MeshCraft User Guide</title>
+<link rel="stylesheet" href="../assets/style.css"/>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <a href="../index.html">
+      <div class="logo-icon">M</div>
+      <div class="logo-text">
+        <span class="logo-name">Mesh Craft</span>
+        <span class="logo-sub">User Guide</span>
+      </div>
+    </a>
+  </div>
+  <div class="section-switch"><a href="index.html" class="current">Users</a><a href="../developers/index.html" class="">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Start Here</div>
+      <a href="index.html">Overview</a>
+      <a href="installing.html">Installing &amp; Running</a>
+      <a href="interface-tour.html">Interface Tour</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Learn the Basics</div>
+      <a href="first-scene.html">Your First Scene</a>
+      <a href="shapes-and-tools.html">Shapes &amp; Tools</a>
+      <a href="materials-and-lighting.html">Materials &amp; Lighting</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Go Further</div>
+      <a href="csg.html">Combining Shapes (CSG)</a>
+      <a href="animation.html">Keyframe Animation</a>
+      <a href="walk-mode.html">Walk Mode</a>
+      <a href="exporting.html" class="active">Exporting Your Scene</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Reference</div>
+      <a href="keyboard-shortcuts.html">Keyboard Shortcuts</a>
+      <a href="faq.html">FAQ &amp; Troubleshooting</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License
+  </div>
+</aside>
+
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb">
+      <a href="index.html">Users</a>
+      <span class="sep">/</span>
+      <span>Exporting Your Scene</span>
+    </div>
+    <div class="topbar-search">
+      <input type="search" id="searchInput" placeholder="Search docs… (/)"/>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+    <div class="page-header">
+      <h1>Exporting Your Scene</h1>
+      <p class="subtitle">Send your finished scene to Blender, Godot, Unity, or any other glTF-compatible tool.</p>
+    </div>
+
+    <p>
+      MeshCraft's native <code>.mc3.xml</code> file keeps everything editable, but most other 3D
+      software doesn't understand it. To hand your scene off, export it to <strong>glTF</strong> (a
+      readable JSON format) or <strong>GLB</strong> (the same thing packed into one binary file) —
+      an open standard that nearly every modern 3D tool and game engine can import.
+    </p>
+
+    <h2>Exporting</h2>
+    <ol class="steps">
+      <li><span class="step-title">Open the export dialog</span>Press <kbd>Ctrl+E</kbd>, or use <strong>File → Export</strong>.</li>
+      <li><span class="step-title">Choose a destination and format</span>Pick <code>.gltf</code> (readable, with separate texture files) or <code>.glb</code> (a single self-contained file — usually the easier choice to share).</li>
+      <li><span class="step-title">Export</span>MeshCraft writes out your geometry, materials, textures, and any keyframe animations in one pass.</li>
+    </ol>
+
+    <h2>What comes across</h2>
+    <ul>
+      <li>All primitive shapes, extrusions, and CSG results, converted to real triangle meshes.</li>
+      <li>PBR materials and textures.</li>
+      <li>Keyframe animations (position, rotation, scale, visibility, and color channels).</li>
+      <li>Repeated shapes and definition instances are exported efficiently — identical geometry shares data instead of being duplicated.</li>
+    </ul>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>A note about CSG shapes</strong>
+        <p>By default, exporting a scene that contains CSG (Union/Difference/Intersection) shapes with unsupported child types inside them will stop with a clear error rather than silently producing something wrong. If you hit this, either simplify the CSG group's children, or enable the "allow approximate CSG export" option to export the pieces separately (this is a geometrically approximate fallback, not the true boolean result).</p>
+      </div>
+    </div>
+
+    <h2>After exporting</h2>
+    <p>
+      Open the resulting <code>.glb</code>/<code>.gltf</code> file directly in Blender's importer, drag
+      it into a Godot or Unity project, or preview it in any online glTF viewer to confirm it looks
+      right before handing it off.
+    </p>
+
+    <div class="page-nav">
+      <a href="walk-mode.html" class="prev">Walk Mode</a>
+      <a href="keyboard-shortcuts.html" class="next">Keyboard Shortcuts</a>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/script.js"></script>
+</body>
+</html>

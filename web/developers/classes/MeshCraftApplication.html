@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>MeshCraftApplication — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="index.html">All Classes</a>
+      <a href="MeshCraftApplication.html" class="active">MeshCraftApplication</a>
+      <a href="Mc3Document.html">Mc3Document</a><a href="Mc3Object.html">Mc3Object</a>
+      <a href="SceneRenderer.html">SceneRenderer</a><a href="EditorCamera.html">EditorCamera</a>
+      <a href="Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a><a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a><a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a><a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a><a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a><a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Classes</a><span class="sep">/</span><span>MeshCraftApplication</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1><code>MeshCraftApplication</code></h1>
+      <p class="subtitle">Central application class. Inherits from CNA's <code>Microsoft::Xna::Framework::Game</code>.</p>
+    </div>
+
+    <h4>Header</h4>
+    <p><code>include/MeshCraft/MeshCraftApplication.hpp</code></p>
+    <h4>Source</h4>
+    <p><code>src/MeshCraft/MeshCraftApplication.cpp</code></p>
+    <h4>Namespace</h4>
+    <p><code>MeshCraft</code></p>
+
+    <h2>Purpose</h2>
+    <p>
+      <code>MeshCraftApplication</code> is the single owner of all editor state. It is the class that CNA's <code>Game</code> base calls in the game loop. Every editor operation — file I/O, selection, transformation, undo/redo, animation playback, export — is orchestrated here.
+    </p>
+
+    <h2>Constructors</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Signature</th><th>Usage</th></tr></thead>
+        <tbody>
+          <tr><td><code>MeshCraftApplication()</code></td><td>Starts with an empty scene. Used when no command-line path is given.</td></tr>
+          <tr><td><code>MeshCraftApplication(filesystem::path filePath)</code></td><td>Loads the given <code>.mc3.xml</code> file on startup.</td></tr>
+          <tr><td><code>MeshCraftApplication(filesystem::path filePath, string screenshotPath)</code></td><td>Loads file and enables auto-screenshot mode (exits after ~2 s, writes PPM).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Game Loop Overrides</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Method</th><th>Behaviour</th></tr></thead>
+        <tbody>
+          <tr><td><code>LoadContent()</code></td><td>Creates <code>GridRenderer</code>, <code>SceneRenderer</code>, <code>SceneHierarchyPanel</code>, <code>PropertiesPanel</code>. Loads scene from <code>currentFile_</code> if set. Initialises ImGui (SDL3 + OpenGL ES 3 backends). Loads recent-files list.</td></tr>
+          <tr><td><code>BeginDraw()</code></td><td>Calls <code>ImGui::NewFrame()</code>, returns true.</td></tr>
+          <tr><td><code>Update(GameTime&amp;)</code></td><td>Polls keyboard/mouse. Calls <code>handleKeyboardShortcuts()</code> and <code>handleMouseInput()</code>. Advances animation clock if playing.</td></tr>
+          <tr><td><code>Draw(const GameTime&amp;)</code></td><td>Clears frame. Evaluates animation overrides. Draws grid and 3D scene. Calls <code>drawImGuiUi()</code> and optionally <code>drawTimelinePanel()</code>.</td></tr>
+          <tr><td><code>EndDraw()</code></td><td>Calls <code>ImGui::Render()</code> + draw data flush. Writes screenshot if <code>pendingScreenshot_</code>. Calls <code>Game::EndDraw()</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Key Private Members (State)</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><code>document_</code></td><td><code>Mc3::Mc3Document</code></td><td>The scene currently being edited.</td></tr>
+          <tr><td><code>currentFile_</code></td><td><code>filesystem::path</code></td><td>Path of the open file (empty for new scenes).</td></tr>
+          <tr><td><code>modified_</code></td><td><code>bool</code></td><td>True when there are unsaved changes.</td></tr>
+          <tr><td><code>camera_</code></td><td><code>EditorCamera</code></td><td>3D viewport camera.</td></tr>
+          <tr><td><code>selection_</code></td><td><code>SelectionManager</code></td><td>Current selection.</td></tr>
+          <tr><td><code>gizmo_</code></td><td><code>TransformGizmo</code></td><td>Active gizmo mode and drag state.</td></tr>
+          <tr><td><code>activeTool_</code></td><td><code>ActiveTool</code></td><td>Which tool is active (Select, Move, Rotate, Scale, Add*).</td></tr>
+          <tr><td><code>undoStack_</code></td><td><code>vector&lt;Mc3Document&gt;</code></td><td>Deep-copy snapshots for undo (max 20).</td></tr>
+          <tr><td><code>redoStack_</code></td><td><code>vector&lt;Mc3Document&gt;</code></td><td>Deep-copy snapshots for redo (max 20).</td></tr>
+          <tr><td><code>clipboard_</code></td><td><code>vector&lt;shared_ptr&lt;Mc3Object&gt;&gt;</code></td><td>Cut/copy clipboard.</td></tr>
+          <tr><td><code>currentActionName_</code></td><td><code>string</code></td><td>Name of the animation action being played/edited.</td></tr>
+          <tr><td><code>animTime_</code></td><td><code>float</code></td><td>Current playback time in seconds.</td></tr>
+          <tr><td><code>animPlaying_</code></td><td><code>bool</code></td><td>Whether animation is playing.</td></tr>
+          <tr><td><code>showTimeline_</code></td><td><code>bool</code></td><td>Whether the Timeline panel is visible.</td></tr>
+          <tr><td><code>imguiTopH_</code></td><td><code>int</code></td><td>Height of the menu bar + toolbar in pixels. Updated each frame.</td></tr>
+          <tr><td><code>showEdgeOverlay_</code></td><td><code>bool</code></td><td>Alt+W toggles black wireframe overlay.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Key Private Methods</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Method</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><code>pushUndo()</code></td><td>Deep-copies <code>document_</code> onto <code>undoStack_</code>. Clears redo stack. Clears CSG cache. Must be called before any document mutation.</td></tr>
+          <tr><td><code>newScene()</code></td><td>Replaces <code>document_</code> with an empty document.</td></tr>
+          <tr><td><code>openFile()</code></td><td>Opens an MC3 XML file via the in-editor path dialog.</td></tr>
+          <tr><td><code>saveFile()</code> / <code>saveFileAs()</code></td><td>Serializes <code>document_</code> to XML using <code>Mc3XmlWriter</code>.</td></tr>
+          <tr><td><code>exportGltf()</code></td><td>Finds the <code>mc3togltf</code> binary, shells out to it, exports to GLB.</td></tr>
+          <tr><td><code>addPrimitive(ObjectType)</code></td><td>Creates a new primitive object, pushes undo, adds to scene root.</td></tr>
+          <tr><td><code>deleteSelected()</code></td><td>Removes all selected objects from the scene tree (recursive search).</td></tr>
+          <tr><td><code>duplicateSelected()</code></td><td>Deep-copies selected objects with a <code>_copy</code> name suffix.</td></tr>
+          <tr><td><code>groupSelected()</code></td><td>Wraps selected objects in a new <code>Group</code> node.</td></tr>
+          <tr><td><code>ungroupSelected()</code></td><td>Promotes group children to the group's parent level.</td></tr>
+          <tr><td><code>evaluateAndPushAnimOverrides()</code></td><td>Evaluates all channels of the current action at <code>animTime_</code>, calls <code>SceneRenderer::setAnimOverrides()</code>.</td></tr>
+          <tr><td><code>drawImGuiUi(screenW, screenH)</code></td><td>Draws all ImGui panels: menu bar, toolbar, hierarchy, properties, viewport overlay, status bar.</td></tr>
+          <tr><td><code>drawTimelinePanel(screenW, screenH)</code></td><td>Draws the Timeline panel (Ctrl+T).</td></tr>
+          <tr><td><code>handleKeyboardShortcuts(ks, prevKs)</code></td><td>Processes all keyboard shortcuts using edge-detection (prev vs current state).</td></tr>
+          <tr><td><code>handleMouseInput(ms, prev)</code></td><td>Camera orbit/pan/zoom, ray-cast picking, gizmo drag.</td></tr>
+          <tr><td><code>setStatusMsg(msg, isError, duration)</code></td><td>Shows a timed colored message in the status bar.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Panel Layout Constants</h2>
+    <pre><code><span class="kw">static constexpr int</span> kLeftPanelW  = 220; <span class="cmt">// hierarchy panel width</span>
+<span class="kw">static constexpr int</span> kRightPanelW = 220; <span class="cmt">// properties panel width</span>
+<span class="kw">static constexpr int</span> kStatusH     =  22; <span class="cmt">// status bar height</span>
+<span class="kw">static constexpr int</span> kTimelineH   = 190; <span class="cmt">// timeline panel height</span>
+<span class="kw">static constexpr int</span> kUndoMax     =  20; <span class="cmt">// max undo steps</span></code></pre>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>Structural constraint</strong>
+        <p>Do not refactor <code>MeshCraftApplication.cpp</code> structurally — it is large but functional. Splitting it would require careful coordination to preserve all ImGui state and the 1-frame lag between Draw and Update.</p>
+      </div>
+    </div>
+
+    <div class="page-nav">
+      <a href="index.html" class="prev">All Classes</a>
+      <a href="Mc3Document.html" class="next">Mc3Document</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

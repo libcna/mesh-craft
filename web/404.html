@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Page Not Found — MeshCraft</title>
+<link rel="stylesheet" href="/assets/style.css"/>
+<style>
+  .not-found-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+    gap: 1.5rem;
+    padding: 60px 20px;
+  }
+  .not-found-code {
+    font-size: 6rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: -2px;
+  }
+  .not-found-msg {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    max-width: 42ch;
+  }
+  .not-found-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+  .not-found-links a {
+    display: inline-block;
+    padding: 0.5rem 1.25rem;
+    border-radius: 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-heading);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .not-found-links a:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    text-decoration: none;
+  }
+</style>
+</head>
+<body>
+<div class="landing">
+  <header class="landing-header">
+    <a href="/index.html" class="logo">
+      <div class="logo-icon">M</div>
+      <span class="logo-name">Mesh Craft</span>
+    </a>
+    <nav>
+      <a href="/users/index.html">Users Docs</a>
+      <a href="/developers/index.html">Developer Docs</a>
+      <a href="https://github.com/openeggbert/mesh-craft" target="_blank" class="btn">GitHub</a>
+    </nav>
+  </header>
+  <div class="not-found-body">
+    <div class="not-found-code">404</div>
+    <p class="not-found-msg">This page doesn't exist — or the link is broken. Try one of these instead.</p>
+    <div class="not-found-links">
+      <a href="/index.html">Home</a>
+      <a href="/users/index.html">Users Docs</a>
+      <a href="/developers/index.html">Developer Docs</a>
+      <a href="/developers/tutorials/index.html">Tutorials</a>
+      <a href="/developers/api/mc3-format.html">Format Reference</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

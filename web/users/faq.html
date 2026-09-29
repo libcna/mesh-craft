@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>FAQ &amp; Troubleshooting — MeshCraft User Guide</title>
+<link rel="stylesheet" href="../assets/style.css"/>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <a href="../index.html">
+      <div class="logo-icon">M</div>
+      <div class="logo-text">
+        <span class="logo-name">Mesh Craft</span>
+        <span class="logo-sub">User Guide</span>
+      </div>
+    </a>
+  </div>
+  <div class="section-switch"><a href="index.html" class="current">Users</a><a href="../developers/index.html" class="">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Start Here</div>
+      <a href="index.html">Overview</a>
+      <a href="installing.html">Installing &amp; Running</a>
+      <a href="interface-tour.html">Interface Tour</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Learn the Basics</div>
+      <a href="first-scene.html">Your First Scene</a>
+      <a href="shapes-and-tools.html">Shapes &amp; Tools</a>
+      <a href="materials-and-lighting.html">Materials &amp; Lighting</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Go Further</div>
+      <a href="csg.html">Combining Shapes (CSG)</a>
+      <a href="animation.html">Keyframe Animation</a>
+      <a href="walk-mode.html">Walk Mode</a>
+      <a href="exporting.html">Exporting Your Scene</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Reference</div>
+      <a href="keyboard-shortcuts.html">Keyboard Shortcuts</a>
+      <a href="faq.html" class="active">FAQ &amp; Troubleshooting</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License
+  </div>
+</aside>
+
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb">
+      <a href="index.html">Users</a>
+      <span class="sep">/</span>
+      <span>FAQ &amp; Troubleshooting</span>
+    </div>
+    <div class="topbar-search">
+      <input type="search" id="searchInput" placeholder="Search docs… (/)"/>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+    <div class="page-header">
+      <h1>FAQ &amp; Troubleshooting</h1>
+      <p class="subtitle">Answers to the questions new users ask most.</p>
+    </div>
+
+    <h2>Getting started</h2>
+
+    <h3>Where do I download MeshCraft?</h3>
+    <p>MeshCraft doesn't yet publish ready-made downloads. See <a href="installing.html">Installing &amp; Running</a> — either a developer on your team builds it for you, or you follow the <a href="../developers/getting-started.html">Developer build guide</a> yourself.</p>
+
+    <h3>Does MeshCraft run on Mac or Windows?</h3>
+    <p>Not yet — Linux and browser (WASM) builds are currently working; macOS, Windows, and Android are planned. Check the <a href="installing.html">Installing</a> page for the current status.</p>
+
+    <h3>Do I need to know how to code?</h3>
+    <p>No. Everything in the <a href="index.html">Users</a> section only requires point-and-click use of the editor. The <code>.mc3.xml</code> file format underneath is plain text, but you never need to open or edit it by hand.</p>
+
+    <h2>Working in the editor</h2>
+
+    <h3>I lost my work — can I get it back?</h3>
+    <p>Check for an autosave. If MeshCraft closed unexpectedly, reopening the same scene will offer to load a newer autosave if one exists — look for a message like "Autosave found — may be newer than saved file" along the bottom of the window. Otherwise, look next to your <code>.mc3.xml</code> file for rotating backup copies.</p>
+
+    <h3>How do I undo a mistake?</h3>
+    <p><kbd>Ctrl+Z</kbd>, up to 20 steps back. It covers every kind of edit — adding, deleting, moving, grouping, and more. <kbd>Ctrl+Y</kbd> redoes.</p>
+
+    <h3>I selected the wrong thing / can't find my object</h3>
+    <p>Use the Command Palette (<kbd>Ctrl+P</kbd>) to search for an object by name, or use the search box at the top of the Scene panel. Press <kbd>F</kbd> to snap the camera to whatever is currently selected.</p>
+
+    <h3>My CSG result looks wrong or won't export</h3>
+    <p>Make sure exactly the shape(s) meant to cut are marked with the "cutter" role inside a Difference group — see <a href="csg.html">Combining Shapes (CSG)</a>. Some shape types aren't yet supported as CSG children on export; MeshCraft will tell you which one if that happens.</p>
+
+    <h3>Walk Mode lets me walk through walls</h3>
+    <p>This is a known current limitation — Walk Mode only collides with the ground plane (y=0) so far, not with scene geometry. It's still useful for checking scale and layout; just don't rely on it to test whether a space is physically enclosed.</p>
+
+    <h2>Exporting</h2>
+
+    <h3>What's the difference between glTF and GLB?</h3>
+    <p>They're the same format — <code>.gltf</code> is readable JSON with separate texture files alongside it, while <code>.glb</code> packs everything (geometry, materials, textures) into one binary file. GLB is usually the simpler choice to share or hand off.</p>
+
+    <h3>Will my animation still work after exporting?</h3>
+    <p>Yes — keyframe animations (position, rotation, scale, visibility, and color) are included in the glTF/GLB export and play back in any tool that supports glTF animation.</p>
+
+    <h2>Still stuck?</h2>
+    <p>MeshCraft is early, actively-developed software, so rough edges are expected. Check the project's <a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub repository</a> for the latest status, or ask a developer on your team — they'll find the <a href="../developers/index.html">Developer docs</a> useful for digging deeper.</p>
+
+    <div class="page-nav">
+      <a href="keyboard-shortcuts.html" class="prev">Keyboard Shortcuts</a>
+      <span class="empty"></span>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/script.js"></script>
+</body>
+</html>

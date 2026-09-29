@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Renderer Module — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a>
+      <a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a>
+      <a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="index.html">All Modules</a>
+      <a href="mc3-library.html">MC3 Library</a>
+      <a href="mc3togltf.html">mc3togltf</a>
+      <a href="editor.html">Editor</a>
+      <a href="renderer.html" class="active">Renderer</a>
+      <a href="scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a>
+      <a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a>
+      <a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a>
+      <a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a>
+      <a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a>
+      <a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a>
+      <a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a>
+      <a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a>
+      <a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a>
+      <a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a>
+      <a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Modules</a><span class="sep">/</span><span>Renderer</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Renderer Module</h1>
+      <p class="subtitle">SceneRenderer and GridRenderer — the 3D viewport rendering layer.</p>
+    </div>
+
+    <h2>Components</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Class</th><th>File</th><th>Role</th></tr></thead>
+        <tbody>
+          <tr><td><a href="../classes/SceneRenderer.html"><code>SceneRenderer</code></a></td><td><code>src/MeshCraft/Renderer/SceneRenderer.cpp</code></td><td>Renders all MC3 objects, transform gizmos, light/camera icons, edge overlay, and CSG booleans.</td></tr>
+          <tr><td><code>GridRenderer</code></td><td><code>src/MeshCraft/Renderer/GridRenderer.cpp</code></td><td>Draws the infinite XYZ reference grid using CNA <code>BasicEffect</code> and a <code>VertexBuffer</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>SceneRenderer Overview</h2>
+    <p>
+      <code>SceneRenderer</code> is initialized once in <code>LoadContent()</code>. During initialization it builds all pre-computed <em>unit meshes</em> (a 1×1×1 box, unit sphere, unit cylinder, unit cone, unit plane) as <code>VertexBuffer</code> + <code>IndexBuffer</code> pairs. Each mesh is stored in a <code>RenderMesh</code> struct that holds:
+    </p>
+    <ul>
+      <li>A <code>VertexPositionColor</code> VB+IB pair for flat-colored rendering</li>
+      <li>A <code>VertexPositionNormalTexture</code> VB+IB pair for lit+textured rendering</li>
+      <li>A <code>WireShape</code> for edge overlay (line-list geometry)</li>
+    </ul>
+    <p>Each frame, <code>SceneRenderer::draw()</code> is called with the <code>Mc3Document</code>, view and projection matrices, and the current selection list.</p>
+
+    <h2>Draw Traversal</h2>
+    <p>The renderer traverses the scene graph recursively via <code>drawObject()</code>:</p>
+    <ol>
+      <li><strong>Compute world matrix</strong> from <code>Mc3Transform</code> using the pivot-compensated formula:
+        <br><code>world = T(pos + pivot) × R(rotation) × S(scale) × T(-pivot)</code></li>
+      <li><strong>Apply animation overrides</strong> — if an animation clip is playing, the <code>animOverrides_</code> map may replace the transform position/rotation/scale and visibility for this object.</li>
+      <li><strong>Select render path</strong> by <code>ObjectType</code>:
+        <ul>
+          <li><code>Box/Cube</code> → scaled unit box</li>
+          <li><code>Sphere</code> → scaled unit sphere</li>
+          <li><code>Cylinder</code> → scaled unit cylinder</li>
+          <li><code>Cone</code> → scaled unit cone</li>
+          <li><code>Plane</code> → scaled unit plane</li>
+          <li><code>Extrude</code> → dynamically tessellated sweep mesh (per-frame, cached)</li>
+          <li><code>Mesh</code> → OBJ loaded via tinyobjloader (<code>loadOrGetMesh()</code>, cached by path)</li>
+          <li><code>Group</code> → render children recursively</li>
+          <li><code>Instance</code> → resolve definition, render with overridden material</li>
+          <li><code>Union/Difference/Intersection</code> → evaluate Manifold CSG, cache result</li>
+          <li><code>Area</code> → (no visual representation)</li>
+        </ul>
+      </li>
+      <li><strong>Look up material</strong>: if the object has a material ID, retrieve <code>Mc3Material.baseColor</code> from the document map. If the material has a <code>baseColorTexture</code>, load/cache the texture.</li>
+      <li><strong>Render</strong> via <code>drawMesh()</code> (flat color) or <code>drawMeshTextured()</code> (texture).</li>
+      <li><strong>Wireframe highlight</strong>: if the object is selected, draw a white wire box around its AABB.</li>
+    </ol>
+
+    <h2>Key Data Structures</h2>
+    <pre><code><span class="kw">struct</span> <span class="cls">RenderMesh</span> {
+    <span class="kw">unique_ptr</span>&lt;VertexBuffer&gt; vb;    <span class="cmt">// VertexPositionColor</span>
+    <span class="kw">unique_ptr</span>&lt;IndexBuffer&gt;  ib;
+    <span class="kw">unique_ptr</span>&lt;VertexBuffer&gt; texVB; <span class="cmt">// VertexPositionNormalTexture</span>
+    <span class="kw">unique_ptr</span>&lt;IndexBuffer&gt;  texIB;
+    <span class="kw">int</span> primitiveCount, texPrimitiveCount;
+    <span class="kw">vector</span>&lt;Vector3&gt; positions; <span class="cmt">// for AABB picking</span>
+};
+
+<span class="kw">struct</span> <span class="cls">AnimOverride</span> {
+    <span class="kw">optional</span>&lt;array&lt;float,3&gt;&gt; position;
+    <span class="kw">optional</span>&lt;array&lt;float,3&gt;&gt; rotation;
+    <span class="kw">optional</span>&lt;array&lt;float,3&gt;&gt; scale;
+    <span class="kw">optional</span>&lt;<span class="kw">bool</span>&gt;           visible;
+};</code></pre>
+
+    <h2>Caches</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Cache field</th><th>Key</th><th>Invalidated by</th></tr></thead>
+        <tbody>
+          <tr><td><code>textureCache_</code></td><td>Absolute file path</td><td>Never cleared (textures are immutable in the current session)</td></tr>
+          <tr><td><code>meshCache_</code></td><td>Absolute OBJ file path</td><td>Never cleared</td></tr>
+          <tr><td><code>csgMeshCache_</code></td><td><code>const Mc3Object*</code></td><td><code>clearCsgCache()</code> — called from <code>pushUndo()</code> on every document mutation</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Animation Overrides</h2>
+    <p>Before each <code>draw()</code> call, <code>MeshCraftApplication::evaluateAndPushAnimOverrides()</code> evaluates all channels of the currently playing action at the current time, building an <code>unordered_map&lt;string, AnimOverride&gt;</code> keyed by object name. This is then injected into the renderer via <code>SceneRenderer::setAnimOverrides()</code>.</p>
+
+    <h2>GridRenderer</h2>
+    <p>Draws a flat reference grid in the XZ plane centered at the origin, plus colored X (red), Y (green), and Z (blue) axis lines. Uses CNA's <code>BasicEffect</code> with vertex color enabled. The grid vertex buffer is built once and reused each frame.</p>
+
+    <div class="page-nav">
+      <a href="editor.html" class="prev">Editor</a>
+      <a href="scene.html" class="next">Scene Panels</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

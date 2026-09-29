@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Data Flow — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section"><div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a><a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a><a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a><a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a><a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a><a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a><a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a><a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a><a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Internals</div>
+      <a href="index.html">Overview</a><a href="data-flow.html" class="active">Data Flow</a>
+      <a href="rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="csg-engine.html">CSG Engine</a><a href="undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Internals</a><span class="sep">/</span><span>Data Flow</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Data Flow</h1>
+      <p class="subtitle">How information moves from disk to UI, from UI to scene model, and back to disk.</p>
+    </div>
+
+    <h2>The Mc3Document as the Central Hub</h2>
+    <p>
+      Every piece of scene data lives in exactly one <code>Mc3Document</code> instance owned by <code>MeshCraftApplication</code> as a <code>std::shared_ptr&lt;Mc3Document&gt; document_</code>.
+      The renderer, all UI panels, the undo stack, and the serialiser all reference this same object.
+    </p>
+    <pre><code>MeshCraftApplication
+  ├── std::shared_ptr&lt;Mc3Document&gt;  document_      ← single source of truth
+  ├── SceneRenderer                 renderer_
+  ├── EditorCamera                  camera_
+  ├── SceneHierarchyPanel           hierarchyPanel_
+  ├── PropertiesPanel               propertiesPanel_
+  ├── TimelinePanel                 timelinePanel_
+  └── std::vector&lt;Mc3Document&gt;     undoStack_      ← deep-copy snapshots</code></pre>
+
+    <h2>Load Path</h2>
+    <pre class="arch-diagram">
+┌─────────────┐   argv[1] / Ctrl+O   ┌─────────────────┐
+│   OS / User │ ──────────────────▶  │ MeshCraftApp     │
+└─────────────┘                      │ ::loadFile()     │
+                                     └────────┬─────────┘
+                                              │ calls
+                                              ▼
+                                    ┌──────────────────────┐
+                                    │  Mc3Document         │
+                                    │  ::loadFromFile()    │
+                                    │   (tinyxml2 parse)   │
+                                    └────────┬─────────────┘
+                                             │ populates
+                                             ▼
+                                    ┌──────────────────────┐
+                                    │  Mc3Document         │
+                                    │  (lights, materials, │
+                                    │   objects, actions…) │
+                                    └──────────────────────┘
+    </pre>
+    <ol>
+      <li><code>MeshCraftApplication::LoadContent()</code> checks <code>argv[1]</code>; if present, calls <code>loadFile(path)</code>.</li>
+      <li><code>loadFile()</code> calls <code>Mc3Document::loadFromFile(path)</code>, which uses tinyxml2 to parse the XML into the in-memory model.</li>
+      <li>The renderer's GPU caches are empty; meshes are uploaded lazily on the first frame they are needed.</li>
+      <li>The undo stack is cleared on load.</li>
+    </ol>
+
+    <h2>Edit Path (UI → Model)</h2>
+    <pre class="arch-diagram">
+User drags gizmo / edits field in ImGui panel
+         │
+         ▼
+┌────────────────────────────────┐
+│  PropertiesPanel / Gizmo code  │
+│  1. pushUndo()                 │  ← deep-copy Mc3Document into undoStack_
+│  2. mutate document_->objects  │  ← in-place edit
+└────────────┬───────────────────┘
+             │ document_ is shared_ptr — renderer sees the same data next frame
+             ▼
+┌─────────────────────┐
+│  SceneRenderer      │
+│  next frame:        │
+│  cache miss → re-   │
+│  upload GPU mesh    │
+└─────────────────────┘
+    </pre>
+    <p>The mutation protocol for every editor panel is always:</p>
+    <ol>
+      <li>Call <code>MeshCraftApplication::pushUndo()</code> — pushes a deep copy of <code>*document_</code>.</li>
+      <li>Mutate <code>document_</code> fields directly.</li>
+      <li>Optionally invalidate renderer caches if the mutation changes geometry.</li>
+    </ol>
+
+    <h2>Save Path</h2>
+    <pre class="arch-diagram">
+Ctrl+S / Ctrl+Shift+S
+         │
+         ▼
+┌──────────────────────────────┐
+│ MeshCraftApplication         │
+│ ::saveFile(path)             │
+└──────────┬───────────────────┘
+           │ calls
+           ▼
+┌──────────────────────────────┐
+│ Mc3Document::saveToFile()    │
+│  (tinyxml2 write)            │
+└──────────────────────────────┘
+           │ writes
+           ▼
+    .mc3.xml on disk
+    </pre>
+    <p><code>Mc3Document::saveToFile()</code> serialises the entire in-memory document back to XML. The file is overwritten atomically (write to temp, then rename — exact behavior depends on the OS and tinyxml2 version).</p>
+
+    <h2>Animation Playback Data Flow</h2>
+    <pre class="arch-diagram">
+TimelinePanel
+  sets: currentAction_, playbackTime_, isPlaying_
+         │
+         ▼
+MeshCraftApplication::Update()
+  if (isPlaying_) advance playbackTime_
+         │
+         ▼
+SceneRenderer::drawScene(document_, camera_, animOverrides)
+         │
+  For each object in scene:
+    1. look up animOverrides[object.name]
+    2. if override present → use override transform
+    3. else → use object.transform
+         │
+         ▼
+  render with computed transform
+    </pre>
+    <p>The <code>animOverrides</code> map is rebuilt every frame by evaluating all channels of the active action at <code>playbackTime_</code> using <code>evaluateChannel()</code>. It is a temporary data structure — it is not stored in <code>Mc3Document</code> and is not saved to disk.</p>
+
+    <h2>mc3togltf Data Flow</h2>
+    <p>The converter has its own independent data flow with no runtime editor dependency:</p>
+    <pre class="arch-diagram">
+  .mc3.xml file
+       │
+       ▼
+Mc3XmlParser (local copy in mc3togltf/)
+       │  builds local Mc3Document model
+       ▼
+GltfExporter
+       │  traverses model, emits glTF JSON / GLB binary
+       ▼
+  .gltf + .bin  OR  .glb
+    </pre>
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <p>The mc3togltf converter has its own copy of the MC3 parser (not the same source files as <code>mc3/</code>). Changes to the format must be applied to <em>both</em> parsers.</p>
+      </div>
+    </div>
+
+    <div class="page-nav">
+      <a href="index.html" class="prev">Internals Overview</a>
+      <a href="rendering-pipeline.html" class="next">Rendering Pipeline</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

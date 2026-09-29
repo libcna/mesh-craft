@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../assets/style.css"/>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <a href="index.html">
+      <div class="logo-icon">M</div>
+      <div class="logo-text">
+        <span class="logo-name">Mesh Craft</span>
+        <span class="logo-sub">Developer Docs</span>
+      </div>
+    </a>
+  </div>
+    <div class="section-switch"><a href="../users/index.html" class="">Users</a><a href="../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="index.html" class="active">Overview</a>
+      <a href="getting-started.html">Getting Started</a>
+      <a href="build.html">Build &amp; Run</a>
+      <a href="project-structure.html">Project Structure</a>
+      <a href="architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="modules/index.html">All Modules</a>
+      <a href="modules/mc3-library.html">MC3 Library</a>
+      <a href="modules/mc3togltf.html">mc3togltf</a>
+      <a href="modules/editor.html">Editor</a>
+      <a href="modules/renderer.html">Renderer</a>
+      <a href="modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="classes/index.html">All Classes</a>
+      <a href="classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="classes/Mc3Document.html">Mc3Document</a>
+      <a href="classes/Mc3Object.html">Mc3Object</a>
+      <a href="classes/SceneRenderer.html">SceneRenderer</a>
+      <a href="classes/EditorCamera.html">EditorCamera</a>
+      <a href="classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="api/mc3-format.html">MC3 Format</a>
+      <a href="api/mc3-objects.html">Object Types</a>
+      <a href="api/mc3-materials.html">Materials &amp; Textures</a>
+      <a href="api/mc3-animation.html">Animation</a>
+      <a href="api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="tutorials/index.html">All Tutorials</a>
+      <a href="tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="tutorials/loading-scene.html">Loading a Scene</a>
+      <a href="tutorials/csg-operations.html">CSG Operations</a>
+      <a href="tutorials/export-gltf.html">Export to glTF/GLB</a>
+      <a href="tutorials/animation.html">Keyframe Animation</a>
+      <a href="tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="internals/index.html">Overview</a>
+      <a href="internals/data-flow.html">Data Flow</a>
+      <a href="internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="internals/csg-engine.html">CSG Engine</a>
+      <a href="internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot;
+    MIT License
+  </div>
+</aside>
+
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb">
+      <span>Developers</span>
+      <span class="sep">/</span>
+      <span>Overview</span>
+    </div>
+    <div class="topbar-search">
+      <input type="search" id="searchInput" placeholder="Search docs… (/)"/>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Mesh Craft</h1>
+      <p class="subtitle">A 3D scene editor for the MC3 format — primitives, CSG, extrusion, and keyframe animation exported to glTF/GLB.</p>
+      <div class="tags">
+        <span class="badge wip">Early Active Development</span>
+        <span class="badge done">C++23</span>
+        <span class="badge done">Cross-Platform</span>
+        <span class="badge done">MIT License</span>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <strong>Just want to use MeshCraft?</strong>
+        <p>This section is for people building and extending MeshCraft itself (C++, CMake, the MC3 format internals). If you want to learn the editor's interface and create scenes — no programming required — head over to the <a href="../users/index.html">Users section</a> instead.</p>
+      </div>
+    </div>
+
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <strong>Status</strong>
+        <p>MeshCraft is under active development. ~72 of 100 planned tasks are done. Working features include all primitive shapes (Box, Sphere, Cylinder, Cone, Plane, Torus, Capsule, Disk, Grid, Ico-sphere), extrusion (5 path types, 5 cross-section types), CSG booleans, PBR materials and textures, keyframe animation timeline (with material/deform channels), named layers, first-person walk mode, proportional editing, scatter along curve, procedural LOD, fog rendering, bloom post-process pipeline, and the MCB binary format. The project builds cleanly with all CTests passing.</p>
+      </div>
+    </div>
+
+    <h2>What is Mesh Craft?</h2>
+    <p>
+      <strong>Mesh Craft</strong> is a C++23 desktop 3D scene editor for creating and editing models in
+      the <strong>MC3 format</strong> — a custom XML-based scene description format used by the
+      <a href="https://github.com/openeggbert" target="_blank">OpenEggbert</a> project family.
+    </p>
+    <p>
+      Instead of working with raw triangle meshes, Mesh Craft lets you build scenes from
+      <em>constructive objects</em>: primitive shapes, extrusions, CSG booleans, reusable
+      definitions, hierarchical groups, lights, cameras, and keyframe animations. These are stored
+      in human-readable <code>.mc3.xml</code> files and can be exported to
+      <strong>glTF 2.0 / GLB</strong> for use in game engines and real-time applications.
+    </p>
+    <p>
+      The project is inspired by <em>Ray Dream Studio</em> and <em>Google SketchUp</em>.
+    </p>
+
+    <h2>Main Features</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">📦</div>
+        <div class="card-title">Primitive Shapes</div>
+        <div class="card-desc">Box, Sphere, Cylinder, Cone, Plane, Mesh, plus Torus, Capsule, Disk, Grid, and Ico-sphere — all editable with per-shape properties.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔩</div>
+        <div class="card-title">Extrude</div>
+        <div class="card-desc">Sweep 2D cross-sections (rect, circle, polygon, star, custom) along 5 path types: line, arc, helix, polyline, Bézier.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚗️</div>
+        <div class="card-title">CSG Booleans</div>
+        <div class="card-desc">Union, Difference, Intersection — evaluated using the Manifold v3 library for real boolean mesh geometry.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎨</div>
+        <div class="card-title">PBR Materials</div>
+        <div class="card-desc">Full PBR material editor: base color, metallic, roughness, emissive, normal scale, alpha modes, and 5 texture slots with UV mapping control.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎞️</div>
+        <div class="card-title">Keyframe Animation</div>
+        <div class="card-desc">Timeline editor with Step, Linear, and Cubic Bézier interpolation. Animates position, rotation, scale, material properties, and deforms. Exports to glTF animations.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔘</div>
+        <div class="card-title">Interactive Actions</div>
+        <div class="card-desc">State machine system for runtime interactivity: doors that open, levers that toggle, triggered sequences and parallels. Driven by on_load, interact, on_collision, on_signal, and more.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📤</div>
+        <div class="card-title">glTF/GLB Export</div>
+        <div class="card-desc">Standalone <code>mc3togltf</code> converter outputs glTF 2.0 JSON or self-contained GLB, including animation tracks and embedded textures.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧩</div>
+        <div class="card-title">Definitions &amp; Instances</div>
+        <div class="card-desc">Define reusable object templates and place multiple instances. Instances can override transform and material per-instance. Convert selected objects into a definition in one click.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚶</div>
+        <div class="card-title">First-Person Walk Mode</div>
+        <div class="card-desc">Press F5 to enter first-person exploration of your scene. WASD to move, mouse to look, Ctrl to jump. Gravity included. Press Esc or the HUD button to exit.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📦</div>
+        <div class="card-title">MCB Binary Format</div>
+        <div class="card-desc">Compact binary runtime format (<code>.mcb</code>) for fast scene loading. The <code>mc3tomcb</code> CLI converts <code>.mc3.xml</code> ↔ <code>.mcb</code> in both directions.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌐</div>
+        <div class="card-title">Web/WASM Build</div>
+        <div class="card-desc">Emscripten build produces a browser-ready <code>MeshCraft.html</code> with IDBFS persistent storage.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔁</div>
+        <div class="card-title">Undo/Redo</div>
+        <div class="card-desc">20-step deep-copy snapshot stack covering all edit operations: add, delete, transform, duplicate, paste, group, ungroup.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🖱️</div>
+        <div class="card-title">Transform Gizmo</div>
+        <div class="card-desc">Move / Rotate / Scale gizmo with Local/World space toggle, live delta overlay while dragging, vertex snapping, and angle snapping (15°/45°/90°).</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📐</div>
+        <div class="card-title">Editor Tools</div>
+        <div class="card-desc">Multi-object selection with mixed-value properties, measurement tool, alignment commands, command palette, viewport camera presets, and bounding box display.</div>
+      </div>
+    </div>
+
+    <h2>Supported Platforms</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Platform</th><th>Backend</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Linux</td><td>EasyGL (OpenGL ES 3.2)</td><td><span class="badge done">Working</span></td></tr>
+          <tr><td>macOS</td><td>EasyGL or SDL_RENDERER</td><td><span class="badge planned">Planned</span></td></tr>
+          <tr><td>Windows</td><td>EasyGL / BGFX / Vulkan</td><td><span class="badge planned">Planned</span></td></tr>
+          <tr><td>Android</td><td>SDL_RENDERER</td><td><span class="badge planned">Planned</span></td></tr>
+          <tr><td>Browser (WASM)</td><td>Emscripten + WebGL 2</td><td><span class="badge done">Working</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Key Dependencies</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Dependency</th><th>Role</th><th>Source</th></tr></thead>
+        <tbody>
+          <tr><td><strong>CNA</strong></td><td>XNA-like C++ runtime: windowing, input, audio, graphics abstraction (SDL3 + OpenGL ES 3.2)</td><td>Sibling repo <code>../cna</code></td></tr>
+          <tr><td><strong>sharp-runtime</strong></td><td>C++ System layer (math: Matrix, Vector3, …) used by CNA</td><td>Sibling repo <code>../sharp-runtime</code></td></tr>
+          <tr><td><strong>Dear ImGui v1.91.6</strong></td><td>Immediate-mode UI for all editor panels</td><td>FetchContent from GitHub</td></tr>
+          <tr><td><strong>Manifold v3</strong></td><td>CSG boolean mesh evaluation</td><td>FetchContent from GitHub</td></tr>
+          <tr><td><strong>tinyobjloader v2</strong></td><td>OBJ mesh loading for viewport preview</td><td>FetchContent from GitHub</td></tr>
+          <tr><td><strong>tinyxml2</strong></td><td>XML parsing (bundled via sharp-runtime)</td><td>Bundled</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Repository Structure at a Glance</h2>
+    <pre><code>mesh-craft/
+├── src/MeshCraft/          Main editor application (C++)
+├── include/MeshCraft/      Public headers
+├── mc3/                    Pure-C++ MC3 format library (sublibrary)
+├── mcb/                    MCB binary format library (sublibrary)
+├── mc3togltf/              CLI converter: MC3 → glTF/GLB
+├── mc3tomcb/               CLI converter: MC3 ↔ MCB
+├── Mc3Format/              Format specification markdown docs
+├── test/                   Test scenes (.mc3.xml) and smoke test
+├── cmake/                  Platform-specific CMake helpers
+└── CMakeLists.txt          Top-level build script</code></pre>
+
+    <h2>Quick Start</h2>
+    <pre><code><span class="cmt"># Prerequisites: CMake 3.21+, GCC 13+ or Clang 16+, sibling repos cna / sharp-runtime</span>
+
+<span class="cmt"># Configure (first time)</span>
+cmake -S . -B cmake-build-debug
+
+<span class="cmt"># Build everything (editor + mc3togltf + mc3tomcb)</span>
+ninja -C cmake-build-debug
+
+<span class="cmt"># Run with a test scene</span>
+./cmake-build-debug/MeshCraft test/house.mc3.xml</code></pre>
+
+    <p>For full setup instructions, see <a href="getting-started.html">Getting Started</a> and <a href="build.html">Build &amp; Run</a>.</p>
+
+    <div class="page-nav">
+      <span class="empty"></span>
+      <a href="getting-started.html" class="next">Getting Started</a>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/script.js"></script>
+</body>
+</html>

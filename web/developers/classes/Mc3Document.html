@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Mc3Document — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="index.html">All Classes</a>
+      <a href="MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="Mc3Document.html" class="active">Mc3Document</a>
+      <a href="Mc3Object.html">Mc3Object</a>
+      <a href="SceneRenderer.html">SceneRenderer</a><a href="EditorCamera.html">EditorCamera</a>
+      <a href="Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a><a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a><a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a><a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a><a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a><a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Classes</a><span class="sep">/</span><span>Mc3Document</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1><code>Mc3Document</code></h1>
+      <p class="subtitle">Top-level container for all scene data. Loaded from / saved to <code>.mc3.xml</code>.</p>
+    </div>
+
+    <h4>Header</h4><p><code>mc3/include/MeshCraft/Mc3/Mc3Document.hpp</code></p>
+    <h4>Namespace</h4><p><code>MeshCraft::Mc3</code></p>
+
+    <h2>Public Fields</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>version</code></td><td><code>string</code></td><td><code>"0.1"</code></td><td>MC3 format version. Active format is 0.3 — the default needs updating.</td></tr>
+          <tr><td><code>model</code></td><td><code>string</code></td><td></td><td>Human-readable scene/model name.</td></tr>
+          <tr><td><code>unit</code></td><td><code>string</code></td><td><code>"meter"</code></td><td>World unit (<code>meter</code>, <code>centimeter</code>, <code>inch</code>).</td></tr>
+          <tr><td><code>coordinateSystem</code></td><td><code>string</code></td><td><code>"right_handed_y_up"</code></td><td>Coordinate convention.</td></tr>
+          <tr><td><code>sourcePath</code></td><td><code>filesystem::path</code></td><td></td><td>Directory of the XML file. Used to resolve relative texture/mesh URIs.</td></tr>
+          <tr><td><code>environment</code></td><td><code>optional&lt;Mc3Environment&gt;</code></td><td></td><td>Background color/texture and fog.</td></tr>
+          <tr><td><code>lights</code></td><td><code>vector&lt;Mc3Light&gt;</code></td><td></td><td>All scene lights (ambient, directional, point, spot).</td></tr>
+          <tr><td><code>cameras</code></td><td><code>vector&lt;Mc3Camera&gt;</code></td><td></td><td>All scene cameras.</td></tr>
+          <tr><td><code>defaultCamera</code></td><td><code>string</code></td><td></td><td>Name of the default camera.</td></tr>
+          <tr><td><code>textures</code></td><td><code>map&lt;string, Mc3Texture&gt;</code></td><td></td><td>Texture library. Key = texture ID.</td></tr>
+          <tr><td><code>materials</code></td><td><code>map&lt;string, Mc3Material&gt;</code></td><td></td><td>Material library. Key = material ID. <strong>Iterate with structured bindings.</strong></td></tr>
+          <tr><td><code>definitions</code></td><td><code>map&lt;string, shared_ptr&lt;Mc3Object&gt;&gt;</code></td><td></td><td>Reusable object templates. Key = definition ID.</td></tr>
+          <tr><td><code>objects</code></td><td><code>vector&lt;shared_ptr&lt;Mc3Object&gt;&gt;</code></td><td></td><td>Root-level scene graph nodes.</td></tr>
+          <tr><td><code>actions</code></td><td><code>map&lt;string, Mc3Action&gt;</code></td><td></td><td>Animation clips. Key = action name.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Static Methods</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Method</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>static Mc3Document loadFromFile(const filesystem::path&amp;)</code></td><td>Parses a <code>.mc3.xml</code> file using <code>Mc3XmlParser</code>. Sets <code>sourcePath</code> to the directory of the file. Throws <code>std::runtime_error</code> on parse failure.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Instance Methods</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Method</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>void saveToFile(const filesystem::path&amp;) const</code></td><td>Serializes the document to XML using <code>Mc3XmlWriter</code>. Writes UTF-8 XML with the standard <code>&lt;?xml …?&gt;</code> header.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Important Usage Notes</h2>
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <ul>
+          <li><code>materials</code> is a <code>std::map</code>. Always iterate with structured bindings: <code>for (const auto&amp; [key, mat] : doc.materials)</code>.</li>
+          <li><code>Mc3Material</code> uses <code>baseColor</code> (a <code>float[4]</code>), <strong>not</strong> <code>diffuse</code>.</li>
+          <li>When renaming a definition key in <code>definitions</code>, walk all scene objects and update any <code>Mc3Object::definition</code> references to match.</li>
+          <li>Always call <code>pushUndo()</code> in <code>MeshCraftApplication</code> before mutating a document.</li>
+          <li>Do not change the public API without checking <code>mc3togltf</code> and all test XML files.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Example: Creating a Document Programmatically</h2>
+    <pre><code>MeshCraft::Mc3::Mc3Document doc;
+doc.model = "MyScene";
+doc.unit  = "meter";
+
+<span class="cmt">// Add a material</span>
+MeshCraft::Mc3::Mc3Material mat;
+mat.name = "red";
+mat.baseColor = {1.0f, 0.2f, 0.1f, 1.0f};
+doc.materials["red"] = mat;
+
+<span class="cmt">// Add a box object</span>
+<span class="kw">auto</span> box = std::make_shared&lt;MeshCraft::Mc3::Mc3Object&gt;();
+box-&gt;type = MeshCraft::Mc3::ObjectType::Box;
+box-&gt;name = "Cube";
+box-&gt;material = "red";
+box-&gt;primitive = MeshCraft::Mc3::Mc3Primitive{};
+doc.objects.push_back(box);
+
+<span class="cmt">// Save</span>
+doc.saveToFile("scene.mc3.xml");</code></pre>
+
+    <div class="page-nav">
+      <a href="MeshCraftApplication.html" class="prev">MeshCraftApplication</a>
+      <a href="Mc3Object.html" class="next">Mc3Object</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

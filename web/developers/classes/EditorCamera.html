@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>EditorCamera — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="index.html">All Classes</a>
+      <a href="MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="Mc3Document.html">Mc3Document</a><a href="Mc3Object.html">Mc3Object</a>
+      <a href="SceneRenderer.html">SceneRenderer</a>
+      <a href="EditorCamera.html" class="active">EditorCamera</a>
+      <a href="Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a><a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a><a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a><a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a><a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a><a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Classes</a><span class="sep">/</span><span>EditorCamera</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1><code>EditorCamera</code></h1>
+      <p class="subtitle">Spherical orbit camera for the 3D viewport. Produces view + projection matrices and picking rays.</p>
+    </div>
+
+    <h4>Header</h4><p><code>include/MeshCraft/Editor/EditorCamera.hpp</code></p>
+    <h4>Namespace</h4><p><code>MeshCraft::Editor</code></p>
+
+    <h2>Model</h2>
+    <p>The camera is defined by three parameters plus a target point:</p>
+    <ul>
+      <li><code>yaw</code> (radians) — horizontal orbit angle</li>
+      <li><code>pitch</code> (radians) — vertical orbit angle, clamped to ±1.48 rad (~±85°)</li>
+      <li><code>distance</code> — distance from the camera eye to the target, clamped to [0.5, 2000]</li>
+      <li><code>target</code> (<code>Vector3</code>) — the point the camera orbits around and looks at</li>
+    </ul>
+    <p>The camera eye position is computed from these four values each frame. There is no separate eye position stored.</p>
+
+    <h2>Public Fields</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>yaw</code></td><td><code>float</code></td><td><code>0.0f</code></td><td>Horizontal orbit (radians)</td></tr>
+          <tr><td><code>pitch</code></td><td><code>float</code></td><td><code>0.4f</code></td><td>Vertical orbit (radians, clamped to ±85°)</td></tr>
+          <tr><td><code>distance</code></td><td><code>float</code></td><td><code>15.0f</code></td><td>Distance from target</td></tr>
+          <tr><td><code>fovDegrees</code></td><td><code>float</code></td><td><code>60.0f</code></td><td>Field of view</td></tr>
+          <tr><td><code>nearPlane</code></td><td><code>float</code></td><td><code>0.1f</code></td><td>Near clip</td></tr>
+          <tr><td><code>farPlane</code></td><td><code>float</code></td><td><code>2000.0f</code></td><td>Far clip</td></tr>
+          <tr><td><code>target</code></td><td><code>Vector3</code></td><td><code>(0,0,0)</code></td><td>The orbit center / look-at point</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Methods</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Method</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>orbit(deltaYaw, deltaPitch)</code></td><td>Add to <code>yaw</code> and <code>pitch</code>. Pitch is clamped. Called on middle-mouse drag.</td></tr>
+          <tr><td><code>pan(deltaX, deltaY)</code></td><td>Translate <code>target</code> in the camera's right+up plane. Called on right-mouse drag.</td></tr>
+          <tr><td><code>zoom(delta)</code></td><td>Multiply <code>distance</code> by a factor. Clamps result to [0.5, 2000].</td></tr>
+          <tr><td><code>focusOn(x, y, z, radius)</code></td><td>Move <code>target</code> to (x,y,z), set <code>distance</code> to fit the given radius. Used by <code>F</code> key.</td></tr>
+          <tr><td><code>reset()</code></td><td>Reset yaw=0, pitch=0.4, distance=15, target=(0,0,0).</td></tr>
+          <tr><td><code>viewMatrix()</code></td><td>Compute and return the view matrix from yaw/pitch/distance/target.</td></tr>
+          <tr><td><code>projectionMatrix(aspectRatio)</code></td><td>Return a perspective projection matrix (fovDegrees, aspect, near, far).</td></tr>
+          <tr><td><code>position()</code></td><td>Compute and return the current eye position (derived from orbit params).</td></tr>
+          <tr><td><code>screenRayDirection(ndcX, ndcY, aspect)</code></td><td>Unproject a normalized device coordinate to a world-space ray direction. Used for AABB picking.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="page-nav">
+      <a href="SceneRenderer.html" class="prev">SceneRenderer</a>
+      <a href="Mc3Animation.html" class="next">Mc3Animation</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

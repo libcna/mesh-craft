@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Materials &amp; Textures — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section"><div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a><a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a><a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a><a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Format Reference</div>
+      <a href="mc3-format.html">MC3 Format</a><a href="mc3-objects.html">Object Types</a>
+      <a href="mc3-materials.html" class="active">Materials &amp; Textures</a>
+      <a href="mc3-animation.html">Animation</a>
+      <a href="mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a><a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a><a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a><a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="mc3-format.html">Format</a><span class="sep">/</span><span>Materials &amp; Textures</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Materials &amp; Textures</h1>
+      <p class="subtitle">PBR material system and texture library for MC3 scenes.</p>
+    </div>
+
+    <h2>Materials</h2>
+    <p>Materials use a PBR metallic-roughness model compatible with glTF 2.0.</p>
+    <pre><code>&lt;<span class="tag">materials</span>&gt;
+  &lt;<span class="tag">material</span> <span class="atr">id</span>=<span class="val">"brick"</span> <span class="atr">roughness</span>=<span class="val">"0.8"</span> <span class="atr">metallic</span>=<span class="val">"0.0"</span>
+            <span class="atr">alpha_mode</span>=<span class="val">"opaque"</span> <span class="atr">double_sided</span>=<span class="val">"false"</span>&gt;
+    &lt;<span class="tag">base_color</span>&gt;0.8 0.2 0.1 1.0&lt;/<span class="tag">base_color</span>&gt;
+    &lt;<span class="tag">base_color_texture</span>&gt;brick_wall&lt;/<span class="tag">base_color_texture</span>&gt;
+    &lt;<span class="tag">emissive_color</span>&gt;0 0 0&lt;/<span class="tag">emissive_color</span>&gt;
+    &lt;<span class="tag">normal_texture</span>&gt;brick_normal&lt;/<span class="tag">normal_texture</span>&gt;
+  &lt;/<span class="tag">material</span>&gt;
+&lt;/<span class="tag">materials</span>&gt;</code></pre>
+
+    <h3>Material Attributes</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>ID</td><td>—</td><td>Unique material identifier. Referenced by object <code>material</code> attributes.</td></tr>
+        <tr><td><code>roughness</code></td><td>float 0–1</td><td><code>0.5</code></td><td>PBR roughness factor</td></tr>
+        <tr><td><code>metallic</code></td><td>float 0–1</td><td><code>0.0</code></td><td>PBR metallic factor</td></tr>
+        <tr><td><code>normal_scale</code></td><td>float</td><td><code>1.0</code></td><td>Normal map intensity multiplier</td></tr>
+        <tr><td><code>occlusion_strength</code></td><td>float 0–1</td><td><code>1.0</code></td><td>AO strength</td></tr>
+        <tr><td><code>alpha_mode</code></td><td><code>opaque</code>|<code>mask</code>|<code>blend</code></td><td><code>opaque</code></td><td>Transparency mode</td></tr>
+        <tr><td><code>alpha_cutoff</code></td><td>float 0–1</td><td><code>0.5</code></td><td>Alpha threshold for <code>mask</code> mode</td></tr>
+        <tr><td><code>double_sided</code></td><td>boolean</td><td><code>false</code></td><td>Disable back-face culling</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Child Elements</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Element</th><th>Content type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>&lt;base_color&gt;</code></td><td>RGB or RGBA vec</td><td>Base color tint. Alpha defaults to 1.0 when 3 components given.</td></tr>
+        <tr><td><code>&lt;emissive_color&gt;</code></td><td>RGB vec3</td><td>Emissive light emission.</td></tr>
+        <tr><td><code>&lt;base_color_texture&gt;</code></td><td>texture IDREF</td><td>Albedo / diffuse map.</td></tr>
+        <tr><td><code>&lt;metallic_roughness_texture&gt;</code></td><td>texture IDREF</td><td>ORM map: R=occlusion, G=roughness, B=metallic.</td></tr>
+        <tr><td><code>&lt;normal_texture&gt;</code></td><td>texture IDREF</td><td>Tangent-space normal map.</td></tr>
+        <tr><td><code>&lt;occlusion_texture&gt;</code></td><td>texture IDREF</td><td>Ambient occlusion map.</td></tr>
+        <tr><td><code>&lt;emissive_texture&gt;</code></td><td>texture IDREF</td><td>Emissive map.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>Textures</h2>
+    <pre><code>&lt;<span class="tag">textures</span>&gt;
+  &lt;<span class="tag">texture</span> <span class="atr">id</span>=<span class="val">"brick_wall"</span>
+           <span class="atr">uri</span>=<span class="val">"textures/brick.png"</span>
+           <span class="atr">wrap_u</span>=<span class="val">"repeat"</span>
+           <span class="atr">wrap_v</span>=<span class="val">"repeat"</span>
+           <span class="atr">filter</span>=<span class="val">"linear"</span>
+           <span class="atr">color_space</span>=<span class="val">"srgb"</span>
+           <span class="atr">mip_maps</span>=<span class="val">"true"</span>/&gt;
+&lt;/<span class="tag">textures</span>&gt;</code></pre>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Values</th><th>Default</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>ID</td><td>—</td></tr>
+        <tr><td><code>uri</code></td><td>path (relative to .mc3.xml)</td><td>—</td></tr>
+        <tr><td><code>wrap_u</code></td><td><code>repeat</code>|<code>clamp</code>|<code>mirror</code></td><td><code>repeat</code></td></tr>
+        <tr><td><code>wrap_v</code></td><td><code>repeat</code>|<code>clamp</code>|<code>mirror</code></td><td><code>repeat</code></td></tr>
+        <tr><td><code>filter</code></td><td><code>linear</code>|<code>nearest</code></td><td><code>linear</code></td></tr>
+        <tr><td><code>color_space</code></td><td><code>srgb</code>|<code>linear</code></td><td><code>srgb</code></td></tr>
+        <tr><td><code>mip_maps</code></td><td>boolean</td><td><code>true</code></td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>UV Mapping (<code>&lt;uv_mapping&gt;</code>)</h2>
+    <p>Optional child element on leaf object types. Controls texture coordinate scale/offset/rotation.</p>
+    <pre><code>&lt;<span class="tag">uv_mapping</span> <span class="atr">scale</span>=<span class="val">"2.5 1.5"</span> <span class="atr">offset</span>=<span class="val">"0 0"</span> <span class="atr">rotation</span>=<span class="val">"0"</span>/&gt;</code></pre>
+    <div class="callout todo">
+      <span class="callout-icon">📋</span>
+      <div class="callout-body">
+        <p>UV mapping is parsed from XML but not yet fully wired into the editor UI or the glTF exporter tessellation pass. Marked as TODO in <code>Mc3Object.hpp</code>.</p>
+      </div>
+    </div>
+
+    <h2>C++ Representation</h2>
+    <pre><code><span class="kw">struct</span> <span class="cls">Mc3Material</span> {
+    <span class="kw">string</span> name;
+    array&lt;<span class="kw">float</span>,4&gt; baseColor{0.8f, 0.8f, 0.8f, 1.0f}; <span class="cmt">// RGBA</span>
+    <span class="kw">string</span> baseColorTexture;          <span class="cmt">// texture id</span>
+    <span class="kw">string</span> normalTexture;
+    <span class="kw">string</span> emissiveTexture;
+    <span class="kw">string</span> metallicRoughnessTexture;
+    <span class="kw">string</span> occlusionTexture;
+    <span class="kw">float</span> roughness{0.5f};
+    <span class="kw">float</span> metallic{0.0f};
+    <span class="kw">float</span> normalScale{1.0f};
+    <span class="kw">float</span> occlusionStrength{1.0f};
+    array&lt;<span class="kw">float</span>,3&gt; emissiveColor{0,0,0};
+    <span class="kw">string</span> alphaMode{"opaque"};
+    <span class="kw">float</span> alphaCutoff{0.5f};
+    <span class="kw">bool</span> doubleSided{false};
+};</code></pre>
+
+    <div class="page-nav">
+      <a href="mc3-objects.html" class="prev">Object Types</a>
+      <a href="mc3-animation.html" class="next">Animation</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

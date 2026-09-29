@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Editor Module — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a>
+      <a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a>
+      <a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="index.html">All Modules</a>
+      <a href="mc3-library.html">MC3 Library</a>
+      <a href="mc3togltf.html">mc3togltf</a>
+      <a href="editor.html" class="active">Editor</a>
+      <a href="renderer.html">Renderer</a>
+      <a href="scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a>
+      <a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a>
+      <a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a>
+      <a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a>
+      <a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a>
+      <a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a>
+      <a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a>
+      <a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a>
+      <a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a>
+      <a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a>
+      <a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Modules</a><span class="sep">/</span><span>Editor</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Editor Module</h1>
+      <p class="subtitle">Camera control, object selection, and transform gizmo — the 3D viewport interaction layer.</p>
+    </div>
+
+    <h2>Components</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Class</th><th>File</th><th>Role</th></tr></thead>
+        <tbody>
+          <tr><td><a href="../classes/EditorCamera.html"><code>EditorCamera</code></a></td><td><code>include/MeshCraft/Editor/EditorCamera.hpp</code></td><td>Orbit / pan / zoom / focus camera model. Produces view + projection matrices.</td></tr>
+          <tr><td><code>SelectionManager</code></td><td><code>include/MeshCraft/Editor/SelectionManager.hpp</code></td><td>Tracks the set of selected <code>shared_ptr&lt;Mc3Object&gt;</code>. Supports single and multi-select.</td></tr>
+          <tr><td><code>TransformGizmo</code></td><td><code>include/MeshCraft/Editor/TransformGizmo.hpp</code></td><td>Holds the active gizmo mode (Move/Scale/Rotate) and per-axis drag state.</td></tr>
+          <tr><td><code>EditorTool</code></td><td><code>include/MeshCraft/Editor/EditorTool.hpp</code></td><td>Tool state helpers (currently minimal).</td></tr>
+          <tr><td><code>EditorViewport</code></td><td><code>include/MeshCraft/Editor/EditorViewport.hpp</code></td><td>Viewport rect calculation helpers.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>EditorCamera</h2>
+    <p>Uses a <strong>spherical orbit</strong> model: <code>yaw</code> (horizontal), <code>pitch</code> (vertical, clamped to ±85°), and <code>distance</code> from a <code>target</code> point.</p>
+
+    <h3>Key Methods</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Method</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>orbit(deltaYaw, deltaPitch)</code></td><td>Rotate around the target. Called on middle-mouse drag.</td></tr>
+          <tr><td><code>pan(deltaX, deltaY)</code></td><td>Translate the target point in camera space. Called on right-mouse drag.</td></tr>
+          <tr><td><code>zoom(delta)</code></td><td>Change the distance to target. Clamped to [0.5, 2000]. Called on scroll wheel.</td></tr>
+          <tr><td><code>focusOn(x, y, z, radius)</code></td><td>Move the target to a world position and adjust distance to fit. Called on <code>F</code> key.</td></tr>
+          <tr><td><code>reset()</code></td><td>Reset to default yaw=0, pitch=0.4, distance=15.</td></tr>
+          <tr><td><code>viewMatrix()</code></td><td>Returns the view matrix from the orbit model.</td></tr>
+          <tr><td><code>projectionMatrix(aspectRatio)</code></td><td>Returns a perspective projection (60° FOV, near=0.1, far=2000).</td></tr>
+          <tr><td><code>screenRayDirection(ndcX, ndcY, aspect)</code></td><td>Unprojects a screen NDC coordinate to a world-space ray direction. Used for AABB picking.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Object Picking</h2>
+    <p>Ray-cast picking is implemented in <code>MeshCraftApplication::handleMouseInput()</code>:</p>
+    <ol>
+      <li>On left-click in the 3D viewport, compute an NDC coordinate from the mouse position.</li>
+      <li>Call <code>EditorCamera::screenRayDirection(ndcX, ndcY, aspectRatio)</code> to get a world-space ray.</li>
+      <li>Recursively test each object's axis-aligned bounding box (AABB) — including nested children in groups, CSG nodes, and instances.</li>
+      <li>Select the closest hit object. Ctrl+click toggles it in the selection set.</li>
+    </ol>
+
+    <h2>Selection</h2>
+    <p><code>SelectionManager</code> holds a <code>std::set&lt;std::shared_ptr&lt;Mc3Object&gt;&gt;</code>.</p>
+    <ul>
+      <li><strong>Single select</strong>: left-click clears selection, then adds the picked object.</li>
+      <li><strong>Multi-select</strong>: Ctrl+click toggles the picked object.</li>
+      <li><strong>Select all</strong>: Ctrl+A selects all root objects (or all children if a single group is selected).</li>
+      <li><strong>Box select</strong>: right-drag in the viewport draws a rectangle; on release, all objects whose AABB projects inside are added to the selection.</li>
+    </ul>
+
+    <h2>Transform Gizmo</h2>
+    <p>Three modes, activated by keyboard shortcuts:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Mode</th><th>Key</th><th>Visual</th><th>Drag effect</th></tr></thead>
+        <tbody>
+          <tr><td>Move</td><td><code>G</code></td><td>Colored axis arrows with cube tips</td><td>Translates position along the dragged axis</td></tr>
+          <tr><td>Scale</td><td><code>S</code></td><td>Colored axis lines with flat-square tips</td><td>Scales the object along the dragged axis</td></tr>
+          <tr><td>Rotate</td><td><code>R</code></td><td>Colored arcs in the three planes</td><td>Rotates the object around the dragged axis</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>For multi-selection, the gizmo applies the <strong>delta</strong> to all selected objects simultaneously.</p>
+    <p>Arrow key nudge (0.1 step with Shift, 1.0 without) applies to the active tool. PageUp/PageDown nudge along the Z axis.</p>
+
+    <div class="page-nav">
+      <a href="mc3togltf.html" class="prev">mc3togltf</a>
+      <a href="renderer.html" class="next">Renderer</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Export to glTF/GLB — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section"><div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a><a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a><a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a><a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a><a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a><a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Tutorials</div>
+      <a href="index.html">All Tutorials</a>
+      <a href="minimal-example.html">Minimal Scene</a>
+      <a href="loading-scene.html">Loading a Scene</a>
+      <a href="csg-operations.html">CSG Operations</a>
+      <a href="export-gltf.html" class="active">Export to glTF/GLB</a>
+      <a href="animation.html">Keyframe Animation</a>
+      <a href="complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Tutorials</a><span class="sep">/</span><span>Export to glTF/GLB</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Tutorial: Export to glTF/GLB</h1>
+      <p class="subtitle">Convert an <code>.mc3.xml</code> scene to a glTF 2.0 JSON or self-contained GLB binary for use in Godot, Unity, Blender, and other engines.</p>
+    </div>
+
+    <h2>What is mc3togltf?</h2>
+    <p>
+      <code>mc3togltf</code> is a standalone command-line tool included in the MeshCraft repository. It reads an <code>.mc3.xml</code> file and writes a standard <strong>glTF 2.0</strong> file (<code>.gltf</code> JSON + separate <code>.bin</code>) or a self-contained <strong>GLB</strong> binary (<code>.glb</code>).
+    </p>
+    <p>The tool does <em>not</em> require the editor to be running — it can be used in automated pipelines and CI.</p>
+
+    <h2>Step 1 — Build mc3togltf</h2>
+    <p>The converter is built alongside the main editor when you use the default CMake target. You can also build only the converter:</p>
+    <pre><code>cmake -B cmake-build-debug -DCMAKE_BUILD_TYPE=Debug .
+cmake --build cmake-build-debug --target mc3togltf</code></pre>
+    <p>The binary is placed at <code>cmake-build-debug/mc3togltf/mc3togltf</code>.</p>
+
+    <h2>Step 2 — Run the Conversion</h2>
+
+    <h3>Export as glTF JSON</h3>
+    <pre><code>./cmake-build-debug/mc3togltf/mc3togltf scene.mc3.xml scene.gltf</code></pre>
+    <p>This produces <code>scene.gltf</code> (JSON) and <code>scene.bin</code> (binary mesh data) in the same directory.</p>
+
+    <h3>Export as GLB (single file)</h3>
+    <pre><code>./cmake-build-debug/mc3togltf/mc3togltf scene.mc3.xml scene.glb</code></pre>
+    <p>The output format is determined from the file extension: <code>.gltf</code> → JSON+BIN, <code>.glb</code> → binary container.</p>
+
+    <h3>Export the test house scene</h3>
+    <pre><code>./cmake-build-debug/mc3togltf/mc3togltf test/house.mc3.xml /tmp/house.glb</code></pre>
+
+    <h2>What Gets Exported</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>MC3 feature</th><th>glTF equivalent</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Box, Sphere, Cylinder, Cone, Plane primitives</td><td><code>mesh</code> with <code>TRIANGLES</code> primitive</td><td><span class="badge done">Exported</span></td></tr>
+        <tr><td>Extrude objects</td><td><code>mesh</code> (tessellated geometry)</td><td><span class="badge done">Exported</span></td></tr>
+        <tr><td>Group (hierarchy)</td><td><code>node</code> with children</td><td><span class="badge done">Exported</span></td></tr>
+        <tr><td>Instance (reference to definition)</td><td>Separate node with copied mesh</td><td><span class="badge done">Exported</span></td></tr>
+        <tr><td>Transform (position, rotation, scale)</td><td><code>node.translation</code>/<code>rotation</code>/<code>scale</code></td><td><span class="badge done">Exported</span></td></tr>
+        <tr><td>Pivot offset</td><td>Baked into node transform</td><td><span class="badge done">Exported</span></td></tr>
+        <tr><td>PBR materials (baseColor, roughness, metallic)</td><td><code>material.pbrMetallicRoughness</code></td><td><span class="badge done">Exported</span></td></tr>
+        <tr><td>Texture references</td><td><code>texture</code> + <code>image</code> entries</td><td><span class="badge done">Exported</span></td></tr>
+        <tr><td>Position/rotation/scale animation channels</td><td><code>animation</code> samplers + channels</td><td><span class="badge done">Exported</span></td></tr>
+        <tr><td>Directional and ambient lights</td><td>Not in base glTF — skipped</td><td><span class="badge planned">Skipped</span></td></tr>
+        <tr><td>CSG objects (union/difference/intersection)</td><td>Individual child meshes (not merged)</td><td><span class="badge partial">Partial</span></td></tr>
+        <tr><td>visible / deform / material.* animation</td><td>No glTF equivalent — skipped</td><td><span class="badge planned">Skipped</span></td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>Verifying the Export</h2>
+    <p>Open the exported file in any of these free tools:</p>
+    <ul>
+      <li><strong>Khronos glTF Sample Viewer</strong> — browser-based, drag-and-drop</li>
+      <li><strong>Blender</strong> — File → Import → glTF 2.0</li>
+      <li><strong>Godot 4</strong> — import directly into the project assets folder</li>
+      <li><strong>VS Code + glTF Tools extension</strong> — preview and validate the JSON</li>
+    </ul>
+
+    <h2>Animation Export Notes</h2>
+    <p>Keyframe animations in the <code>&lt;actions&gt;</code> section are exported as glTF <code>animations[]</code>. Some caveats apply:</p>
+    <ul>
+      <li>Each MC3 action becomes one glTF animation clip.</li>
+      <li>Per-component channels (e.g., <code>position.y</code> alone) are merged into VEC3 samplers; the other two components default to the object's static transform value.</li>
+      <li>Cubic Bézier channels are sampled at <strong>30 fps</strong> and exported as <code>LINEAR</code> glTF samplers (glTF has no native Bézier interpolation).</li>
+      <li><code>visible</code>, <code>deform.*</code>, and <code>material.*</code> channels have no glTF equivalent and are silently dropped.</li>
+    </ul>
+
+    <h2>Running the Test Suite</h2>
+    <p>The <code>mc3togltf</code> module has its own CTest suite with 38 assertions that verify round-trip correctness:</p>
+    <pre><code>cd cmake-build-debug
+ctest -R mc3togltf --output-on-failure</code></pre>
+
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <p><strong>Duplication note:</strong> <code>mc3togltf</code> contains its own local copy of the MC3 XML parser (<code>mc3togltf/src/Mc3XmlParser.cpp</code>) rather than linking against the <code>mc3/</code> library. This is an architectural decision for standalone deployment. If you extend the MC3 format, you must update <em>both</em> parsers to keep them in sync.</p>
+      </div>
+    </div>
+
+    <h2>Common Problems</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Problem</th><th>Likely Cause</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>Output glTF has no meshes</td><td>The scene only contains groups, instances, or unsupported types</td><td>Ensure there are primitive or extrude objects in the scene</td></tr>
+        <tr><td>Textures not found in Blender</td><td>Texture paths in MC3 are relative to the <code>.mc3.xml</code> file</td><td>Keep texture files next to the MC3 file, or use GLB which embeds nothing — embed textures separately</td></tr>
+        <tr><td><code>mc3togltf</code> segfaults on load</td><td>Malformed XML or missing required attributes</td><td>Validate the MC3 file first by opening it in the editor</td></tr>
+        <tr><td>CSG geometry looks like individual pieces</td><td>CSG is not resolved by mc3togltf</td><td>Boolean evaluation is planned; workaround: export individual children and merge in Blender</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="page-nav">
+      <a href="csg-operations.html" class="prev">CSG Operations</a>
+      <a href="animation.html" class="next">Keyframe Animation</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

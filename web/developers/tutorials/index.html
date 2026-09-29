@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Tutorials — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section"><div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a><a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a><a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a><a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a><a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a><a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Tutorials</div>
+      <a href="index.html" class="active">All Tutorials</a>
+      <a href="minimal-example.html">Minimal Scene</a>
+      <a href="loading-scene.html">Loading a Scene</a>
+      <a href="csg-operations.html">CSG Operations</a>
+      <a href="export-gltf.html">Export to glTF/GLB</a>
+      <a href="animation.html">Keyframe Animation</a>
+      <a href="complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><span>Tutorials</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Tutorials</h1>
+      <p class="subtitle">Practical, step-by-step guides for working with MeshCraft and the MC3 format.</p>
+    </div>
+    <div class="card-grid">
+      <a href="minimal-example.html" class="card">
+        <div class="card-icon">📦</div>
+        <div class="card-title">Minimal Scene</div>
+        <div class="card-desc">Create your first MC3 scene from scratch: a ground plane, a box, a light, and a material.</div>
+      </a>
+      <a href="loading-scene.html" class="card">
+        <div class="card-icon">📂</div>
+        <div class="card-title">Loading a Scene</div>
+        <div class="card-desc">How to open an existing <code>.mc3.xml</code> file in the editor and navigate the scene.</div>
+      </a>
+      <a href="csg-operations.html" class="card">
+        <div class="card-icon">⚗️</div>
+        <div class="card-title">CSG Operations</div>
+        <div class="card-desc">Combine primitives with Union, Difference, and Intersection to create complex shapes.</div>
+      </a>
+      <a href="export-gltf.html" class="card">
+        <div class="card-icon">📤</div>
+        <div class="card-title">Export to glTF/GLB</div>
+        <div class="card-desc">Export your scene for use in Godot, Unity, Blender, or any glTF-compatible engine.</div>
+      </a>
+      <a href="animation.html" class="card">
+        <div class="card-icon">🎞️</div>
+        <div class="card-title">Keyframe Animation</div>
+        <div class="card-desc">Create and play keyframe animations using the Timeline panel.</div>
+      </a>
+      <a href="complete-example.html" class="card">
+        <div class="card-icon">🏡</div>
+        <div class="card-title">Complete Scene Example</div>
+        <div class="card-desc">A full garden scene combining environment, PBR materials, lights, cameras, CSG, definitions, interactive actions, extrusion, and keyframe animation — all in one annotated MC3 file.</div>
+      </a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

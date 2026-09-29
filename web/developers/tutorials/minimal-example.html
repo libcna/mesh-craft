@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Minimal Scene Tutorial — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section"><div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a><a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a><a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a><a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a><a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a><a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Tutorials</div>
+      <a href="index.html">All Tutorials</a>
+      <a href="minimal-example.html" class="active">Minimal Scene</a>
+      <a href="loading-scene.html">Loading a Scene</a>
+      <a href="csg-operations.html">CSG Operations</a>
+      <a href="export-gltf.html">Export to glTF/GLB</a>
+      <a href="animation.html">Keyframe Animation</a>
+      <a href="complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Tutorials</a><span class="sep">/</span><span>Minimal Scene</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Tutorial: Minimal Scene</h1>
+      <p class="subtitle">Create your first MC3 scene from scratch — in the editor and by hand-editing XML.</p>
+    </div>
+
+    <h2>Approach 1: Using the Editor</h2>
+
+    <h3>Step 1 — Start with a new scene</h3>
+    <p>Launch MeshCraft with no arguments, or press <code>Ctrl+N</code> to create a new empty scene.</p>
+    <pre><code>./cmake-build-debug/MeshCraft</code></pre>
+
+    <h3>Step 2 — Add a ground plane</h3>
+    <ol>
+      <li>Press <code>F5</code> or click the Plane button in the toolbar.</li>
+      <li>In the Properties panel (right side), set:
+        <ul>
+          <li>Name: <code>Ground</code></li>
+          <li>Size: <code>20 20</code></li>
+          <li>Axis: <code>y</code></li>
+        </ul>
+      </li>
+    </ol>
+
+    <h3>Step 3 — Add a box</h3>
+    <ol>
+      <li>Press <code>F1</code> or click the Box button in the toolbar.</li>
+      <li>In the Properties panel, set:
+        <ul>
+          <li>Name: <code>Cube</code></li>
+          <li>Position: <code>0  0.5  0</code></li>
+          <li>Size: <code>1 1 1</code></li>
+        </ul>
+      </li>
+    </ol>
+
+    <h3>Step 4 — Create a material</h3>
+    <ol>
+      <li>In the Properties panel, click the <strong>Materials</strong> tab.</li>
+      <li>Click <strong>+ Add Material</strong>.</li>
+      <li>Name it <code>grey</code>.</li>
+      <li>Set Base Color to R=0.7, G=0.7, B=0.7, A=1.0.</li>
+    </ol>
+
+    <h3>Step 5 — Assign materials to objects</h3>
+    <ol>
+      <li>Click on the Ground plane in the Hierarchy panel.</li>
+      <li>In the Properties panel (Object tab), set Material to <code>grey</code>.</li>
+      <li>Do the same for the Cube.</li>
+    </ol>
+
+    <h3>Step 6 — Add a light</h3>
+    <ol>
+      <li>Click the <strong>Lights</strong> tab in the Properties panel.</li>
+      <li>Click <strong>+ Add Directional</strong>.</li>
+      <li>Set Direction: <code>-0.5 -1 -0.3</code>, Brightness: <code>2.5</code>.</li>
+      <li>Click <strong>+ Add Ambient</strong>. Set Color: <code>0.3 0.3 0.4</code>, Brightness: <code>0.4</code>.</li>
+    </ol>
+
+    <h3>Step 7 — Save</h3>
+    <p>Press <code>Ctrl+S</code>. Enter a path such as <code>my_scene.mc3.xml</code>.</p>
+
+    <hr/>
+
+    <h2>Approach 2: Hand-Editing XML</h2>
+    <p>Create a file named <code>my_scene.mc3.xml</code> with this content:</p>
+    <pre><code>&lt;?<span class="tag">xml</span> version=<span class="val">"1.0"</span> encoding=<span class="val">"UTF-8"</span>?&gt;
+&lt;<span class="tag">mc3</span> <span class="atr">version</span>=<span class="val">"0.3"</span> <span class="atr">model</span>=<span class="val">"MinimalScene"</span>&gt;
+
+  &lt;<span class="tag">environment</span>&gt;
+    &lt;<span class="tag">background</span> <span class="atr">color</span>=<span class="val">"0.4 0.6 0.9"</span>/&gt;
+  &lt;/<span class="tag">environment</span>&gt;
+
+  &lt;<span class="tag">lights</span>&gt;
+    &lt;<span class="tag">ambient</span>     <span class="atr">color</span>=<span class="val">"0.3 0.3 0.4"</span> <span class="atr">brightness</span>=<span class="val">"0.4"</span>/&gt;
+    &lt;<span class="tag">directional</span> <span class="atr">name</span>=<span class="val">"Sun"</span> <span class="atr">color</span>=<span class="val">"1 0.95 0.8"</span>
+                 <span class="atr">brightness</span>=<span class="val">"2.5"</span> <span class="atr">direction</span>=<span class="val">"-0.5 -1 -0.3"</span>/&gt;
+  &lt;/<span class="tag">lights</span>&gt;
+
+  &lt;<span class="tag">materials</span>&gt;
+    &lt;<span class="tag">material</span> <span class="atr">id</span>=<span class="val">"grey"</span> <span class="atr">roughness</span>=<span class="val">"0.8"</span>&gt;
+      &lt;<span class="tag">base_color</span>&gt;0.7 0.7 0.7 1.0&lt;/<span class="tag">base_color</span>&gt;
+    &lt;/<span class="tag">material</span>&gt;
+  &lt;/<span class="tag">materials</span>&gt;
+
+  &lt;<span class="tag">objects</span>&gt;
+    &lt;<span class="tag">plane</span> <span class="atr">name</span>=<span class="val">"Ground"</span> <span class="atr">size</span>=<span class="val">"20 20"</span> <span class="atr">axis</span>=<span class="val">"y"</span> <span class="atr">material</span>=<span class="val">"grey"</span>/&gt;
+    &lt;<span class="tag">box</span>   <span class="atr">name</span>=<span class="val">"Cube"</span>   <span class="atr">size</span>=<span class="val">"1 1 1"</span> <span class="atr">position</span>=<span class="val">"0 0.5 0"</span> <span class="atr">material</span>=<span class="val">"grey"</span>/&gt;
+  &lt;/<span class="tag">objects</span>&gt;
+
+&lt;/<span class="tag">mc3</span>&gt;</code></pre>
+
+    <p>Then open it in the editor:</p>
+    <pre><code>./cmake-build-debug/MeshCraft my_scene.mc3.xml</code></pre>
+
+    <h2>What You Should See</h2>
+    <ul>
+      <li>A grey flat plane (the ground).</li>
+      <li>A grey box sitting on it.</li>
+      <li>A sky-blue background.</li>
+      <li>Lighting from the directional "Sun" light.</li>
+    </ul>
+
+    <h2>Next Steps</h2>
+    <ul>
+      <li>Press <code>F</code> to focus the camera on the selection.</li>
+      <li>Press <code>G</code>, then drag the box with your mouse to move it.</li>
+      <li>Try adding a cylinder (<code>F3</code>) or sphere (<code>F2</code>).</li>
+      <li>See <a href="csg-operations.html">CSG Operations</a> to combine shapes.</li>
+      <li>See <a href="export-gltf.html">Export to glTF/GLB</a> to use this scene in a game engine.</li>
+    </ul>
+
+    <div class="page-nav">
+      <a href="index.html" class="prev">All Tutorials</a>
+      <a href="loading-scene.html" class="next">Loading a Scene</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Keyframe Animation — MeshCraft User Guide</title>
+<link rel="stylesheet" href="../assets/style.css"/>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <a href="../index.html">
+      <div class="logo-icon">M</div>
+      <div class="logo-text">
+        <span class="logo-name">Mesh Craft</span>
+        <span class="logo-sub">User Guide</span>
+      </div>
+    </a>
+  </div>
+  <div class="section-switch"><a href="index.html" class="current">Users</a><a href="../developers/index.html" class="">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Start Here</div>
+      <a href="index.html">Overview</a>
+      <a href="installing.html">Installing &amp; Running</a>
+      <a href="interface-tour.html">Interface Tour</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Learn the Basics</div>
+      <a href="first-scene.html">Your First Scene</a>
+      <a href="shapes-and-tools.html">Shapes &amp; Tools</a>
+      <a href="materials-and-lighting.html">Materials &amp; Lighting</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Go Further</div>
+      <a href="csg.html">Combining Shapes (CSG)</a>
+      <a href="animation.html" class="active">Keyframe Animation</a>
+      <a href="walk-mode.html">Walk Mode</a>
+      <a href="exporting.html">Exporting Your Scene</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Reference</div>
+      <a href="keyboard-shortcuts.html">Keyboard Shortcuts</a>
+      <a href="faq.html">FAQ &amp; Troubleshooting</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License
+  </div>
+</aside>
+
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb">
+      <a href="index.html">Users</a>
+      <span class="sep">/</span>
+      <span>Keyframe Animation</span>
+    </div>
+    <div class="topbar-search">
+      <input type="search" id="searchInput" placeholder="Search docs… (/)"/>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+    <div class="page-header">
+      <h1>Keyframe Animation</h1>
+      <p class="subtitle">Make objects move, spin, resize, or change color over time using the Timeline.</p>
+    </div>
+
+    <p>
+      A <strong>keyframe</strong> records the state of an object — its position, rotation, scale, color,
+      or visibility — at a specific moment in time. Set two or more keyframes for the same property and
+      MeshCraft smoothly fills in every frame between them.
+    </p>
+
+    <div class="screenshot wide">
+      <img src="../assets/images/screenshots/animation-scene.png" alt="A MeshCraft scene with animated objects: a coiled spring, trees, and a box, set up for keyframe animation."/>
+      <figcaption>A scene with several animatable objects — springs, trees, and a pivoting box.</figcaption>
+    </div>
+
+    <h2>Creating an animation</h2>
+    <ol class="steps">
+      <li><span class="step-title">Open the Timeline</span>Press <kbd>Ctrl+T</kbd> to show or hide the timeline panel along the bottom of the window.</li>
+      <li><span class="step-title">Select the object to animate</span>Click it in the viewport or the Scene panel, as usual.</li>
+      <li><span class="step-title">Move the playhead</span>Drag the timeline's playhead to the moment you want to set — for example, frame 0.</li>
+      <li><span class="step-title">Insert a keyframe</span>Press <kbd>K</kbd> to record the object's current position/rotation/scale at that moment.</li>
+      <li><span class="step-title">Move forward and change something</span>Drag the playhead further along the timeline, then move, rotate, scale, or recolor the object, and press <kbd>K</kbd> again.</li>
+      <li><span class="step-title">Play it back</span>Press <kbd>Space</kbd> to play or pause. The object now smoothly transitions between your keyframes.</li>
+    </ol>
+
+    <h2>Interpolation — how it moves between keyframes</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Mode</th><th>What it looks like</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Step</strong></td><td>Instantly jumps to the next value — no in-between motion. Good for visibility toggles or blinking lights.</td></tr>
+          <tr><td><strong>Linear</strong></td><td>Moves at a constant speed between keyframes — simple and mechanical.</td></tr>
+          <tr><td><strong>Cubic (Bézier)</strong></td><td>Eases in and out smoothly, like most motion in the real world — the natural choice for organic movement.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>You can set the interpolation mode per keyframe from the timeline, mixing modes within the same animation.</p>
+
+    <h2>What can be animated</h2>
+    <p>Position, rotation, scale, and visibility on any object, plus material color and certain deform channels — enough to cover doors opening, lights blinking, platforms moving, and simple character motion.</p>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <p>Animations you build in MeshCraft carry over when you export to glTF/GLB, so a door that opens in the editor still opens in Blender, Godot, or Unity.</p>
+      </div>
+    </div>
+
+    <div class="page-nav">
+      <a href="csg.html" class="prev">Combining Shapes (CSG)</a>
+      <a href="walk-mode.html" class="next">Walk Mode</a>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/script.js"></script>
+</body>
+</html>

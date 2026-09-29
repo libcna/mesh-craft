@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Modules — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a>
+      <a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a>
+      <a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="index.html" class="active">All Modules</a>
+      <a href="mc3-library.html">MC3 Library</a>
+      <a href="mc3togltf.html">mc3togltf</a>
+      <a href="editor.html">Editor</a>
+      <a href="renderer.html">Renderer</a>
+      <a href="scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a>
+      <a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a>
+      <a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a>
+      <a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a>
+      <a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a>
+      <a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a>
+      <a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a>
+      <a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a>
+      <a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a>
+      <a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a>
+      <a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><span>Modules</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Modules</h1>
+      <p class="subtitle">The major subsystems of MeshCraft.</p>
+    </div>
+
+    <div class="card-grid">
+      <a href="mc3-library.html" class="card">
+        <div class="card-icon">📐</div>
+        <div class="card-title">MC3 Library</div>
+        <div class="card-desc">Pure-C++ sublibrary: data model, XML parser/writer, animation, materials, textures. No graphics dependency. Located in <code>mc3/</code>.</div>
+      </a>
+      <a href="mc3togltf.html" class="card">
+        <div class="card-icon">📤</div>
+        <div class="card-title">mc3togltf</div>
+        <div class="card-desc">CLI converter: <code>.mc3.xml</code> → glTF 2.0 JSON or GLB. Built as part of the top-level build. Located in <code>mc3togltf/</code>.</div>
+      </a>
+      <a href="mc3togltf.html" class="card">
+        <div class="card-icon">🗜️</div>
+        <div class="card-title">mc3tomcb</div>
+        <div class="card-desc">CLI converter for the MCB binary format: <code>.mc3.xml</code> ↔ <code>.mcb</code>. MCB is a compact binary format for fast runtime loading. Located in <code>mc3tomcb/</code>.</div>
+      </a>
+      <a href="editor.html" class="card">
+        <div class="card-icon">🖱️</div>
+        <div class="card-title">Editor</div>
+        <div class="card-desc">EditorCamera, SelectionManager, TransformGizmo — the 3D viewport interaction layer. Located in <code>src/MeshCraft/Editor/</code>.</div>
+      </a>
+      <a href="renderer.html" class="card">
+        <div class="card-icon">🖼️</div>
+        <div class="card-title">Renderer</div>
+        <div class="card-desc">SceneRenderer and GridRenderer. Draws MC3 objects, CSG booleans, textures, gizmos, edge overlay, and animation. Located in <code>src/MeshCraft/Renderer/</code>.</div>
+      </a>
+      <a href="scene.html" class="card">
+        <div class="card-icon">🗂️</div>
+        <div class="card-title">Scene Panels</div>
+        <div class="card-desc">SceneHierarchyPanel (left) and PropertiesPanel (right) — the ImGui UI panels for browsing and editing the scene graph.</div>
+      </a>
+    </div>
+
+    <h2>Module Dependency Map</h2>
+    <div class="arch-diagram">
+      <pre>
+MeshCraftApplication
+  ├── EditorCamera       (Editor module)
+  ├── SelectionManager   (Editor module)
+  ├── TransformGizmo     (Editor module)
+  ├── GridRenderer       (Renderer module)
+  ├── SceneRenderer      (Renderer module) ── Manifold, tinyobjloader
+  ├── SceneHierarchyPanel(Scene module)
+  ├── PropertiesPanel    (Scene module)
+  └── Mc3Document        (MC3 Library) ── Mc3XmlParser, Mc3XmlWriter
+
+mc3togltf (built with top-level CMake)
+  ├── Mc3Document        (shared core mc3 library)
+  ├── MeshBuilder
+  └── GltfExporter
+
+mc3tomcb (built with top-level CMake)
+  ├── Mc3Document        (shared core mc3 library)
+  └── Mcb                (MCB binary format library)
+</pre>
+    </div>
+
+    <div class="page-nav">
+      <a href="../architecture.html" class="prev">Architecture</a>
+      <a href="mc3-library.html" class="next">MC3 Library</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

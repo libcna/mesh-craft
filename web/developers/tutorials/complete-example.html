@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Complete Scene Example — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a>
+      <a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a><a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a><a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a>
+      <a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a>
+      <a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="index.html">All Tutorials</a>
+      <a href="minimal-example.html">Minimal Scene</a>
+      <a href="loading-scene.html">Loading a Scene</a>
+      <a href="csg-operations.html">CSG Operations</a>
+      <a href="export-gltf.html">Export to glTF/GLB</a>
+      <a href="animation.html">Keyframe Animation</a>
+      <a href="complete-example.html" class="active">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Tutorials</a><span class="sep">/</span><span>Complete Scene Example</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Tutorial: Complete Scene Example</h1>
+      <p class="subtitle">A fully-featured MC3 scene demonstrating every major subsystem: environment, lights, cameras, textures, materials, CSG, definitions, keyframe animation, and interactive states.</p>
+    </div>
+
+    <h2>What We're Building</h2>
+    <p>
+      This tutorial walks through a complete outdoor garden scene with:
+    </p>
+    <ul>
+      <li>Sky color and distance fog</li>
+      <li>Sun directional light + ambient fill</li>
+      <li>A perspective camera</li>
+      <li>Textured PBR materials (brick, wood, glass, grass)</li>
+      <li>Reusable tree definition instanced three times</li>
+      <li>A house body built from CSG union</li>
+      <li>A front wall with a door hole cut out (CSG difference)</li>
+      <li>A door with open/closed states</li>
+      <li>A bouncing ball keyframe animation</li>
+    </ul>
+    <p>The complete file is ~120 lines of XML and uses all format sections.</p>
+
+    <h2>Step 1 — Root Element and Environment</h2>
+    <p>Start with the root element specifying format version, unit, and coordinate system. Add environment settings and lights.</p>
+    <pre><code>&lt;?<span class="tag">xml</span> version=<span class="val">"1.0"</span> encoding=<span class="val">"UTF-8"</span>?&gt;
+&lt;<span class="tag">mc3</span> <span class="atr">version</span>=<span class="val">"0.3"</span>
+     <span class="atr">model</span>=<span class="val">"GardenScene"</span>
+     <span class="atr">unit</span>=<span class="val">"meter"</span>
+     <span class="atr">coordinate_system</span>=<span class="val">"right_handed_y_up"</span>
+     <span class="atr">default_camera</span>=<span class="val">"Main"</span>&gt;
+
+  &lt;<span class="tag">environment</span>&gt;
+    &lt;<span class="tag">background</span> <span class="atr">color</span>=<span class="val">"0.53 0.81 0.98"</span>/&gt;
+    &lt;<span class="tag">fog</span> <span class="atr">mode</span>=<span class="val">"linear"</span> <span class="atr">color</span>=<span class="val">"0.53 0.81 0.98"</span>
+         <span class="atr">start</span>=<span class="val">"40"</span> <span class="atr">end</span>=<span class="val">"120"</span>/&gt;
+  &lt;/<span class="tag">environment</span>&gt;
+
+  &lt;<span class="tag">lights</span>&gt;
+    &lt;<span class="tag">ambient</span> <span class="atr">color</span>=<span class="val">"0.3 0.35 0.4"</span> <span class="atr">brightness</span>=<span class="val">"0.4"</span>/&gt;
+    &lt;<span class="tag">directional</span> <span class="atr">name</span>=<span class="val">"Sun"</span>
+                 <span class="atr">color</span>=<span class="val">"1 0.95 0.8"</span>
+                 <span class="atr">brightness</span>=<span class="val">"2.0"</span>
+                 <span class="atr">direction</span>=<span class="val">"0.58 -0.58 0.58"</span>
+                 <span class="atr">cast_shadows</span>=<span class="val">"true"</span>/&gt;
+  &lt;/<span class="tag">lights</span>&gt;
+
+  &lt;<span class="tag">cameras</span> <span class="atr">default</span>=<span class="val">"Main"</span>&gt;
+    &lt;<span class="tag">camera</span> <span class="atr">name</span>=<span class="val">"Main"</span> <span class="atr">type</span>=<span class="val">"perspective"</span>
+            <span class="atr">fov</span>=<span class="val">"55"</span> <span class="atr">near</span>=<span class="val">"0.1"</span> <span class="atr">far</span>=<span class="val">"500"</span>
+            <span class="atr">position</span>=<span class="val">"12 8 20"</span> <span class="atr">target</span>=<span class="val">"0 2 0"</span>/&gt;
+    &lt;<span class="tag">camera</span> <span class="atr">name</span>=<span class="val">"TopDown"</span> <span class="atr">type</span>=<span class="val">"orthographic"</span>
+            <span class="atr">size</span>=<span class="val">"25"</span> <span class="atr">near</span>=<span class="val">"0.1"</span> <span class="atr">far</span>=<span class="val">"200"</span>
+            <span class="atr">position</span>=<span class="val">"0 40 0"</span> <span class="atr">target</span>=<span class="val">"0 0 0"</span>/&gt;
+  &lt;/<span class="tag">cameras</span>&gt;</code></pre>
+    <p>The <code>default_camera="Main"</code> on the root element, together with <code>default="Main"</code> on <code>&lt;cameras&gt;</code>, ensures the perspective view is used when no explicit camera is selected.</p>
+
+    <h2>Step 2 — Textures and Materials</h2>
+    <pre><code>  &lt;<span class="tag">textures</span>&gt;
+    &lt;<span class="tag">texture</span> <span class="atr">id</span>=<span class="val">"brick_albedo"</span> <span class="atr">uri</span>=<span class="val">"textures/brick.png"</span>
+             <span class="atr">wrap_u</span>=<span class="val">"repeat"</span> <span class="atr">wrap_v</span>=<span class="val">"repeat"</span> <span class="atr">filter</span>=<span class="val">"linear"</span>/&gt;
+    &lt;<span class="tag">texture</span> <span class="atr">id</span>=<span class="val">"brick_normal"</span> <span class="atr">uri</span>=<span class="val">"textures/brick_n.png"</span>
+             <span class="atr">color_space</span>=<span class="val">"linear"</span>/&gt;
+    &lt;<span class="tag">texture</span> <span class="atr">id</span>=<span class="val">"wood_albedo"</span>  <span class="atr">uri</span>=<span class="val">"textures/wood.png"</span>
+             <span class="atr">wrap_u</span>=<span class="val">"repeat"</span> <span class="atr">wrap_v</span>=<span class="val">"repeat"</span>/&gt;
+    &lt;<span class="tag">texture</span> <span class="atr">id</span>=<span class="val">"grass_albedo"</span> <span class="atr">uri</span>=<span class="val">"textures/grass.png"</span>
+             <span class="atr">wrap_u</span>=<span class="val">"repeat"</span> <span class="atr">wrap_v</span>=<span class="val">"repeat"</span>/&gt;
+  &lt;/<span class="tag">textures</span>&gt;
+
+  &lt;<span class="tag">materials</span>&gt;
+    &lt;<span class="tag">material</span> <span class="atr">id</span>=<span class="val">"brick"</span> <span class="atr">roughness</span>=<span class="val">"0.85"</span> <span class="atr">metallic</span>=<span class="val">"0.0"</span>&gt;
+      &lt;<span class="tag">base_color_texture</span>&gt;brick_albedo&lt;/<span class="tag">base_color_texture</span>&gt;
+      &lt;<span class="tag">normal_texture</span>&gt;brick_normal&lt;/<span class="tag">normal_texture</span>&gt;
+    &lt;/<span class="tag">material</span>&gt;
+    &lt;<span class="tag">material</span> <span class="atr">id</span>=<span class="val">"painted_wood"</span> <span class="atr">roughness</span>=<span class="val">"0.6"</span>&gt;
+      &lt;<span class="tag">base_color_texture</span>&gt;wood_albedo&lt;/<span class="tag">base_color_texture</span>&gt;
+    &lt;/<span class="tag">material</span>&gt;
+    &lt;<span class="tag">material</span> <span class="atr">id</span>=<span class="val">"glass"</span> <span class="atr">roughness</span>=<span class="val">"0.05"</span> <span class="atr">alpha_mode</span>=<span class="val">"blend"</span> <span class="atr">double_sided</span>=<span class="val">"true"</span>&gt;
+      &lt;<span class="tag">base_color</span>&gt;0.7 0.9 1.0 0.35&lt;/<span class="tag">base_color</span>&gt;
+    &lt;/<span class="tag">material</span>&gt;
+    &lt;<span class="tag">material</span> <span class="atr">id</span>=<span class="val">"grass"</span> <span class="atr">roughness</span>=<span class="val">"0.95"</span>&gt;
+      &lt;<span class="tag">base_color_texture</span>&gt;grass_albedo&lt;/<span class="tag">base_color_texture</span>&gt;
+    &lt;/<span class="tag">material</span>&gt;
+    &lt;<span class="tag">material</span> <span class="atr">id</span>=<span class="val">"bark"</span>   <span class="atr">roughness</span>=<span class="val">"0.9"</span>&gt;&lt;<span class="tag">base_color</span>&gt;0.35 0.22 0.1 1.0&lt;/<span class="tag">base_color</span>&gt;&lt;/<span class="tag">material</span>&gt;
+    &lt;<span class="tag">material</span> <span class="atr">id</span>=<span class="val">"leaves"</span> <span class="atr">roughness</span>=<span class="val">"0.8"</span>&gt;&lt;<span class="tag">base_color</span>&gt;0.15 0.55 0.1 1.0&lt;/<span class="tag">base_color</span>&gt;&lt;/<span class="tag">material</span>&gt;
+    &lt;<span class="tag">material</span> <span class="atr">id</span>=<span class="val">"red"</span>&gt;&lt;<span class="tag">base_color</span>&gt;0.9 0.1 0.1 1.0&lt;/<span class="tag">base_color</span>&gt;&lt;/<span class="tag">material</span>&gt;
+  &lt;/<span class="tag">materials</span>&gt;</code></pre>
+
+    <h2>Step 3 — Reusable Tree Definition</h2>
+    <p>Define a tree once and instance it multiple times.</p>
+    <pre><code>  &lt;<span class="tag">definitions</span>&gt;
+    &lt;<span class="tag">definition</span> <span class="atr">id</span>=<span class="val">"Tree"</span>&gt;
+      &lt;<span class="tag">group</span>&gt;
+        &lt;<span class="tag">cylinder</span> <span class="atr">name</span>=<span class="val">"Trunk"</span> <span class="atr">radius</span>=<span class="val">"0.18"</span> <span class="atr">height</span>=<span class="val">"2.5"</span>
+                   <span class="atr">position</span>=<span class="val">"0 1.25 0"</span> <span class="atr">material</span>=<span class="val">"bark"</span>/&gt;
+        &lt;<span class="tag">sphere</span>   <span class="atr">name</span>=<span class="val">"Canopy"</span> <span class="atr">radius</span>=<span class="val">"1.4"</span>
+                   <span class="atr">position</span>=<span class="val">"0 3.5 0"</span>  <span class="atr">material</span>=<span class="val">"leaves"</span>/&gt;
+      &lt;/<span class="tag">group</span>&gt;
+    &lt;/<span class="tag">definition</span>&gt;
+  &lt;/<span class="tag">definitions</span>&gt;</code></pre>
+
+    <h2>Step 4 — Scene Objects</h2>
+    <h3>Ground plane and trees</h3>
+    <pre><code>  &lt;<span class="tag">objects</span>&gt;
+
+    &lt;<span class="tag">plane</span> <span class="atr">name</span>=<span class="val">"Ground"</span> <span class="atr">size</span>=<span class="val">"50 50"</span> <span class="atr">axis</span>=<span class="val">"y"</span>
+           <span class="atr">material</span>=<span class="val">"grass"</span> <span class="atr">collision</span>=<span class="val">"static"</span>&gt;
+      &lt;<span class="tag">uv_mapping</span> <span class="atr">scale</span>=<span class="val">"10 10"</span>/&gt;
+    &lt;/<span class="tag">plane</span>&gt;
+
+    &lt;<span class="tag">instance</span> <span class="atr">name</span>=<span class="val">"Tree1"</span> <span class="atr">definition</span>=<span class="val">"Tree"</span> <span class="atr">position</span>=<span class="val">"-8 0 -4"</span>/&gt;
+    &lt;<span class="tag">instance</span> <span class="atr">name</span>=<span class="val">"Tree2"</span> <span class="atr">definition</span>=<span class="val">"Tree"</span> <span class="atr">position</span>=<span class="val">" 9 0 -5"</span> <span class="atr">rotation</span>=<span class="val">"0 45 0"</span>/&gt;
+    &lt;<span class="tag">instance</span> <span class="atr">name</span>=<span class="val">"Tree3"</span> <span class="atr">definition</span>=<span class="val">"Tree"</span> <span class="atr">position</span>=<span class="val">"-6 0  8"</span> <span class="atr">scale</span>=<span class="val">"1.3 1.3 1.3"</span>/&gt;</code></pre>
+
+    <h3>House body (CSG union)</h3>
+    <pre><code>    &lt;<span class="tag">union</span> <span class="atr">name</span>=<span class="val">"HouseBody"</span>&gt;
+      &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"MainBlock"</span> <span class="atr">size</span>=<span class="val">"8 3.5 6"</span>  <span class="atr">position</span>=<span class="val">"0 1.75 0"</span> <span class="atr">material</span>=<span class="val">"brick"</span>/&gt;
+      &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"RoofBase"</span>  <span class="atr">size</span>=<span class="val">"8.6 0.3 6.6"</span> <span class="atr">position</span>=<span class="val">"0 3.65 0"</span> <span class="atr">material</span>=<span class="val">"brick"</span>/&gt;
+    &lt;/<span class="tag">union</span>&gt;</code></pre>
+
+    <h3>Front wall with door hole (CSG difference)</h3>
+    <pre><code>    &lt;<span class="tag">difference</span> <span class="atr">name</span>=<span class="val">"FrontWall"</span>&gt;
+      &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"FrontWallBase"</span> <span class="atr">size</span>=<span class="val">"8 3.5 0.3"</span>
+           <span class="atr">position</span>=<span class="val">"0 1.75 -3"</span> <span class="atr">material</span>=<span class="val">"brick"</span>/&gt;
+      &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"DoorHole"</span> <span class="atr">size</span>=<span class="val">"1.2 2.3 0.6"</span>
+           <span class="atr">position</span>=<span class="val">"0 1.15 -3"</span>
+           <span class="atr">role</span>=<span class="val">"cutter"</span> <span class="atr">visible</span>=<span class="val">"false"</span>/&gt;
+      &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"WindowHole"</span> <span class="atr">size</span>=<span class="val">"1.4 1.1 0.6"</span>
+           <span class="atr">position</span>=<span class="val">"2.5 2.1 -3"</span>
+           <span class="atr">role</span>=<span class="val">"cutter"</span> <span class="atr">visible</span>=<span class="val">"false"</span>/&gt;
+    &lt;/<span class="tag">difference</span>&gt;</code></pre>
+
+    <h3>Interactive door (pivot + states)</h3>
+    <pre><code>    &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"FrontDoor"</span>
+         <span class="atr">size</span>=<span class="val">"1.1 2.2 0.07"</span>
+         <span class="atr">position</span>=<span class="val">"0 1.1 -3.08"</span>
+         <span class="atr">pivot</span>=<span class="val">"-0.55 0 0"</span>
+         <span class="atr">material</span>=<span class="val">"painted_wood"</span>
+         <span class="atr">collision</span>=<span class="val">"kinematic"</span>
+         <span class="atr">state</span>=<span class="val">"closed"</span>&gt;
+      &lt;<span class="tag">states</span>&gt;
+        &lt;<span class="tag">state</span> <span class="atr">id</span>=<span class="val">"closed"</span> <span class="atr">rotation</span>=<span class="val">"0 0 0"</span>/&gt;
+        &lt;<span class="tag">state</span> <span class="atr">id</span>=<span class="val">"open"</span>   <span class="atr">rotation</span>=<span class="val">"0 90 0"</span>/&gt;
+      &lt;/<span class="tag">states</span>&gt;
+    &lt;/<span class="tag">box</span>&gt;
+
+    &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"WindowGlass"</span>
+         <span class="atr">size</span>=<span class="val">"1.3 1.0 0.05"</span>
+         <span class="atr">position</span>=<span class="val">"2.5 2.1 -3.1"</span>
+         <span class="atr">material</span>=<span class="val">"glass"</span>/&gt;</code></pre>
+
+    <h3>Roof arch (extrude)</h3>
+    <pre><code>    &lt;<span class="tag">extrude</span> <span class="atr">name</span>=<span class="val">"RoofRidge"</span> <span class="atr">position</span>=<span class="val">"0 3.65 0"</span>
+              <span class="atr">material</span>=<span class="val">"painted_wood"</span> <span class="atr">segments</span>=<span class="val">"1"</span>&gt;
+      &lt;<span class="tag">cross_section</span> <span class="atr">type</span>=<span class="val">"rect"</span> <span class="atr">width</span>=<span class="val">"0.15"</span> <span class="atr">height</span>=<span class="val">"0.15"</span>/&gt;
+      &lt;<span class="tag">path</span> <span class="atr">type</span>=<span class="val">"line"</span> <span class="atr">length</span>=<span class="val">"6.6"</span> <span class="atr">axis</span>=<span class="val">"z"</span>/&gt;
+    &lt;/<span class="tag">extrude</span>&gt;</code></pre>
+
+    <h3>Bouncing ball (with keyframe animation target)</h3>
+    <pre><code>    &lt;<span class="tag">sphere</span> <span class="atr">name</span>=<span class="val">"Ball"</span>
+            <span class="atr">radius</span>=<span class="val">"0.35"</span>
+            <span class="atr">position</span>=<span class="val">"4 0.35 4"</span>
+            <span class="atr">material</span>=<span class="val">"red"</span>/&gt;
+
+  &lt;/<span class="tag">objects</span>&gt;</code></pre>
+
+    <h2>Step 5 — Interactive Actions and Keyframe Animation</h2>
+    <pre><code>  &lt;<span class="tag">actions</span>&gt;
+
+    <span class="cmt">&lt;!-- Interactive door control --&gt;</span>
+    &lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"open_door"</span> <span class="atr">target</span>=<span class="val">"FrontDoor"</span>
+            <span class="atr">type</span>=<span class="val">"set_state"</span> <span class="atr">state</span>=<span class="val">"open"</span>
+            <span class="atr">duration</span>=<span class="val">"0.6"</span> <span class="atr">easing</span>=<span class="val">"ease_out"</span>&gt;
+      &lt;<span class="tag">trigger</span> <span class="atr">type</span>=<span class="val">"interact"</span> <span class="atr">prompt</span>=<span class="val">"Open door"</span>/&gt;
+    &lt;/<span class="tag">action</span>&gt;
+
+    &lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"close_door"</span> <span class="atr">target</span>=<span class="val">"FrontDoor"</span>
+            <span class="atr">type</span>=<span class="val">"set_state"</span> <span class="atr">state</span>=<span class="val">"closed"</span>
+            <span class="atr">duration</span>=<span class="val">"0.6"</span> <span class="atr">easing</span>=<span class="val">"ease_in"</span>&gt;
+      &lt;<span class="tag">trigger</span> <span class="atr">type</span>=<span class="val">"interact"</span> <span class="atr">prompt</span>=<span class="val">"Close door"</span>/&gt;
+    &lt;/<span class="tag">action</span>&gt;
+
+    <span class="cmt">&lt;!-- Keyframe animation — bouncing ball --&gt;</span>
+    &lt;<span class="tag">action</span> <span class="atr">name</span>=<span class="val">"BallBounce"</span> <span class="atr">duration</span>=<span class="val">"1.0"</span> <span class="atr">loop</span>=<span class="val">"true"</span>&gt;
+      &lt;<span class="tag">channel</span> <span class="atr">target</span>=<span class="val">"Ball"</span> <span class="atr">property</span>=<span class="val">"position.y"</span>&gt;
+        &lt;<span class="tag">keyframe</span> <span class="atr">time</span>=<span class="val">"0.0"</span> <span class="atr">value</span>=<span class="val">"0.35"</span> <span class="atr">interp</span>=<span class="val">"cubic"</span>&gt;
+          &lt;<span class="tag">handle_left</span>  <span class="atr">dt</span>=<span class="val">"-0.1"</span> <span class="atr">dv</span>=<span class="val">"0.0"</span>/&gt;
+          &lt;<span class="tag">handle_right</span> <span class="atr">dt</span>=<span class="val">" 0.1"</span> <span class="atr">dv</span>=<span class="val">"3.5"</span>/&gt;
+        &lt;/<span class="tag">keyframe</span>&gt;
+        &lt;<span class="tag">keyframe</span> <span class="atr">time</span>=<span class="val">"0.5"</span> <span class="atr">value</span>=<span class="val">"3.5"</span>  <span class="atr">interp</span>=<span class="val">"cubic"</span>&gt;
+          &lt;<span class="tag">handle_left</span>  <span class="atr">dt</span>=<span class="val">"-0.1"</span> <span class="atr">dv</span>=<span class="val">"3.5"</span>/&gt;
+          &lt;<span class="tag">handle_right</span> <span class="atr">dt</span>=<span class="val">" 0.1"</span> <span class="atr">dv</span>=<span class="val">"-3.5"</span>/&gt;
+        &lt;/<span class="tag">keyframe</span>&gt;
+        &lt;<span class="tag">keyframe</span> <span class="atr">time</span>=<span class="val">"1.0"</span> <span class="atr">value</span>=<span class="val">"0.35"</span> <span class="atr">interp</span>=<span class="val">"linear"</span>/&gt;
+      &lt;/<span class="tag">channel</span>&gt;
+    &lt;/<span class="tag">action</span>&gt;
+
+  &lt;/<span class="tag">actions</span>&gt;
+
+&lt;/<span class="tag">mc3</span>&gt;</code></pre>
+
+    <h2>Key Concepts Demonstrated</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Feature</th><th>Where</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>Environment + fog</td><td><code>&lt;environment&gt;</code></td><td>Sky color and distance fade</td></tr>
+        <tr><td>Lights</td><td><code>&lt;lights&gt;</code></td><td>Ambient fill + directional sun</td></tr>
+        <tr><td>Multiple cameras</td><td><code>&lt;cameras&gt;</code></td><td>Perspective main view + top-down ortho</td></tr>
+        <tr><td>Normal map texture</td><td><code>brick_normal</code> in material</td><td>Surface micro-detail without geometry</td></tr>
+        <tr><td>Reusable definition</td><td><code>Tree</code> definition + 3 instances</td><td>DRY — one definition, three placements</td></tr>
+        <tr><td>CSG union</td><td>HouseBody</td><td>Merge main block and roof base</td></tr>
+        <tr><td>CSG difference</td><td>FrontWall</td><td>Cut door hole and window hole from wall</td></tr>
+        <tr><td>Extrusion</td><td>RoofRidge</td><td>Beam swept along Z axis</td></tr>
+        <tr><td>Pivot on door</td><td><code>pivot="-0.55 0 0"</code></td><td>Rotation around hinge edge, not center</td></tr>
+        <tr><td>Object states</td><td><code>&lt;states&gt;</code> on FrontDoor</td><td>Named closed/open configurations</td></tr>
+        <tr><td>Interactive actions</td><td><code>type="set_state"</code> with trigger</td><td>Player-triggered door open/close</td></tr>
+        <tr><td>Keyframe animation</td><td><code>BallBounce</code> action</td><td>Cubic-bezier ball bounce, exportable to glTF</td></tr>
+        <tr><td>UV mapping</td><td><code>&lt;uv_mapping scale="10 10"/&gt;</code> on Ground</td><td>Tile the grass texture across a 50 m plane</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>Opening in the Editor</h2>
+    <pre><code>./cmake-build-debug/MeshCraft garden_scene.mc3.xml</code></pre>
+    <p>You should see the garden with three trees, the house body, and a red sphere. Press <code>Ctrl+T</code> to open the Timeline panel, select <strong>BallBounce</strong>, and press Play to watch the sphere bounce.</p>
+    <p>The door can be toggled by selecting <code>FrontDoor</code> in the hierarchy and editing its <code>state</code> attribute in the Properties panel.</p>
+
+    <h2>Exporting to GLB</h2>
+    <pre><code>./mc3togltf/build/mc3togltf garden_scene.mc3.xml garden_scene.glb</code></pre>
+    <p>The GLB export will include all geometry (primitives, CSG children as separate meshes, extrusion) and the <strong>BallBounce</strong> keyframe animation clip. Interactive door actions are not exported — they are a runtime game concept.</p>
+
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <p>Texture files are <strong>not</strong> embedded in the GLB by default — they are referenced as relative paths. Ensure the <code>textures/</code> folder is kept alongside the GLB when deploying to a game engine.</p>
+      </div>
+    </div>
+
+    <div class="page-nav">
+      <a href="animation.html" class="prev">Keyframe Animation</a>
+      <a href="../internals/index.html" class="next">Internals Overview</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

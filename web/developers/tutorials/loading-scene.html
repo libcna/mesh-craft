@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Loading a Scene — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section"><div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a><a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a><a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a><a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a><a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a><a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Tutorials</div>
+      <a href="index.html">All Tutorials</a>
+      <a href="minimal-example.html">Minimal Scene</a>
+      <a href="loading-scene.html" class="active">Loading a Scene</a>
+      <a href="csg-operations.html">CSG Operations</a>
+      <a href="export-gltf.html">Export to glTF/GLB</a>
+      <a href="animation.html">Keyframe Animation</a>
+      <a href="complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Tutorials</a><span class="sep">/</span><span>Loading a Scene</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Tutorial: Loading a Scene</h1>
+      <p class="subtitle">Open an existing <code>.mc3.xml</code> file, explore it, and make edits.</p>
+    </div>
+
+    <h2>Opening a File</h2>
+    <h3>Method 1: Command-line argument</h3>
+    <pre><code>./cmake-build-debug/MeshCraft test/house.mc3.xml</code></pre>
+    <p>The file is loaded immediately on startup. The window title shows the file name.</p>
+
+    <h3>Method 2: In-editor dialog (Ctrl+O)</h3>
+    <ol>
+      <li>Press <code>Ctrl+O</code> or use <strong>File → Open</strong>.</li>
+      <li>An in-editor text field appears. Type the path to the file and press Enter.</li>
+    </ol>
+
+    <h3>Method 3: Recent Files</h3>
+    <p>Use <strong>File → Open Recent</strong> to see the last 10 opened files. The list is persisted at <code>~/.config/meshcraft/recent.txt</code>.</p>
+
+    <h2>Exploring the Scene</h2>
+    <h3>Hierarchy Panel (left)</h3>
+    <ul>
+      <li>Shows a recursive tree of all objects in the scene.</li>
+      <li>Click the <strong>triangle</strong> next to a group or CSG node to expand/collapse its children.</li>
+      <li>Click any object to select it. The selected object is highlighted in the viewport.</li>
+      <li>The <strong>eye icon</strong> toggles visibility without deleting the object.</li>
+    </ul>
+
+    <h3>Properties Panel (right)</h3>
+    <ul>
+      <li>Shows the selected object's name, type, position, rotation, scale, material, and type-specific parameters.</li>
+      <li>Click on the <strong>Lights</strong>, <strong>Cameras</strong>, <strong>Textures</strong>, <strong>Materials</strong>, or <strong>Defs</strong> tabs to see other scene data.</li>
+    </ul>
+
+    <h3>Viewport</h3>
+    <ul>
+      <li><strong>Middle-drag</strong>: orbit the camera.</li>
+      <li><strong>Right-drag</strong>: pan.</li>
+      <li><strong>Scroll wheel</strong>: zoom.</li>
+      <li><strong>Left-click</strong>: select an object.</li>
+      <li><strong>F</strong>: focus camera on selected object.</li>
+    </ul>
+
+    <h2>The House Test Scene</h2>
+    <p>The repository includes a simple test scene at <code>test/house.mc3.xml</code>:</p>
+    <pre><code>&lt;<span class="tag">mc3</span> <span class="atr">version</span>=<span class="val">"0.1"</span> <span class="atr">model</span>=<span class="val">"House"</span>&gt;
+  <span class="cmt">&lt;!-- sky-blue background + linear fog --&gt;</span>
+  <span class="cmt">&lt;!-- ambient + directional sun --&gt;</span>
+  <span class="cmt">&lt;!-- 4 materials: brick, stone, roof, ground --&gt;</span>
+  &lt;<span class="tag">objects</span>&gt;
+    &lt;<span class="tag">group</span> <span class="atr">name</span>=<span class="val">"House"</span>&gt;
+      &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"FrontWall"</span>  <span class="atr">size</span>=<span class="val">"10 4 0.3"</span> …/&gt;
+      &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"BackWall"</span>   …/&gt;
+      &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"LeftWall"</span>   …/&gt;
+      &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"RightWall"</span>  …/&gt;
+      &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Floor"</span>      …/&gt;
+      &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Roof"</span>       …/&gt;
+    &lt;/<span class="tag">group</span>&gt;
+    &lt;<span class="tag">cylinder</span> <span class="atr">name</span>=<span class="val">"LeftColumn"</span>  …/&gt;
+    &lt;<span class="tag">cylinder</span> <span class="atr">name</span>=<span class="val">"RightColumn"</span> …/&gt;
+    &lt;<span class="tag">sphere</span>   <span class="atr">name</span>=<span class="val">"Ornament"</span>    …/&gt;
+    &lt;<span class="tag">plane</span>    <span class="atr">name</span>=<span class="val">"Ground"</span>      …/&gt;
+  &lt;/<span class="tag">objects</span>&gt;
+&lt;/<span class="tag">mc3</span>&gt;</code></pre>
+
+    <h2>Making Edits</h2>
+    <ul>
+      <li>Select the "House" group in the hierarchy and press <code>G</code> to activate the Move gizmo. Drag to reposition the entire house.</li>
+      <li>Click on "Ornament" and press <code>R</code> for Rotate — drag the gizmo rings to rotate.</li>
+      <li>Ctrl+click to multi-select several walls, then press <code>S</code> to scale them together.</li>
+      <li>Press <code>Ctrl+Z</code> to undo any changes.</li>
+    </ul>
+
+    <h2>Saving</h2>
+    <ul>
+      <li><code>Ctrl+S</code>: save to the current file (overwrites the original).</li>
+      <li><code>Ctrl+Shift+S</code>: Save As — opens a dialog to specify a new path.</li>
+    </ul>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <p>The editor modifies the scene in memory. Until you save, your changes are only in RAM. The undo stack (max 20 steps) is also in RAM only — closing the editor without saving loses all changes.</p>
+      </div>
+    </div>
+
+    <div class="page-nav">
+      <a href="minimal-example.html" class="prev">Minimal Scene</a>
+      <a href="csg-operations.html" class="next">CSG Operations</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

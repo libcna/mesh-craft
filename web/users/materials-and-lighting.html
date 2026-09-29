@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Materials &amp; Lighting — MeshCraft User Guide</title>
+<link rel="stylesheet" href="../assets/style.css"/>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <a href="../index.html">
+      <div class="logo-icon">M</div>
+      <div class="logo-text">
+        <span class="logo-name">Mesh Craft</span>
+        <span class="logo-sub">User Guide</span>
+      </div>
+    </a>
+  </div>
+  <div class="section-switch"><a href="index.html" class="current">Users</a><a href="../developers/index.html" class="">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Start Here</div>
+      <a href="index.html">Overview</a>
+      <a href="installing.html">Installing &amp; Running</a>
+      <a href="interface-tour.html">Interface Tour</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Learn the Basics</div>
+      <a href="first-scene.html">Your First Scene</a>
+      <a href="shapes-and-tools.html">Shapes &amp; Tools</a>
+      <a href="materials-and-lighting.html" class="active">Materials &amp; Lighting</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Go Further</div>
+      <a href="csg.html">Combining Shapes (CSG)</a>
+      <a href="animation.html">Keyframe Animation</a>
+      <a href="walk-mode.html">Walk Mode</a>
+      <a href="exporting.html">Exporting Your Scene</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Reference</div>
+      <a href="keyboard-shortcuts.html">Keyboard Shortcuts</a>
+      <a href="faq.html">FAQ &amp; Troubleshooting</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License
+  </div>
+</aside>
+
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb">
+      <a href="index.html">Users</a>
+      <span class="sep">/</span>
+      <span>Materials &amp; Lighting</span>
+    </div>
+    <div class="topbar-search">
+      <input type="search" id="searchInput" placeholder="Search docs… (/)"/>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+    <div class="page-header">
+      <h1>Materials &amp; Lighting</h1>
+      <p class="subtitle">Give your objects color, shine, and glow, and set the mood of the scene around them.</p>
+    </div>
+
+    <h2>What a material controls</h2>
+    <p>
+      Every object has a <strong>material</strong> — a small bundle of settings that decides how it
+      reacts to light. Select an object and open the <strong>Mat</strong> tab (or the Properties panel)
+      to edit it. You don't need to understand the physics to use it — here's what each slider actually
+      looks like in practice:
+    </p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Property</th><th>Plain-language meaning</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Base Color</strong></td><td>The object's main color.</td></tr>
+          <tr><td><strong>Roughness</strong></td><td>Low = polished and shiny (like a bowling ball). High = matte and dull (like chalk or cloth).</td></tr>
+          <tr><td><strong>Metallic</strong></td><td>Off = a normal painted/plastic surface. On = looks like bare metal, tinted by the base color.</td></tr>
+          <tr><td><strong>Emissive</strong></td><td>Makes the object glow with its own light — useful for lamps, screens, or sci-fi panels — independent of scene lighting.</td></tr>
+          <tr><td><strong>Alpha Mode</strong></td><td>Whether the object is fully solid, uses cutout transparency (like a leaf texture), or blends smoothly (like glass).</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Try a few combinations: <strong>low roughness + metallic on</strong> looks like chrome; <strong>high roughness + metallic off</strong> looks like rubber or fabric.</p>
+
+    <h2>Textures</h2>
+    <p>
+      Instead of a flat color, a material's slots (base color, roughness, metallic, normal, emissive)
+      can each use an image texture for more detail — wood grain, brick, rust, fabric weave. Load and
+      assign textures from the <strong>Tex</strong> tab.
+    </p>
+
+    <h2>Lights</h2>
+    <p>
+      Add and edit lights from the <strong>Lights</strong> tab. A scene with no lights will still render
+      using its background/environment lighting, but adding a light or two brings out shading and depth.
+    </p>
+
+    <h2>Environment &amp; fog</h2>
+    <p>
+      With nothing selected, the Properties panel shows scene-wide settings under the <strong>Env</strong>
+      tab: the background color behind your objects, an optional background texture, and fog. Fog fades
+      distant objects toward a chosen color — useful for hiding the edge of a scene or setting a moody
+      atmosphere.
+    </p>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <p>Materials are shared: if two objects use the same material and you edit it, both update together. If you only want to change one object, look for a "make unique" or per-instance override option before editing.</p>
+      </div>
+    </div>
+
+    <div class="page-nav">
+      <a href="shapes-and-tools.html" class="prev">Shapes &amp; Tools</a>
+      <a href="csg.html" class="next">Combining Shapes (CSG)</a>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/script.js"></script>
+</body>
+</html>

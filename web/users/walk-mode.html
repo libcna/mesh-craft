@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Walk Mode — MeshCraft User Guide</title>
+<link rel="stylesheet" href="../assets/style.css"/>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <a href="../index.html">
+      <div class="logo-icon">M</div>
+      <div class="logo-text">
+        <span class="logo-name">Mesh Craft</span>
+        <span class="logo-sub">User Guide</span>
+      </div>
+    </a>
+  </div>
+  <div class="section-switch"><a href="index.html" class="current">Users</a><a href="../developers/index.html" class="">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Start Here</div>
+      <a href="index.html">Overview</a>
+      <a href="installing.html">Installing &amp; Running</a>
+      <a href="interface-tour.html">Interface Tour</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Learn the Basics</div>
+      <a href="first-scene.html">Your First Scene</a>
+      <a href="shapes-and-tools.html">Shapes &amp; Tools</a>
+      <a href="materials-and-lighting.html">Materials &amp; Lighting</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Go Further</div>
+      <a href="csg.html">Combining Shapes (CSG)</a>
+      <a href="animation.html">Keyframe Animation</a>
+      <a href="walk-mode.html" class="active">Walk Mode</a>
+      <a href="exporting.html">Exporting Your Scene</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Reference</div>
+      <a href="keyboard-shortcuts.html">Keyboard Shortcuts</a>
+      <a href="faq.html">FAQ &amp; Troubleshooting</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License
+  </div>
+</aside>
+
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb">
+      <a href="index.html">Users</a>
+      <span class="sep">/</span>
+      <span>Walk Mode</span>
+    </div>
+    <div class="topbar-search">
+      <input type="search" id="searchInput" placeholder="Search docs… (/)"/>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+    <div class="page-header">
+      <h1>Walk Mode</h1>
+      <p class="subtitle">Step out of the orbit camera and walk through your scene in first person.</p>
+    </div>
+
+    <p>
+      Sometimes the best way to check a scene — is it too cramped, is that doorway tall enough, does the
+      layout actually make sense — is to walk through it like you would in a game. Walk Mode does exactly
+      that, using nothing but the scene you already built.
+    </p>
+
+    <h2>Using it</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Input</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>F5</kbd></td><td>Enter or exit Walk Mode</td></tr>
+          <tr><td><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or Arrow keys</td><td>Walk forward / left / back / right</td></tr>
+          <tr><td>Mouse movement</td><td>Look around</td></tr>
+          <tr><td><kbd>Ctrl</kbd></td><td>Jump</td></tr>
+          <tr><td><kbd>Esc</kbd> or the on-screen "Exit Walk Mode" button</td><td>Return to the normal editor view</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <strong>Good to know</strong>
+        <p>Gravity applies, so you'll fall to the ground if you walk off a ledge. Floor collision currently works at ground level (y=0) — Walk Mode doesn't yet collide with the walls and objects in your scene, so you can walk through geometry rather than being blocked by it.</p>
+      </div>
+    </div>
+
+    <p>Walk Mode is a preview tool only — nothing you do while walking changes your scene. It's a quick way to get a feel for scale and layout before you export and hand the scene off to a game engine.</p>
+
+    <div class="page-nav">
+      <a href="animation.html" class="prev">Keyframe Animation</a>
+      <a href="exporting.html" class="next">Exporting Your Scene</a>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/script.js"></script>
+</body>
+</html>

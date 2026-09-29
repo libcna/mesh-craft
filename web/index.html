@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>MeshCraft — A 3D Scene Editor for the MC3 Format</title>
+<meta name="description" content="MeshCraft is a free, open-source 3D scene editor: primitives, CSG booleans, extrusion, PBR materials, and keyframe animation, exported to glTF/GLB. Docs for both users and developers."/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%236c8ef5'/%3E%3Ctext x='50' y='68' font-size='58' font-family='sans-serif' font-weight='800' fill='white' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E"/>
+<link rel="stylesheet" href="assets/style.css"/>
+</head>
+<body>
+
+<div class="landing">
+
+  <header class="landing-header">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">M</div>
+      <span class="logo-name">Mesh Craft</span>
+    </a>
+    <nav>
+      <a href="users/index.html">Users Docs</a>
+      <a href="developers/index.html">Developer Docs</a>
+      <a href="https://github.com/openeggbert/mesh-craft" target="_blank" class="btn">GitHub</a>
+    </nav>
+  </header>
+
+  <section class="landing-hero">
+    <div class="badge-row">
+      <span class="badge wip">Early Active Development</span>
+      <span class="badge done">Free &amp; Open Source</span>
+      <span class="badge done">C++23</span>
+      <span class="badge done">MIT License</span>
+    </div>
+    <h1>A 3D scene editor that thinks in <span>shapes</span>, not triangles.</h1>
+    <p class="lead">
+      MeshCraft lets you build 3D scenes from primitive shapes, boolean operations, extrusions,
+      and keyframe animation — then export straight to glTF/GLB for use in games, viewers, and
+      other 3D tools.
+    </p>
+    <div class="path-grid" style="max-width:640px;margin:0 auto 40px;">
+      <a href="users/index.html" class="path-card">
+        <div class="path-icon">🧑‍🎨</div>
+        <h3>I want to use MeshCraft</h3>
+        <p>Learn the editor and build your first 3D scene. No programming required.</p>
+        <span class="path-cta">Start the Users guide</span>
+      </a>
+      <a href="developers/index.html" class="path-card">
+        <div class="path-icon">🛠️</div>
+        <h3>I want to build on MeshCraft</h3>
+        <p>Build from source, understand the architecture, work with the MC3 format.</p>
+        <span class="path-cta">Start the Developer docs</span>
+      </a>
+    </div>
+    <div class="landing-hero-shot">
+      <img src="assets/images/screenshots/hero-garden-house.png" alt="MeshCraft editor showing a garden house scene with trees, a walkway, and a properties panel open on the right." loading="lazy"/>
+    </div>
+  </section>
+
+  <section class="landing-section">
+    <h2>What you can build</h2>
+    <p class="section-lead">Everything is stored as editable, human-readable <code>.mc3.xml</code> — not baked triangle soup — so you can always go back and change your mind.</p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">📦</div>
+        <div class="card-title">Primitive Shapes</div>
+        <div class="card-desc">Box, Sphere, Cylinder, Cone, Plane, Torus, Capsule, Disk, Grid, and Ico-sphere — all editable after placement.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚗️</div>
+        <div class="card-title">CSG Booleans</div>
+        <div class="card-desc">Union, Difference, and Intersection — cut holes, merge shapes, and carve real geometry.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔩</div>
+        <div class="card-title">Extrude</div>
+        <div class="card-desc">Sweep a cross-section — rectangle, circle, polygon, or custom — along a line, arc, helix, polyline, or curve.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎨</div>
+        <div class="card-title">PBR Materials</div>
+        <div class="card-desc">Color, roughness, metallic, and emissive glow, with texture support — the same material model used by modern game engines.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎞️</div>
+        <div class="card-title">Keyframe Animation</div>
+        <div class="card-desc">A timeline editor for moving, rotating, scaling, and recoloring objects over time.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚶</div>
+        <div class="card-title">Walk Mode</div>
+        <div class="card-desc">Drop into first-person and walk around your scene before you ever export it.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧩</div>
+        <div class="card-title">Definitions &amp; Instances</div>
+        <div class="card-desc">Build something once, then place it a hundred times — edit the original and every copy updates.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📤</div>
+        <div class="card-title">glTF/GLB Export</div>
+        <div class="card-desc">One click sends your scene to Blender, Godot, Unity, or any glTF-compatible engine, animations included.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="landing-section">
+    <h2>A closer look</h2>
+    <p class="section-lead">Real screenshots of the editor — not mockups.</p>
+    <div class="shot-gallery">
+      <figure>
+        <img src="assets/images/screenshots/showcase-medieval-castle.png" alt="A large medieval castle scene in MeshCraft with towers, a moat, flags, and trees — 548 objects." loading="lazy"/>
+        <figcaption>A 548-object castle scene — MeshCraft holds up at scale.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/images/screenshots/showcase-blupi-car.png" alt="A stylized cartoon car with a round character behind the wheel, built entirely from MeshCraft primitives." loading="lazy"/>
+        <figcaption>A stylized character car, built entirely from primitives.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/images/screenshots/csg-example.png" alt="Three overlapping colored boxes in MeshCraft representing CSG union, difference, and intersection operands." loading="lazy"/>
+        <figcaption>CSG booleans: union, difference, and intersection.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="landing-section">
+    <h2>Supported Platforms</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Platform</th><th>Backend</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Linux</td><td>EasyGL (OpenGL ES 3.2)</td><td><span class="badge done">Working</span></td></tr>
+          <tr><td>Browser (WASM)</td><td>Emscripten + WebGL 2</td><td><span class="badge done">Working</span></td></tr>
+          <tr><td>macOS</td><td>EasyGL or SDL_RENDERER</td><td><span class="badge planned">Planned</span></td></tr>
+          <tr><td>Windows</td><td>EasyGL / BGFX / Vulkan</td><td><span class="badge planned">Planned</span></td></tr>
+          <tr><td>Android</td><td>SDL_RENDERER</td><td><span class="badge planned">Planned</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="landing-footer">
+    <p>
+      <a href="users/index.html">Users Docs</a> &middot;
+      <a href="developers/index.html">Developer Docs</a> &middot;
+      <a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot;
+      MIT License
+    </p>
+  </footer>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Using MeshCraft — MeshCraft User Guide</title>
+<link rel="stylesheet" href="../assets/style.css"/>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <a href="../index.html">
+      <div class="logo-icon">M</div>
+      <div class="logo-text">
+        <span class="logo-name">Mesh Craft</span>
+        <span class="logo-sub">User Guide</span>
+      </div>
+    </a>
+  </div>
+  <div class="section-switch"><a href="index.html" class="current">Users</a><a href="../developers/index.html" class="">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Start Here</div>
+      <a href="index.html" class="active">Overview</a>
+      <a href="installing.html">Installing &amp; Running</a>
+      <a href="interface-tour.html">Interface Tour</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Learn the Basics</div>
+      <a href="first-scene.html">Your First Scene</a>
+      <a href="shapes-and-tools.html">Shapes &amp; Tools</a>
+      <a href="materials-and-lighting.html">Materials &amp; Lighting</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Go Further</div>
+      <a href="csg.html">Combining Shapes (CSG)</a>
+      <a href="animation.html">Keyframe Animation</a>
+      <a href="walk-mode.html">Walk Mode</a>
+      <a href="exporting.html">Exporting Your Scene</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Reference</div>
+      <a href="keyboard-shortcuts.html">Keyboard Shortcuts</a>
+      <a href="faq.html">FAQ &amp; Troubleshooting</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License
+  </div>
+</aside>
+
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb">
+      <a href="index.html">Users</a>
+      <span class="sep">/</span>
+      <span>Overview</span>
+    </div>
+    <div class="topbar-search">
+      <input type="search" id="searchInput" placeholder="Search docs… (/)"/>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+    <div class="page-header">
+      <h1>Using MeshCraft</h1>
+      <p class="subtitle">Everything you need to open the editor and start building 3D scenes — no programming required.</p>
+      <div class="tags">
+        <span class="badge wip">Early Active Development</span>
+        <span class="badge done">No Coding Needed</span>
+      </div>
+    </div>
+
+    <div class="screenshot wide">
+      <img src="../assets/images/screenshots/hero-garden-house.png" alt="The MeshCraft editor open on a garden house scene, showing the toolbar, object hierarchy, 3D viewport, and properties panel."/>
+      <figcaption>The MeshCraft editor — a real screenshot, not a mockup.</figcaption>
+    </div>
+
+    <h2>What is MeshCraft?</h2>
+    <p>
+      MeshCraft is a 3D scene editor. Instead of sculpting triangles like a traditional 3D modeling
+      program, you work with <strong>ready-made building blocks</strong>: boxes, spheres, cylinders,
+      and other shapes that you place, resize, and combine. You can cut holes in shapes, glue shapes
+      together, color and light your scene, and even animate objects over time — all through
+      point-and-click panels.
+    </p>
+    <p>
+      When you're happy with a scene, MeshCraft exports it to <strong>glTF/GLB</strong>, a format that
+      almost every modern 3D tool and game engine (Blender, Godot, Unity, and more) can open directly.
+    </p>
+
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <strong>This guide assumes no programming knowledge</strong>
+        <p>You won't need to write code, use the command line, or understand XML to follow this guide. If you're a developer looking to build MeshCraft from source or extend it, see the <a href="../developers/index.html">Developer docs</a> instead.</p>
+      </div>
+    </div>
+
+    <h2>What you'll learn</h2>
+    <div class="card-grid">
+      <a href="installing.html" class="card">
+        <div class="card-icon">💾</div>
+        <div class="card-title">Installing &amp; Running</div>
+        <div class="card-desc">Get the editor onto your computer and open it for the first time.</div>
+      </a>
+      <a href="interface-tour.html" class="card">
+        <div class="card-icon">🧭</div>
+        <div class="card-title">Interface Tour</div>
+        <div class="card-desc">What every panel, button, and toolbar does.</div>
+      </a>
+      <a href="first-scene.html" class="card">
+        <div class="card-icon">🏁</div>
+        <div class="card-title">Your First Scene</div>
+        <div class="card-desc">Place a shape, move it, color it, and save your work.</div>
+      </a>
+      <a href="shapes-and-tools.html" class="card">
+        <div class="card-icon">📦</div>
+        <div class="card-title">Shapes &amp; Tools</div>
+        <div class="card-desc">All the primitive shapes, selection, grouping, and extrusion.</div>
+      </a>
+      <a href="materials-and-lighting.html" class="card">
+        <div class="card-icon">🎨</div>
+        <div class="card-title">Materials &amp; Lighting</div>
+        <div class="card-desc">Give your objects color, shine, and glow — and light the scene.</div>
+      </a>
+      <a href="csg.html" class="card">
+        <div class="card-icon">⚗️</div>
+        <div class="card-title">Combining Shapes (CSG)</div>
+        <div class="card-desc">Cut, merge, and overlap shapes to build things a single primitive can't.</div>
+      </a>
+      <a href="animation.html" class="card">
+        <div class="card-icon">🎞️</div>
+        <div class="card-title">Keyframe Animation</div>
+        <div class="card-desc">Make objects move, spin, and change over time.</div>
+      </a>
+      <a href="walk-mode.html" class="card">
+        <div class="card-icon">🚶</div>
+        <div class="card-title">Walk Mode</div>
+        <div class="card-desc">Step into your scene and walk around it in first person.</div>
+      </a>
+      <a href="exporting.html" class="card">
+        <div class="card-icon">📤</div>
+        <div class="card-title">Exporting Your Scene</div>
+        <div class="card-desc">Send your finished scene to Blender, Godot, Unity, or any glTF viewer.</div>
+      </a>
+      <a href="keyboard-shortcuts.html" class="card">
+        <div class="card-icon">⌨️</div>
+        <div class="card-title">Keyboard Shortcuts</div>
+        <div class="card-desc">A one-page cheat sheet for every shortcut in the editor.</div>
+      </a>
+      <a href="faq.html" class="card">
+        <div class="card-icon">❓</div>
+        <div class="card-title">FAQ &amp; Troubleshooting</div>
+        <div class="card-desc">Answers to the questions new users ask most.</div>
+      </a>
+    </div>
+
+    <h2>A few real examples</h2>
+    <p class="section-lead text-muted">All built entirely in MeshCraft, from primitive shapes.</p>
+    <div class="shot-gallery">
+      <figure>
+        <img src="../assets/images/screenshots/showcase-medieval-castle.png" alt="A medieval castle scene with towers, a moat, flags and trees."/>
+        <figcaption>A 548-object castle scene.</figcaption>
+      </figure>
+      <figure>
+        <img src="../assets/images/screenshots/showcase-blupi-car.png" alt="A stylized cartoon car with a round character behind the wheel."/>
+        <figcaption>A stylized character car.</figcaption>
+      </figure>
+      <figure>
+        <img src="../assets/images/screenshots/csg-example.png" alt="Three overlapping colored boxes representing CSG union, difference and intersection."/>
+        <figcaption>Shapes ready to be combined with CSG.</figcaption>
+      </figure>
+    </div>
+
+    <div class="page-nav">
+      <span class="empty"></span>
+      <a href="installing.html" class="next">Installing &amp; Running</a>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/script.js"></script>
+</body>
+</html>

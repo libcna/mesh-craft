@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>MC3 Format Reference — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a>
+      <a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a><a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a><a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="mc3-format.html" class="active">MC3 Format</a>
+      <a href="mc3-objects.html">Object Types</a>
+      <a href="mc3-materials.html">Materials &amp; Textures</a>
+      <a href="mc3-animation.html">Animation</a>
+      <a href="mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a><a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a><a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a><a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><span>MC3 Format Reference</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>MC3 Format Reference</h1>
+      <p class="subtitle">Version 0.1 &mdash; XML-based 3D scene format native to MeshCraft and the OpenEggbert project.</p>
+      <div class="tags">
+        <span class="badge done">v0.1</span>
+        <span class="badge done">UTF-8 XML</span>
+        <span class="badge done">.mc3.xml extension</span>
+      </div>
+    </div>
+
+    <h2>Overview</h2>
+    <p>
+      MC3 (Mesh Craft 3D) is a human-readable XML format for 3D scenes. It describes scenes as <em>constructive objects</em> — primitives, extrusions, CSG booleans, groups, instances — rather than raw triangle meshes. The recommended pipeline:
+    </p>
+    <div class="arch-diagram">
+      <pre>
+.mc3.xml  →  mc3togltf  →  .glb / .gltf  →  game engine / browser
+</pre>
+    </div>
+
+    <h2>Root Element</h2>
+    <pre><code>&lt;<span class="tag">mc3</span> <span class="atr">version</span>=<span class="val">"0.1"</span>
+     <span class="atr">model</span>=<span class="val">"MyScene"</span>
+     <span class="atr">unit</span>=<span class="val">"meter"</span>
+     <span class="atr">coordinate_system</span>=<span class="val">"right_handed_y_up"</span>&gt;
+  …
+&lt;/<span class="tag">mc3</span>&gt;</code></pre>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Attribute</th><th>Values</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>version</code></td><td>string</td><td><code>0.1</code></td><td>Format version</td></tr>
+          <tr><td><code>model</code></td><td>string</td><td><code>"unnamed"</code></td><td>Scene/model name</td></tr>
+          <tr><td><code>unit</code></td><td><code>meter</code> | <code>centimeter</code> | <code>inch</code></td><td><code>meter</code></td><td>World unit</td></tr>
+          <tr><td><code>coordinate_system</code></td><td><code>right_handed_y_up</code></td><td><code>right_handed_y_up</code></td><td>Coordinate convention (Y-up, right-handed)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Top-Level Structure</h2>
+    <pre><code>&lt;<span class="tag">mc3</span> …&gt;
+  &lt;<span class="tag">environment</span>&gt;…&lt;/<span class="tag">environment</span>&gt;   <span class="cmt">&lt;!-- background, fog --&gt;</span>
+  &lt;<span class="tag">lights</span>&gt;…&lt;/<span class="tag">lights</span>&gt;               <span class="cmt">&lt;!-- ambient, directional, point, spot --&gt;</span>
+  &lt;<span class="tag">cameras</span>&gt;…&lt;/<span class="tag">cameras</span>&gt;             <span class="cmt">&lt;!-- perspective, orthographic --&gt;</span>
+  &lt;<span class="tag">textures</span>&gt;…&lt;/<span class="tag">textures</span>&gt;           <span class="cmt">&lt;!-- texture library --&gt;</span>
+  &lt;<span class="tag">materials</span>&gt;…&lt;/<span class="tag">materials</span>&gt;         <span class="cmt">&lt;!-- PBR material library --&gt;</span>
+  &lt;<span class="tag">definitions</span>&gt;…&lt;/<span class="tag">definitions</span>&gt;     <span class="cmt">&lt;!-- reusable prefabs --&gt;</span>
+  &lt;<span class="tag">objects</span>&gt;…&lt;/<span class="tag">objects</span>&gt;             <span class="cmt">&lt;!-- scene graph --&gt;</span>
+  &lt;<span class="tag">actions</span>&gt;…&lt;/<span class="tag">actions</span>&gt;             <span class="cmt">&lt;!-- keyframe animations --&gt;</span>
+&lt;/<span class="tag">mc3</span>&gt;</code></pre>
+    <p>All sections are optional and may appear in any order.</p>
+
+    <h2>Environment</h2>
+    <pre><code>&lt;<span class="tag">environment</span>&gt;
+  &lt;<span class="tag">background</span> <span class="atr">color</span>=<span class="val">"0.5 0.7 1.0"</span> <span class="atr">texture</span>=<span class="val">"sky"</span>/&gt;
+  &lt;<span class="tag">fog</span> <span class="atr">mode</span>=<span class="val">"linear"</span> <span class="atr">color</span>=<span class="val">"0.5 0.7 1.0"</span> <span class="atr">start</span>=<span class="val">"50"</span> <span class="atr">end</span>=<span class="val">"200"</span> <span class="atr">density</span>=<span class="val">"0.01"</span>/&gt;
+&lt;/<span class="tag">environment</span>&gt;</code></pre>
+
+    <h2>Lights</h2>
+    <pre><code>&lt;<span class="tag">lights</span>&gt;
+  &lt;<span class="tag">ambient</span>     <span class="atr">color</span>=<span class="val">"0.3 0.3 0.4"</span> <span class="atr">brightness</span>=<span class="val">"0.5"</span>/&gt;
+  &lt;<span class="tag">directional</span> <span class="atr">name</span>=<span class="val">"Sun"</span> <span class="atr">color</span>=<span class="val">"1 0.95 0.8"</span> <span class="atr">brightness</span>=<span class="val">"2"</span>
+               <span class="atr">direction</span>=<span class="val">"-0.5 -1 -0.5"</span> <span class="atr">cast_shadows</span>=<span class="val">"true"</span>/&gt;
+  &lt;<span class="tag">point</span>       <span class="atr">name</span>=<span class="val">"Lamp"</span> <span class="atr">color</span>=<span class="val">"1 0.6 0.2"</span> <span class="atr">brightness</span>=<span class="val">"5"</span>
+               <span class="atr">position</span>=<span class="val">"0 3 0"</span> <span class="atr">range</span>=<span class="val">"10"</span>/&gt;
+  &lt;<span class="tag">spot</span>        <span class="atr">name</span>=<span class="val">"Torch"</span> <span class="atr">position</span>=<span class="val">"0 5 0"</span> <span class="atr">direction</span>=<span class="val">"0 -1 0"</span>
+               <span class="atr">angle</span>=<span class="val">"30"</span> <span class="atr">falloff</span>=<span class="val">"45"</span> <span class="atr">range</span>=<span class="val">"20"</span>/&gt;
+&lt;/<span class="tag">lights</span>&gt;</code></pre>
+
+    <h2>Cameras</h2>
+    <pre><code>&lt;<span class="tag">cameras</span> <span class="atr">default</span>=<span class="val">"Main"</span>&gt;
+  &lt;<span class="tag">camera</span> <span class="atr">name</span>=<span class="val">"Main"</span> <span class="atr">type</span>=<span class="val">"perspective"</span>
+          <span class="atr">position</span>=<span class="val">"8 5 12"</span> <span class="atr">target</span>=<span class="val">"0 1 0"</span>
+          <span class="atr">fov</span>=<span class="val">"60"</span> <span class="atr">near</span>=<span class="val">"0.1"</span> <span class="atr">far</span>=<span class="val">"500"</span>/&gt;
+  &lt;<span class="tag">camera</span> <span class="atr">name</span>=<span class="val">"Ortho"</span> <span class="atr">type</span>=<span class="val">"orthographic"</span>
+          <span class="atr">position</span>=<span class="val">"0 10 0"</span> <span class="atr">target</span>=<span class="val">"0 0 0"</span> <span class="atr">size</span>=<span class="val">"20"</span>/&gt;
+&lt;/<span class="tag">cameras</span>&gt;</code></pre>
+
+    <h2>Common Object Attributes</h2>
+    <p>All object types support these attributes:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>—</td><td>Object name (used by animation <code>target</code>)</td></tr>
+          <tr><td><code>position</code></td><td>vec3</td><td><code>0 0 0</code></td><td>World position</td></tr>
+          <tr><td><code>rotation</code></td><td>vec3</td><td><code>0 0 0</code></td><td>Euler angles (units/order set by root attributes)</td></tr>
+          <tr><td><code>scale</code></td><td>vec3</td><td><code>1 1 1</code></td><td>Scale per axis</td></tr>
+          <tr><td><code>pivot</code></td><td>vec3</td><td><code>0 0 0</code></td><td>Rotation/scale pivot offset (local space)</td></tr>
+          <tr><td><code>material</code></td><td>IDREF</td><td>—</td><td>Reference to a material <code>id</code></td></tr>
+          <tr><td><code>visible</code></td><td>boolean</td><td><code>true</code></td><td>Visibility</td></tr>
+          <tr><td><code>collision</code></td><td>string</td><td><code>none</code></td><td>Collision shape hint</td></tr>
+          <tr><td><code>tags</code></td><td>string</td><td>—</td><td>Space-separated tag list</td></tr>
+          <tr><td><code>layer</code></td><td>string</td><td>—</td><td>Named layer for visibility grouping (empty = default layer)</td></tr>
+          <tr><td><code>role</code></td><td><code>cutter</code></td><td>—</td><td>Marks as CSG cutter inside <code>&lt;difference&gt;</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>Transform order:</strong> <code>T(position + pivot) × R(rotation) × S(scale) × T(-pivot)</code>. All rotation angles are in degrees, applied XYZ Euler order.</p>
+
+    <h2>Value Formats</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Type</th><th>Format</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>vec2</td><td><code>"W H"</code></td><td><code>"50 50"</code></td></tr>
+          <tr><td>vec3</td><td><code>"X Y Z"</code></td><td><code>"0 2 -5"</code></td></tr>
+          <tr><td>vec4</td><td><code>"R G B A"</code></td><td><code>"0.8 0.2 0.1 1.0"</code></td></tr>
+          <tr><td>boolean</td><td><code>"true"</code> or <code>"false"</code></td><td><code>"true"</code></td></tr>
+          <tr><td>float</td><td>decimal</td><td><code>"0.5"</code></td></tr>
+          <tr><td>int</td><td>positive integer</td><td><code>"24"</code></td></tr>
+          <tr><td>ID</td><td>XML ID (unique)</td><td><code>"brick"</code></td></tr>
+          <tr><td>IDREF</td><td>XML IDREF (must match an existing ID)</td><td><code>"brick"</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Coordinates and Units</h2>
+    <p>MC3 uses a <strong>right-handed, Y-up coordinate system</strong> by default — the same convention as glTF 2.0. All lengths are in the unit declared by the <code>unit</code> root attribute (default: <code>meter</code>).</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Axis</th><th>Direction</th></tr></thead>
+        <tbody>
+          <tr><td>+X</td><td>Right</td></tr>
+          <tr><td>+Y</td><td>Up</td></tr>
+          <tr><td>+Z</td><td>Towards viewer (out of screen)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Rotation angles default to <strong>degrees</strong> and use <strong>XYZ Euler</strong> order unless overridden by the <code>rotation_units</code> / <code>euler_order</code> root attributes. The transform matrix per object is:</p>
+    <pre><code>M = T(position + pivot) × Rx × Ry × Rz × S(scale) × T(-pivot)</code></pre>
+    <p>When exporting to glTF the coordinate system is automatically converted to the glTF convention (right-handed, Y-up) and Euler angles are converted to quaternions.</p>
+
+    <h2>Best Practices</h2>
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <strong>Keep scenes human-readable</strong>
+        <ul>
+          <li>Give every object a meaningful <code>name</code>. Animation <code>target</code> attributes and interactive action <code>object</code> references use the name to resolve objects.</li>
+          <li>Give every material and texture a short, stable <code>id</code>. Renaming IDs requires updating all object <code>material</code> attributes that reference them.</li>
+          <li>Prefer <code>&lt;definition&gt;</code> + <code>&lt;instance&gt;</code> over duplicating geometry. Multiple instances share one definition and produce leaner export files.</li>
+          <li>Keep CSG trees shallow. Deep union/difference/intersection chains re-evaluate every ancestor; flatten where possible using exported mesh objects.</li>
+          <li>Use tags (<code>tags="door interactive"</code>) to group objects semantically — MeshCraft's hierarchy filter and interactive action resolver both support tag queries.</li>
+          <li>Set <code>collision="none"</code> explicitly for purely decorative objects. The default is <code>none</code> but making it explicit documents intent.</li>
+          <li>Prefer relative texture URIs (<code>textures/brick.png</code>) over absolute paths so scenes are portable across machines.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Minimal Example</h2>
+    <pre><code>&lt;?<span class="tag">xml</span> version=<span class="val">"1.0"</span> encoding=<span class="val">"UTF-8"</span>?&gt;
+&lt;<span class="tag">mc3</span> <span class="atr">version</span>=<span class="val">"0.1"</span> <span class="atr">model</span>=<span class="val">"Minimal"</span>&gt;
+
+  &lt;<span class="tag">environment</span>&gt;
+    &lt;<span class="tag">background</span> <span class="atr">color</span>=<span class="val">"0.4 0.6 0.9"</span>/&gt;
+  &lt;/<span class="tag">environment</span>&gt;
+
+  &lt;<span class="tag">lights</span>&gt;
+    &lt;<span class="tag">ambient</span>     <span class="atr">color</span>=<span class="val">"0.3 0.3 0.4"</span> <span class="atr">brightness</span>=<span class="val">"0.4"</span>/&gt;
+    &lt;<span class="tag">directional</span> <span class="atr">name</span>=<span class="val">"Sun"</span> <span class="atr">color</span>=<span class="val">"1 0.95 0.8"</span>
+                 <span class="atr">brightness</span>=<span class="val">"2.5"</span> <span class="atr">direction</span>=<span class="val">"-0.5 -1 -0.3"</span>/&gt;
+  &lt;/<span class="tag">lights</span>&gt;
+
+  &lt;<span class="tag">materials</span>&gt;
+    &lt;<span class="tag">material</span> <span class="atr">id</span>=<span class="val">"grey"</span>&gt;
+      &lt;<span class="tag">base_color</span>&gt;0.7 0.7 0.7 1.0&lt;/<span class="tag">base_color</span>&gt;
+    &lt;/<span class="tag">material</span>&gt;
+  &lt;/<span class="tag">materials</span>&gt;
+
+  &lt;<span class="tag">objects</span>&gt;
+    &lt;<span class="tag">plane</span> <span class="atr">name</span>=<span class="val">"Ground"</span> <span class="atr">size</span>=<span class="val">"20 20"</span> <span class="atr">axis</span>=<span class="val">"y"</span> <span class="atr">material</span>=<span class="val">"grey"</span>/&gt;
+    &lt;<span class="tag">box</span>   <span class="atr">name</span>=<span class="val">"Cube"</span>   <span class="atr">size</span>=<span class="val">"1 1 1"</span> <span class="atr">position</span>=<span class="val">"0 0.5 0"</span> <span class="atr">material</span>=<span class="val">"grey"</span>/&gt;
+  &lt;/<span class="tag">objects</span>&gt;
+
+&lt;/<span class="tag">mc3</span>&gt;</code></pre>
+
+    <h2>See Also</h2>
+    <ul>
+      <li><a href="mc3-objects.html">Object Types</a> — all object elements with their attributes</li>
+      <li><a href="mc3-materials.html">Materials &amp; Textures</a> — PBR material system</li>
+      <li><a href="mc3-animation.html">Animation</a> — <code>&lt;actions&gt;</code> reference</li>
+      <li><a href="mc3-interactive.html">Interactive Actions</a> — state machines and runtime triggers</li>
+      <li><a href="../tutorials/minimal-example.html">Tutorial: Minimal Scene</a></li>
+    </ul>
+
+    <div class="page-nav">
+      <a href="../classes/Mc3Animation.html" class="prev">Mc3Animation class</a>
+      <a href="mc3-objects.html" class="next">Object Types</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

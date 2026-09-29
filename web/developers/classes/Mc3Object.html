@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Mc3Object — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="index.html">All Classes</a>
+      <a href="MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="Mc3Document.html">Mc3Document</a>
+      <a href="Mc3Object.html" class="active">Mc3Object</a>
+      <a href="SceneRenderer.html">SceneRenderer</a><a href="EditorCamera.html">EditorCamera</a>
+      <a href="Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a><a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a><a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a><a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a><a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a><a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Classes</a><span class="sep">/</span><span>Mc3Object</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1><code>Mc3Object</code></h1>
+      <p class="subtitle">A node in the MC3 scene graph. Represents any geometric object, container, or CSG operation.</p>
+    </div>
+
+    <h4>Header</h4><p><code>mc3/include/MeshCraft/Mc3/Mc3Object.hpp</code></p>
+    <h4>Namespace</h4><p><code>MeshCraft::Mc3</code></p>
+
+    <h2>ObjectType Enum</h2>
+    <p>The <code>type</code> field determines which optional data fields are populated and how the object is rendered.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Value</th><th>XML element</th><th>Active optional field(s)</th></tr></thead>
+        <tbody>
+          <tr><td><code>Box</code>, <code>Cube</code></td><td><code>&lt;box&gt;</code>, <code>&lt;cube&gt;</code></td><td><code>primitive</code></td></tr>
+          <tr><td><code>Sphere</code></td><td><code>&lt;sphere&gt;</code></td><td><code>primitive</code></td></tr>
+          <tr><td><code>Cylinder</code></td><td><code>&lt;cylinder&gt;</code></td><td><code>primitive</code></td></tr>
+          <tr><td><code>Cone</code></td><td><code>&lt;cone&gt;</code></td><td><code>primitive</code></td></tr>
+          <tr><td><code>Plane</code></td><td><code>&lt;plane&gt;</code></td><td><code>primitive</code></td></tr>
+          <tr><td><code>Mesh</code></td><td><code>&lt;mesh&gt;</code></td><td><code>meshSource</code></td></tr>
+          <tr><td><code>Extrude</code></td><td><code>&lt;extrude&gt;</code></td><td><code>extrude</code></td></tr>
+          <tr><td><code>Group</code></td><td><code>&lt;group&gt;</code></td><td><code>children</code></td></tr>
+          <tr><td><code>Instance</code></td><td><code>&lt;instance&gt;</code></td><td><code>definition</code>, <code>materialOverride</code></td></tr>
+          <tr><td><code>Union</code></td><td><code>&lt;union&gt;</code></td><td><code>csgOperation</code>, <code>children</code></td></tr>
+          <tr><td><code>Difference</code></td><td><code>&lt;difference&gt;</code></td><td><code>csgOperation</code>, <code>children</code></td></tr>
+          <tr><td><code>Intersection</code></td><td><code>&lt;intersection&gt;</code></td><td><code>csgOperation</code>, <code>children</code></td></tr>
+          <tr><td><code>Area</code></td><td><code>&lt;area&gt;</code></td><td><code>primitive</code> (box extent)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Public Fields</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>type</code></td><td><code>ObjectType</code></td><td>Determines the object's behavior and which optional fields are active.</td></tr>
+          <tr><td><code>name</code></td><td><code>string</code></td><td>Human-readable name. Used by animation channels as <code>target</code>.</td></tr>
+          <tr><td><code>id</code></td><td><code>string</code></td><td>XML ID (unique per document, may be empty if not set).</td></tr>
+          <tr><td><code>transform</code></td><td><code>Mc3Transform</code></td><td>Local transform: position, rotation (XYZ Euler °), scale, pivot.</td></tr>
+          <tr><td><code>deform</code></td><td><code>optional&lt;Mc3Deform&gt;</code></td><td>Geometry-level deform scale, applied before the object transform.</td></tr>
+          <tr><td><code>material</code></td><td><code>string</code></td><td>ID reference into <code>Mc3Document.materials</code>.</td></tr>
+          <tr><td><code>visible</code></td><td><code>bool</code></td><td>Default: <code>true</code>.</td></tr>
+          <tr><td><code>collision</code></td><td><code>string</code></td><td>Collision shape hint: <code>"none"</code>, <code>"box"</code>, <code>"mesh"</code>, etc.</td></tr>
+          <tr><td><code>tags</code></td><td><code>vector&lt;string&gt;</code></td><td>Space-separated tag list.</td></tr>
+          <tr><td><code>primitive</code></td><td><code>optional&lt;Mc3Primitive&gt;</code></td><td>Shape parameters for primitive types.</td></tr>
+          <tr><td><code>extrude</code></td><td><code>optional&lt;Mc3Extrude&gt;</code></td><td>Extrude path + cross-section parameters.</td></tr>
+          <tr><td><code>csgOperation</code></td><td><code>optional&lt;Mc3CsgOperation&gt;</code></td><td>CSG operation type (Union / Difference / Intersection).</td></tr>
+          <tr><td><code>definition</code></td><td><code>string</code></td><td>For <code>Instance</code>: ID of the definition in <code>Mc3Document.definitions</code>.</td></tr>
+          <tr><td><code>meshSource</code></td><td><code>string</code></td><td>For <code>Mesh</code>: relative path to the OBJ file.</td></tr>
+          <tr><td><code>materialOverride</code></td><td><code>string</code></td><td>For <code>Instance</code>: material to use instead of the definition's materials.</td></tr>
+          <tr><td><code>isCutter</code></td><td><code>bool</code></td><td>Default: <code>false</code>. Set to true for <code>role="cutter"</code> children in <code>&lt;difference&gt;</code>.</td></tr>
+          <tr><td><code>children</code></td><td><code>vector&lt;shared_ptr&lt;Mc3Object&gt;&gt;</code></td><td>Child nodes (Group, CSG types, etc.).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Transform Formula</h2>
+    <p>The world matrix for an object, given its local transform and the parent world matrix, is:</p>
+    <pre><code>localMatrix = T(position + pivot) × R(rotation) × S(scale) × T(-pivot)
+worldMatrix = parentWorld × localMatrix</code></pre>
+    <p>This ensures the pivot is the rotation/scale center. The pivot is specified in local space.</p>
+
+    <h2>Ownership</h2>
+    <p>Objects are owned by <code>shared_ptr</code>. The scene graph's roots are stored in <code>Mc3Document.objects</code>. Children are stored in <code>Mc3Object.children</code>. Definitions are stored in <code>Mc3Document.definitions</code>.</p>
+    <p>The <code>SelectionManager</code> holds <strong>non-owning copies</strong> of <code>shared_ptr</code>s. This means deleting an object from the document while it is selected will leave a dangling shared_ptr in the selection — the application must clear the selection when modifying the object list.</p>
+
+    <div class="page-nav">
+      <a href="Mc3Document.html" class="prev">Mc3Document</a>
+      <a href="SceneRenderer.html" class="next">SceneRenderer</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

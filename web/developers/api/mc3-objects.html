@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Object Types — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a><a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a><a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a><a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="mc3-format.html">MC3 Format</a>
+      <a href="mc3-objects.html" class="active">Object Types</a>
+      <a href="mc3-materials.html">Materials &amp; Textures</a>
+      <a href="mc3-animation.html">Animation</a>
+      <a href="mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a><a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a><a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a><a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="mc3-format.html">Format</a><span class="sep">/</span><span>Object Types</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Object Types</h1>
+      <p class="subtitle">All MC3 object elements with their attributes. Common attributes apply to every type.</p>
+    </div>
+
+    <h2>Common Object Attributes</h2>
+    <p>Every object element supports these attributes:</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>name</code></td><td>string</td><td>—</td><td>Object name. Required for animation targets and interactive action references.</td></tr>
+        <tr><td><code>position</code></td><td>vec3</td><td><code>0 0 0</code></td><td>World position (X Y Z).</td></tr>
+        <tr><td><code>rotation</code></td><td>vec3</td><td><code>0 0 0</code></td><td>Euler rotation in degrees, applied XYZ order.</td></tr>
+        <tr><td><code>scale</code></td><td>vec3</td><td><code>1 1 1</code></td><td>Scale per axis.</td></tr>
+        <tr><td><code>pivot</code></td><td>vec3</td><td><code>0 0 0</code></td><td>Rotation/scale pivot offset in local space. Essential for doors, lids, and levers.</td></tr>
+        <tr><td><code>material</code></td><td>IDREF</td><td>—</td><td>Reference to a material <code>id</code> declared in <code>&lt;materials&gt;</code>.</td></tr>
+        <tr><td><code>visible</code></td><td>boolean</td><td><code>true</code></td><td>Whether the object is rendered.</td></tr>
+        <tr><td><code>collision</code></td><td>string</td><td><code>none</code></td><td>Physics collision type: <code>none</code>, <code>static</code>, <code>dynamic</code>, <code>kinematic</code>, <code>trigger</code>.</td></tr>
+        <tr><td><code>tags</code></td><td>string</td><td>—</td><td>Space-separated tag list (e.g., <code>"door interactive wood"</code>).</td></tr>
+        <tr><td><code>role</code></td><td>string</td><td>—</td><td><code>cutter</code> — marks this object as a subtractor inside a <code>&lt;difference&gt;</code> CSG node.</td></tr>
+        <tr><td><code>layer</code></td><td>string</td><td>—</td><td>Named layer for visibility grouping. Empty means the default layer.</td></tr>
+        <tr><td><code>state</code></td><td>string</td><td>—</td><td>Initial active state name (must match an <code>id</code> in the object's <code>&lt;states&gt;</code> block).</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>Transform order:</strong> <code>T(position + pivot) × R(rotation) × S(scale) × T(−pivot)</code></p>
+
+    <h2>Object Child Elements (all types)</h2>
+    <p>The following optional child elements may appear inside any object element, in this order:</p>
+
+    <h3><code>&lt;states&gt;</code> — named configurations</h3>
+    <p>Declares named configurations that override the object's base attributes at runtime.</p>
+    <pre><code>&lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Door"</span> <span class="atr">state</span>=<span class="val">"closed"</span>&gt;
+  &lt;<span class="tag">states</span>&gt;
+    &lt;<span class="tag">state</span> <span class="atr">id</span>=<span class="val">"closed"</span> <span class="atr">rotation</span>=<span class="val">"0 0 0"</span>/&gt;
+    &lt;<span class="tag">state</span> <span class="atr">id</span>=<span class="val">"open"</span>   <span class="atr">rotation</span>=<span class="val">"0 90 0"</span>/&gt;
+  &lt;/<span class="tag">states</span>&gt;
+&lt;/<span class="tag">box</span>&gt;</code></pre>
+    <p>See <a href="mc3-interactive.html">Interactive Actions &amp; States</a> for the full reference.</p>
+
+    <h3><code>&lt;deform&gt;</code> — geometry-level scale</h3>
+    <p>Applied before the object transform. Useful for non-uniform stretching of a primitive without affecting its children's transforms.</p>
+    <pre><code>&lt;<span class="tag">sphere</span> <span class="atr">name</span>=<span class="val">"Egg"</span> <span class="atr">radius</span>=<span class="val">"0.5"</span>&gt;
+  &lt;<span class="tag">deform</span> <span class="atr">scale</span>=<span class="val">"1.0 1.5 1.0"</span>/&gt;
+&lt;/<span class="tag">sphere</span>&gt;</code></pre>
+    <p>The <code>deform.x/y/z</code> components are also <strong>animatable</strong> via keyframe channels (see <a href="mc3-animation.html">Animation Reference</a>).</p>
+
+    <h3><code>&lt;uv_mapping&gt;</code> — texture coordinate control</h3>
+    <p>Controls how the texture is tiled and positioned on the object surface.</p>
+    <pre><code>&lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Wall"</span> <span class="atr">size</span>=<span class="val">"10 3 0.3"</span> <span class="atr">material</span>=<span class="val">"brick"</span>&gt;
+  &lt;<span class="tag">uv_mapping</span> <span class="atr">scale</span>=<span class="val">"2.5 1.5"</span> <span class="atr">offset</span>=<span class="val">"0 0"</span> <span class="atr">rotation</span>=<span class="val">"0"</span>/&gt;
+&lt;/<span class="tag">box</span>&gt;</code></pre>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>scale</code></td><td>vec2</td><td><code>1 1</code></td><td>U and V scale (tiling factor).</td></tr>
+        <tr><td><code>offset</code></td><td>vec2</td><td><code>0 0</code></td><td>U and V offset.</td></tr>
+        <tr><td><code>rotation</code></td><td>float</td><td><code>0</code></td><td>Rotation in degrees.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3><code>&lt;metadata&gt;</code> — import source data</h3>
+    <p>Opaque key-value store preserved during round-trip serialization. Intended for tool-specific import/export hints that should not affect rendering.</p>
+    <pre><code>&lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"ImportedWall"</span>&gt;
+  &lt;<span class="tag">metadata</span>&gt;
+    &lt;<span class="tag">property</span> <span class="atr">name</span>=<span class="val">"rd4_original_type"</span> <span class="atr">value</span>=<span class="val">"SweepObject"</span>/&gt;
+    &lt;<span class="tag">property</span> <span class="atr">name</span>=<span class="val">"rd4_source_line"</span>   <span class="atr">value</span>=<span class="val">"142"</span>/&gt;
+  &lt;/<span class="tag">metadata</span>&gt;
+&lt;/<span class="tag">box</span>&gt;</code></pre>
+
+    <hr/>
+
+    <h2>Primitive Objects</h2>
+
+    <h3><code>&lt;box&gt;</code> / <code>&lt;cube&gt;</code></h3>
+    <p>Rectangular box centered at the local origin. <code>&lt;cube size="n"&gt;</code> is equivalent to <code>&lt;box size="n n n"&gt;</code>.</p>
+    <pre><code>&lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Wall"</span> <span class="atr">size</span>=<span class="val">"10 4 0.3"</span> <span class="atr">position</span>=<span class="val">"0 2 -5"</span> <span class="atr">material</span>=<span class="val">"brick"</span>/&gt;
+&lt;<span class="tag">cube</span> <span class="atr">name</span>=<span class="val">"Crate"</span> <span class="atr">size</span>=<span class="val">"1"</span> <span class="atr">material</span>=<span class="val">"wood"</span>/&gt;</code></pre>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>size</code></td><td>vec3</td><td><code>1 1 1</code></td><td>Width × Height × Depth. For <code>&lt;cube&gt;</code>, a single number is expanded to W H D.</td></tr>
+        <tr><td><code>segments</code></td><td>int</td><td><code>1</code></td><td>Subdivisions per axis.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3><code>&lt;sphere&gt;</code></h3>
+    <pre><code>&lt;<span class="tag">sphere</span> <span class="atr">name</span>=<span class="val">"Ball"</span> <span class="atr">radius</span>=<span class="val">"0.5"</span> <span class="atr">segments</span>=<span class="val">"24"</span> <span class="atr">position</span>=<span class="val">"0 1 0"</span>/&gt;</code></pre>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>radius</code></td><td>float</td><td><code>0.5</code></td><td>Sphere radius.</td></tr>
+        <tr><td><code>segments</code></td><td>int</td><td><code>16</code></td><td>Latitude/longitude subdivisions.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3><code>&lt;cylinder&gt;</code></h3>
+    <pre><code>&lt;<span class="tag">cylinder</span> <span class="atr">name</span>=<span class="val">"Pillar"</span> <span class="atr">radius</span>=<span class="val">"0.3"</span> <span class="atr">height</span>=<span class="val">"4"</span> <span class="atr">segments</span>=<span class="val">"16"</span> <span class="atr">axis</span>=<span class="val">"y"</span>/&gt;</code></pre>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>radius</code></td><td>float</td><td><code>0.5</code></td><td>Base radius.</td></tr>
+        <tr><td><code>height</code></td><td>float</td><td><code>1.0</code></td><td>Total height.</td></tr>
+        <tr><td><code>segments</code></td><td>int</td><td><code>16</code></td><td>Circumference subdivisions.</td></tr>
+        <tr><td><code>axis</code></td><td><code>x</code>|<code>y</code>|<code>z</code></td><td><code>y</code></td><td>Height axis. Controls how the mesh is generated; does not apply a rotation transform.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3><code>&lt;cone&gt;</code></h3>
+    <pre><code>&lt;<span class="tag">cone</span> <span class="atr">name</span>=<span class="val">"Cap"</span> <span class="atr">radius</span>=<span class="val">"0.5"</span> <span class="atr">height</span>=<span class="val">"1.5"</span> <span class="atr">segments</span>=<span class="val">"16"</span>/&gt;</code></pre>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Default</th></tr></thead>
+      <tbody>
+        <tr><td><code>radius</code></td><td>float</td><td><code>0.5</code></td></tr>
+        <tr><td><code>height</code></td><td>float</td><td><code>1.0</code></td></tr>
+        <tr><td><code>segments</code></td><td>int</td><td><code>16</code></td></tr>
+      </tbody>
+    </table></div>
+
+    <h3><code>&lt;plane&gt;</code></h3>
+    <p>Flat surface with no thickness. Useful for floors, ground planes, and walls with one-sided rendering.</p>
+    <pre><code>&lt;<span class="tag">plane</span> <span class="atr">name</span>=<span class="val">"Ground"</span> <span class="atr">size</span>=<span class="val">"50 50"</span> <span class="atr">axis</span>=<span class="val">"y"</span> <span class="atr">material</span>=<span class="val">"grass"</span>/&gt;</code></pre>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>size</code></td><td>vec2</td><td><code>1 1</code></td><td>Width and height.</td></tr>
+        <tr><td><code>axis</code></td><td><code>x</code>|<code>y</code>|<code>z</code></td><td><code>y</code></td><td>Normal axis.</td></tr>
+        <tr><td><code>segments</code></td><td>int</td><td><code>1</code></td><td>Subdivisions.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3><code>&lt;torus&gt;</code></h3>
+    <p>Donut-shaped surface. Useful for rings, wheels, and loop shapes.</p>
+    <pre><code>&lt;<span class="tag">torus</span> <span class="atr">name</span>=<span class="val">"Ring"</span> <span class="atr">major_radius</span>=<span class="val">"1.0"</span> <span class="atr">minor_radius</span>=<span class="val">"0.25"</span> <span class="atr">segments</span>=<span class="val">"32"</span>/&gt;</code></pre>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>major_radius</code></td><td>float</td><td><code>1.0</code></td><td>Distance from the center of the tube to the center of the torus.</td></tr>
+        <tr><td><code>minor_radius</code></td><td>float</td><td><code>0.25</code></td><td>Radius of the tube.</td></tr>
+        <tr><td><code>segments</code></td><td>int</td><td><code>32</code></td><td>Ring subdivisions (both major and minor).</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3><code>&lt;capsule&gt;</code></h3>
+    <p>Cylinder with hemispherical end caps. Commonly used as a character or physics body shape.</p>
+    <pre><code>&lt;<span class="tag">capsule</span> <span class="atr">name</span>=<span class="val">"Body"</span> <span class="atr">radius</span>=<span class="val">"0.4"</span> <span class="atr">height</span>=<span class="val">"1.8"</span> <span class="atr">segments</span>=<span class="val">"16"</span>/&gt;</code></pre>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>radius</code></td><td>float</td><td><code>0.5</code></td><td>Radius of the cylinder and the end caps.</td></tr>
+        <tr><td><code>height</code></td><td>float</td><td><code>1.0</code></td><td>Total height including both caps.</td></tr>
+        <tr><td><code>segments</code></td><td>int</td><td><code>16</code></td><td>Circumference subdivisions.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3><code>&lt;disk&gt;</code></h3>
+    <p>Circular disc (or annulus when <code>inner_radius &gt; 0</code>). Use for coin shapes, rings, and washers.</p>
+    <pre><code>&lt;<span class="tag">disk</span> <span class="atr">name</span>=<span class="val">"Coin"</span>   <span class="atr">radius</span>=<span class="val">"0.4"</span> <span class="atr">segments</span>=<span class="val">"32"</span>/&gt;
+&lt;<span class="tag">disk</span> <span class="atr">name</span>=<span class="val">"Washer"</span> <span class="atr">radius</span>=<span class="val">"0.5"</span> <span class="atr">inner_radius</span>=<span class="val">"0.2"</span> <span class="atr">segments</span>=<span class="val">"24"</span>/&gt;</code></pre>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>radius</code></td><td>float</td><td><code>0.5</code></td><td>Outer radius.</td></tr>
+        <tr><td><code>inner_radius</code></td><td>float</td><td><code>0</code></td><td>Inner hole radius. 0 = solid disc.</td></tr>
+        <tr><td><code>segments</code></td><td>int</td><td><code>24</code></td><td>Circumference subdivisions.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3><code>&lt;grid&gt;</code></h3>
+    <p>Flat subdivided plane (N×M quads) useful as a ground or reference surface. Unlike <code>&lt;plane&gt;</code>, a grid has configurable subdivision for deformation or displacement.</p>
+    <pre><code>&lt;<span class="tag">grid</span> <span class="atr">name</span>=<span class="val">"Ground"</span> <span class="atr">size</span>=<span class="val">"10 10"</span> <span class="atr">subdivisions_x</span>=<span class="val">"10"</span> <span class="atr">subdivisions_z</span>=<span class="val">"10"</span>/&gt;</code></pre>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>size</code></td><td>vec2</td><td><code>1 1</code></td><td>Width × depth (X × Z).</td></tr>
+        <tr><td><code>subdivisions_x</code></td><td>int</td><td><code>1</code></td><td>Number of columns.</td></tr>
+        <tr><td><code>subdivisions_z</code></td><td>int</td><td><code>1</code></td><td>Number of rows.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3><code>&lt;icosphere&gt;</code></h3>
+    <p>Sphere with uniformly distributed triangles (no pole singularity). Higher subdivision gives a rounder result with fewer shading artifacts than a UV sphere at the same polygon count.</p>
+    <pre><code>&lt;<span class="tag">icosphere</span> <span class="atr">name</span>=<span class="val">"Ball"</span> <span class="atr">radius</span>=<span class="val">"0.5"</span> <span class="atr">subdivisions</span>=<span class="val">"3"</span>/&gt;</code></pre>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>radius</code></td><td>float</td><td><code>0.5</code></td><td>Sphere radius.</td></tr>
+        <tr><td><code>subdivisions</code></td><td>int</td><td><code>3</code></td><td>Refinement iterations. Each step ×4 triangles: 0=20, 1=80, 2=320, 3=1280 faces.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3><code>&lt;mesh&gt;</code></h3>
+    <p>External polygon mesh loaded from a file. Supports OBJ and GLB/glTF sources.</p>
+    <pre><code>&lt;<span class="tag">mesh</span> <span class="atr">name</span>=<span class="val">"Chair"</span> <span class="atr">src</span>=<span class="val">"assets/chair.obj"</span> <span class="atr">material</span>=<span class="val">"wood"</span>/&gt;</code></pre>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>src</code></td><td>Path to the mesh file, relative to the <code>.mc3.xml</code> file. OBJ files are previewed in the editor viewport (up to ~300k triangles); GLB/glTF references are parsed at export time.</td></tr>
+      </tbody>
+    </table></div>
+
+    <hr/>
+
+    <h2><code>&lt;extrude&gt;</code></h2>
+    <p>
+      Sweeps a 2D cross-section along a 3D path, producing a solid mesh with optional end caps and twist.
+      Contains exactly two child elements: <code>&lt;cross_section&gt;</code> and <code>&lt;path&gt;</code>.
+    </p>
+    <pre><code>&lt;<span class="tag">extrude</span> <span class="atr">name</span>=<span class="val">"Arch"</span> <span class="atr">material</span>=<span class="val">"stone"</span>
+          <span class="atr">segments</span>=<span class="val">"24"</span> <span class="atr">caps</span>=<span class="val">"true"</span> <span class="atr">smooth</span>=<span class="val">"true"</span>&gt;
+  &lt;<span class="tag">cross_section</span> <span class="atr">type</span>=<span class="val">"rect"</span> <span class="atr">width</span>=<span class="val">"0.3"</span> <span class="atr">height</span>=<span class="val">"0.2"</span>/&gt;
+  &lt;<span class="tag">path</span> <span class="atr">type</span>=<span class="val">"arc"</span> <span class="atr">radius</span>=<span class="val">"2.0"</span> <span class="atr">angle</span>=<span class="val">"180"</span>/&gt;
+&lt;/<span class="tag">extrude</span>&gt;</code></pre>
+
+    <h3>Extrude attributes</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>segments</code></td><td>int</td><td>32</td><td>Subdivisions along the path.</td></tr>
+        <tr><td><code>twist</code></td><td>float</td><td>0.0</td><td>Total rotation in degrees applied from start to end of path.</td></tr>
+        <tr><td><code>smooth</code></td><td>bool</td><td>true</td><td>Smooth (averaged) normals between segments vs. flat face normals.</td></tr>
+        <tr><td><code>caps</code></td><td>bool</td><td>true</td><td>Close both ends of the swept tube with filled polygons.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Cross-section types</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>type</th><th>Attributes</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>rect</code></td><td><code>width</code>, <code>height</code></td><td>Rectangle.</td></tr>
+        <tr><td><code>circle</code></td><td><code>radius</code>, <code>inner_radius</code> (optional), <code>segments</code></td><td>Circle or hollow pipe. <code>inner_radius &gt; 0</code> → annular cross-section.</td></tr>
+        <tr><td><code>polygon</code></td><td><code>radius</code> (circumradius), <code>sides</code></td><td>Regular N-gon. <code>sides=3</code>→triangle, <code>sides=6</code>→hexagon.</td></tr>
+        <tr><td><code>custom</code></td><td>child <code>&lt;point x="…" y="…"/&gt;</code> elements (CCW winding)</td><td>Arbitrary closed 2D polygon.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Path types</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>type</th><th>Attributes</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>line</code></td><td><code>length</code>, <code>axis</code> (<code>x</code>|<code>y</code>|<code>z</code>)</td><td>Straight extrusion along a world axis.</td></tr>
+        <tr><td><code>arc</code></td><td><code>radius</code>, <code>angle</code> (degrees)</td><td>Circular arc in the XZ plane. Good for arches and curved rails.</td></tr>
+        <tr><td><code>helix</code></td><td><code>radius</code>, <code>height</code>, <code>turns</code></td><td>Helical coil. Good for springs and screws.</td></tr>
+        <tr><td><code>polyline</code></td><td>child <code>&lt;point x y z/&gt;</code></td><td>Piecewise-linear 3D path.</td></tr>
+        <tr><td><code>bezier</code></td><td>child <code>&lt;point x y z cx cy cz/&gt;</code></td><td>Cubic Bézier spline; <code>cx/cy/cz</code> is the in-tangent control point.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4>Examples</h4>
+    <pre><code><span class="cmt">&lt;!-- Arch --&gt;</span>
+&lt;<span class="tag">extrude</span> <span class="atr">name</span>=<span class="val">"Arch"</span> <span class="atr">segments</span>=<span class="val">"24"</span>&gt;
+  &lt;<span class="tag">cross_section</span> <span class="atr">type</span>=<span class="val">"rect"</span> <span class="atr">width</span>=<span class="val">"0.3"</span> <span class="atr">height</span>=<span class="val">"0.2"</span>/&gt;
+  &lt;<span class="tag">path</span> <span class="atr">type</span>=<span class="val">"arc"</span> <span class="atr">radius</span>=<span class="val">"2.0"</span> <span class="atr">angle</span>=<span class="val">"180"</span>/&gt;
+&lt;/<span class="tag">extrude</span>&gt;
+
+<span class="cmt">&lt;!-- Spring --&gt;</span>
+&lt;<span class="tag">extrude</span> <span class="atr">name</span>=<span class="val">"Spring"</span> <span class="atr">segments</span>=<span class="val">"64"</span>&gt;
+  &lt;<span class="tag">cross_section</span> <span class="atr">type</span>=<span class="val">"circle"</span> <span class="atr">radius</span>=<span class="val">"0.08"</span> <span class="atr">inner_radius</span>=<span class="val">"0.04"</span>/&gt;
+  &lt;<span class="tag">path</span> <span class="atr">type</span>=<span class="val">"helix"</span> <span class="atr">radius</span>=<span class="val">"0.5"</span> <span class="atr">height</span>=<span class="val">"2.0"</span> <span class="atr">turns</span>=<span class="val">"6"</span>/&gt;
+&lt;/<span class="tag">extrude</span>&gt;
+
+<span class="cmt">&lt;!-- Hex bolt --&gt;</span>
+&lt;<span class="tag">extrude</span> <span class="atr">name</span>=<span class="val">"HexBeam"</span> <span class="atr">segments</span>=<span class="val">"1"</span>&gt;
+  &lt;<span class="tag">cross_section</span> <span class="atr">type</span>=<span class="val">"polygon"</span> <span class="atr">radius</span>=<span class="val">"0.15"</span> <span class="atr">sides</span>=<span class="val">"6"</span>/&gt;
+  &lt;<span class="tag">path</span> <span class="atr">type</span>=<span class="val">"line"</span> <span class="atr">length</span>=<span class="val">"3.0"</span> <span class="atr">axis</span>=<span class="val">"y"</span>/&gt;
+&lt;/<span class="tag">extrude</span>&gt;
+
+<span class="cmt">&lt;!-- Twisted ribbon --&gt;</span>
+&lt;<span class="tag">extrude</span> <span class="atr">name</span>=<span class="val">"Ribbon"</span> <span class="atr">segments</span>=<span class="val">"32"</span> <span class="atr">twist</span>=<span class="val">"180"</span>&gt;
+  &lt;<span class="tag">cross_section</span> <span class="atr">type</span>=<span class="val">"rect"</span> <span class="atr">width</span>=<span class="val">"0.5"</span> <span class="atr">height</span>=<span class="val">"0.05"</span>/&gt;
+  &lt;<span class="tag">path</span> <span class="atr">type</span>=<span class="val">"bezier"</span>&gt;
+    &lt;<span class="tag">point</span> <span class="atr">x</span>=<span class="val">"0"</span> <span class="atr">y</span>=<span class="val">"0"</span> <span class="atr">z</span>=<span class="val">"0"</span> <span class="atr">cx</span>=<span class="val">"1"</span> <span class="atr">cy</span>=<span class="val">"1"</span> <span class="atr">cz</span>=<span class="val">"0"</span>/&gt;
+    &lt;<span class="tag">point</span> <span class="atr">x</span>=<span class="val">"3"</span> <span class="atr">y</span>=<span class="val">"2"</span> <span class="atr">z</span>=<span class="val">"1"</span> <span class="atr">cx</span>=<span class="val">"1"</span> <span class="atr">cy</span>=<span class="val">"0"</span> <span class="atr">cz</span>=<span class="val">"0"</span>/&gt;
+    &lt;<span class="tag">point</span> <span class="atr">x</span>=<span class="val">"6"</span> <span class="atr">y</span>=<span class="val">"0"</span> <span class="atr">z</span>=<span class="val">"0"</span>/&gt;
+  &lt;/<span class="tag">path</span>&gt;
+&lt;/<span class="tag">extrude</span>&gt;</code></pre>
+
+    <hr/>
+
+    <h2><code>&lt;group&gt;</code></h2>
+    <p>Container that applies a shared transform to its children. Children can be any type including nested groups.</p>
+    <pre><code>&lt;<span class="tag">group</span> <span class="atr">name</span>=<span class="val">"Table"</span> <span class="atr">position</span>=<span class="val">"3 0 1"</span>&gt;
+  &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Top"</span>  <span class="atr">size</span>=<span class="val">"2 0.1 1"</span>     <span class="atr">position</span>=<span class="val">"0 1 0"</span>      <span class="atr">material</span>=<span class="val">"wood"</span>/&gt;
+  &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Leg1"</span> <span class="atr">size</span>=<span class="val">"0.08 1 0.08"</span> <span class="atr">position</span>=<span class="val">"-0.9 0.5 -0.4"</span> <span class="atr">material</span>=<span class="val">"wood"</span>/&gt;
+  &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Leg2"</span> <span class="atr">size</span>=<span class="val">"0.08 1 0.08"</span> <span class="atr">position</span>=<span class="val">" 0.9 0.5 -0.4"</span> <span class="atr">material</span>=<span class="val">"wood"</span>/&gt;
+  &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Leg3"</span> <span class="atr">size</span>=<span class="val">"0.08 1 0.08"</span> <span class="atr">position</span>=<span class="val">"-0.9 0.5  0.4"</span> <span class="atr">material</span>=<span class="val">"wood"</span>/&gt;
+  &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Leg4"</span> <span class="atr">size</span>=<span class="val">"0.08 1 0.08"</span> <span class="atr">position</span>=<span class="val">" 0.9 0.5  0.4"</span> <span class="atr">material</span>=<span class="val">"wood"</span>/&gt;
+&lt;/<span class="tag">group</span>&gt;</code></pre>
+    <p>Transform hierarchy: <code>world_transform = parent_transform × local_transform</code></p>
+
+    <h2><code>&lt;instance&gt;</code></h2>
+    <p>Places a copy of a <code>&lt;definition&gt;</code> in the scene. Shares the definition's geometry but supports per-instance overrides.</p>
+    <pre><code>&lt;<span class="tag">instance</span> <span class="atr">name</span>=<span class="val">"Tree1"</span> <span class="atr">definition</span>=<span class="val">"tree"</span> <span class="atr">position</span>=<span class="val">"-5 0 3"</span>/&gt;
+&lt;<span class="tag">instance</span> <span class="atr">name</span>=<span class="val">"Tree2"</span> <span class="atr">definition</span>=<span class="val">"tree"</span> <span class="atr">position</span>=<span class="val">" 5 0 1"</span> <span class="atr">material</span>=<span class="val">"autumn_leaves"</span>
+          <span class="atr">scale</span>=<span class="val">"1.2 1.2 1.2"</span>/&gt;</code></pre>
+    <p>Overridable attributes on <code>&lt;instance&gt;</code>: <code>position</code>, <code>rotation</code>, <code>scale</code>, <code>material</code>, <code>visible</code>, <code>collision</code>, <code>state</code>. Tags are merged with definition tags.</p>
+
+    <h2><code>&lt;union&gt;</code> / <code>&lt;difference&gt;</code> / <code>&lt;intersection&gt;</code></h2>
+    <p>CSG Boolean operations. See <a href="../tutorials/csg-operations.html">CSG Tutorial</a> for detailed examples.</p>
+    <pre><code><span class="cmt">&lt;!-- Difference: box with spherical cavity --&gt;</span>
+&lt;<span class="tag">difference</span> <span class="atr">name</span>=<span class="val">"HollowBox"</span> <span class="atr">material</span>=<span class="val">"stone"</span>&gt;
+  &lt;<span class="tag">box</span>    <span class="atr">name</span>=<span class="val">"body"</span>   <span class="atr">size</span>=<span class="val">"2 2 2"</span>/&gt;
+  &lt;<span class="tag">sphere</span> <span class="atr">name</span>=<span class="val">"cavity"</span> <span class="atr">radius</span>=<span class="val">"0.9"</span> <span class="atr">role</span>=<span class="val">"cutter"</span>/&gt;
+&lt;/<span class="tag">difference</span>&gt;
+
+<span class="cmt">&lt;!-- Union: merge two shapes --&gt;</span>
+&lt;<span class="tag">union</span> <span class="atr">name</span>=<span class="val">"TwoSpheres"</span> <span class="atr">material</span>=<span class="val">"glass"</span>&gt;
+  &lt;<span class="tag">sphere</span> <span class="atr">radius</span>=<span class="val">"0.6"</span> <span class="atr">position</span>=<span class="val">"-0.4 0 0"</span>/&gt;
+  &lt;<span class="tag">sphere</span> <span class="atr">radius</span>=<span class="val">"0.6"</span> <span class="atr">position</span>=<span class="val">" 0.4 0 0"</span>/&gt;
+&lt;/<span class="tag">union</span>&gt;
+
+<span class="cmt">&lt;!-- Intersection: only the overlapping volume --&gt;</span>
+&lt;<span class="tag">intersection</span> <span class="atr">name</span>=<span class="val">"RoundBlock"</span> <span class="atr">material</span>=<span class="val">"metal"</span>&gt;
+  &lt;<span class="tag">box</span>    <span class="atr">size</span>=<span class="val">"1.5 1.5 1.5"</span>/&gt;
+  &lt;<span class="tag">sphere</span> <span class="atr">radius</span>=<span class="val">"0.9"</span>/&gt;
+&lt;/<span class="tag">intersection</span>&gt;</code></pre>
+    <p>CSG children can themselves be CSG operations (recursive). The <code>role="cutter"</code> attribute applies only inside <code>&lt;difference&gt;</code>; all children of <code>&lt;union&gt;</code> and <code>&lt;intersection&gt;</code> participate equally.</p>
+    <p>CSG evaluation uses the <strong>Manifold v3</strong> library and requires non-degenerate, watertight meshes. Results are cached per object and invalidated on every edit.</p>
+
+    <h2><code>&lt;area&gt;</code></h2>
+    <p>An invisible logical volume for trigger zones, checkpoints, and pathfinding hints. No visual geometry is generated.</p>
+    <pre><code>&lt;<span class="tag">area</span> <span class="atr">name</span>=<span class="val">"CheckpointZone"</span>
+      <span class="atr">size</span>=<span class="val">"5 3 5"</span>
+      <span class="atr">position</span>=<span class="val">"0 1.5 10"</span>
+      <span class="atr">tags</span>=<span class="val">"trigger checkpoint"</span>/&gt;</code></pre>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>size</code></td><td>vec3</td><td><code>1 1 1</code></td><td>Box extent of the area volume.</td></tr>
+        <tr><td><code>tags</code></td><td>string</td><td>—</td><td>Use tags to classify areas (e.g., <code>"trigger"</code>, <code>"checkpoint"</code>, <code>"navmesh"</code>).</td></tr>
+      </tbody>
+    </table></div>
+    <p>Areas are typically paired with <code>on_enter_area</code> triggers in interactive actions. See <a href="mc3-interactive.html">Interactive Actions</a>.</p>
+
+    <h2>Pivots and Rotation Centers</h2>
+    <p>
+      The <code>pivot</code> attribute shifts the rotation and scale center away from the object's local origin.
+      This is essential for doors (pivot on the hinge edge), lids (pivot at the back edge), levers, and wheels.
+    </p>
+    <pre><code><span class="cmt">&lt;!-- Door that rotates around its left edge --&gt;</span>
+&lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Door"</span>
+     <span class="atr">size</span>=<span class="val">"1 2.1 0.08"</span>
+     <span class="atr">position</span>=<span class="val">"0 1.05 0"</span>
+     <span class="atr">pivot</span>=<span class="val">"-0.5 0 0"</span>
+     <span class="atr">material</span>=<span class="val">"wood"</span>/&gt;</code></pre>
+    <p>Transform order with pivot: <code>T(position + pivot) × R(rotation) × S(scale) × T(−pivot)</code></p>
+    <p>The pivot is in <strong>local object coordinates</strong>, specified before any transform is applied.</p>
+
+    <div class="page-nav">
+      <a href="mc3-format.html" class="prev">MC3 Format</a>
+      <a href="mc3-materials.html" class="next">Materials &amp; Textures</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

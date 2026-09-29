@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Shapes &amp; Tools — MeshCraft User Guide</title>
+<link rel="stylesheet" href="../assets/style.css"/>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <a href="../index.html">
+      <div class="logo-icon">M</div>
+      <div class="logo-text">
+        <span class="logo-name">Mesh Craft</span>
+        <span class="logo-sub">User Guide</span>
+      </div>
+    </a>
+  </div>
+  <div class="section-switch"><a href="index.html" class="current">Users</a><a href="../developers/index.html" class="">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Start Here</div>
+      <a href="index.html">Overview</a>
+      <a href="installing.html">Installing &amp; Running</a>
+      <a href="interface-tour.html">Interface Tour</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Learn the Basics</div>
+      <a href="first-scene.html">Your First Scene</a>
+      <a href="shapes-and-tools.html" class="active">Shapes &amp; Tools</a>
+      <a href="materials-and-lighting.html">Materials &amp; Lighting</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Go Further</div>
+      <a href="csg.html">Combining Shapes (CSG)</a>
+      <a href="animation.html">Keyframe Animation</a>
+      <a href="walk-mode.html">Walk Mode</a>
+      <a href="exporting.html">Exporting Your Scene</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Reference</div>
+      <a href="keyboard-shortcuts.html">Keyboard Shortcuts</a>
+      <a href="faq.html">FAQ &amp; Troubleshooting</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License
+  </div>
+</aside>
+
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb">
+      <a href="index.html">Users</a>
+      <span class="sep">/</span>
+      <span>Shapes &amp; Tools</span>
+    </div>
+    <div class="topbar-search">
+      <input type="search" id="searchInput" placeholder="Search docs… (/)"/>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+    <div class="page-header">
+      <h1>Shapes &amp; Tools</h1>
+      <p class="subtitle">Every primitive shape, how selection works, and how to group, duplicate, and extrude.</p>
+    </div>
+
+    <h2>Primitive shapes</h2>
+    <p>Every scene is built from these. Add them from the toolbar's quick-add buttons or the <strong>Add</strong> menu.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Shape</th><th>Shortcut</th><th>Good for</th></tr></thead>
+        <tbody>
+          <tr><td>Box</td><td><kbd>F1</kbd></td><td>Walls, crates, buildings, blocky anything</td></tr>
+          <tr><td>Sphere</td><td><kbd>F2</kbd></td><td>Balls, heads, planets, rounded caps</td></tr>
+          <tr><td>Cylinder</td><td><kbd>F3</kbd></td><td>Pillars, wheels, trunks, pipes</td></tr>
+          <tr><td>Cone</td><td><kbd>F4</kbd></td><td>Roofs, trees, spikes, funnels</td></tr>
+          <tr><td>Plane</td><td><kbd>F5</kbd></td><td>Floors, walls, flat panels</td></tr>
+          <tr><td>Torus</td><td>Add menu</td><td>Rings, donuts, tubes that loop</td></tr>
+          <tr><td>Capsule</td><td>Add menu</td><td>Rounded columns, simple limbs</td></tr>
+          <tr><td>Disk</td><td>Add menu</td><td>Flat circles, coins, wheels (2D)</td></tr>
+          <tr><td>Grid</td><td>Add menu</td><td>Reference/measuring grids</td></tr>
+          <tr><td>Ico-sphere</td><td>Add menu</td><td>A more evenly-faceted sphere</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Every shape stays fully editable after you place it — resize, reshape, and re-color it any time from the Properties panel, with nothing "baked in".</p>
+
+    <h2>Selecting objects</h2>
+    <ul>
+      <li><strong>Click</strong> an object in the viewport (or its name in the Scene panel) to select it.</li>
+      <li><strong>Ctrl+click</strong> to add another object to the selection.</li>
+      <li>With the Select tool active, <strong>click-drag</strong> across empty viewport space to draw a box and select everything inside it (hold <kbd>Ctrl</kbd> to add the box's contents to your current selection instead of replacing it).</li>
+      <li>Press <kbd>Ctrl+A</kbd> to select everything (or every child, if you're inside a group).</li>
+      <li>Press <kbd>P</kbd> to jump to the selected object's parent.</li>
+    </ul>
+    <p>When multiple objects are selected, the Properties panel shows shared fields for all of them — edit once, apply to every selected object.</p>
+
+    <h2>Grouping &amp; organizing</h2>
+    <ul>
+      <li><kbd>Ctrl+G</kbd> — group the selected objects so they move, rotate, and scale together.</li>
+      <li><kbd>Ctrl+Shift+G</kbd> — ungroup.</li>
+      <li>Drag objects onto one another in the Scene panel to reparent them.</li>
+      <li><kbd>Ctrl+Up</kbd> / <kbd>Ctrl+Down</kbd> — reorder an object among its siblings.</li>
+    </ul>
+
+    <h2>Definitions &amp; instances — build once, place many times</h2>
+    <p>
+      If you need the same object in several places — a tree, a chair, a fence post — convert it into a
+      <strong>Definition</strong> (see the <strong>Defs</strong> tab), then place <strong>Instances</strong>
+      of it around your scene. Each instance can have its own position and even its own material
+      override, but editing the original definition updates every instance at once.
+    </p>
+
+    <h2>Extrude — sweep a 2D shape into 3D</h2>
+    <p>
+      Extrude takes a flat cross-section (rectangle, circle, polygon, or a custom outline) and sweeps it
+      along a path (a straight line, an arc, a helix, a polyline, or a smooth curve). It's how you build
+      things a basic primitive can't: railings, pipes, coils, custom mouldings.
+    </p>
+    <div class="screenshot wide">
+      <img src="../assets/images/screenshots/shapes-extrude.png" alt="A MeshCraft scene showing extruded shapes: a coiled spring, an arch, and a pipe, alongside primitive trees and a box."/>
+      <figcaption>Extruded shapes in the hierarchy: an Arch, a Spring, and a Pipe — each a cross-section swept along a path.</figcaption>
+    </div>
+    <p>Add one from <strong>Add → Extrude</strong>, then set its path type, cross-section, and dimensions in the Properties panel.</p>
+
+    <h2>Other tools worth knowing</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tool</th><th>Shortcut</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td>Measurement</td><td><kbd>M</kbd></td><td>Click two points to see the distance between them.</td></tr>
+          <tr><td>Command Palette</td><td><kbd>Ctrl+P</kbd></td><td>Search for any object or command by name.</td></tr>
+          <tr><td>Wireframe overlay</td><td><kbd>Alt+W</kbd></td><td>See through solid shapes to check alignment.</td></tr>
+          <tr><td>Bounding box display</td><td><kbd>B</kbd></td><td>Show the box around selected objects.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="page-nav">
+      <a href="first-scene.html" class="prev">Your First Scene</a>
+      <a href="materials-and-lighting.html" class="next">Materials &amp; Lighting</a>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>mc3togltf — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a>
+      <a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a>
+      <a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="index.html">All Modules</a>
+      <a href="mc3-library.html">MC3 Library</a>
+      <a href="mc3togltf.html" class="active">mc3togltf</a>
+      <a href="editor.html">Editor</a>
+      <a href="renderer.html">Renderer</a>
+      <a href="scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a>
+      <a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a>
+      <a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a>
+      <a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a>
+      <a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a>
+      <a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a>
+      <a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a>
+      <a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a>
+      <a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a>
+      <a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a>
+      <a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Modules</a><span class="sep">/</span><span>mc3togltf</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>mc3togltf Converter</h1>
+      <p class="subtitle">Standalone CLI tool: converts <code>.mc3.xml</code> to glTF 2.0 JSON or self-contained GLB.</p>
+    </div>
+
+    <h2>Purpose</h2>
+    <p>
+      <code>mc3togltf</code> is a standalone command-line binary — separate from the editor — that takes an MC3 XML scene as input and writes a glTF 2.0 file (JSON + external <code>.bin</code>) or a GLB (self-contained binary). It is required for the editor's <strong>File → Export GLB</strong> command (<code>Ctrl+E</code>).
+    </p>
+
+    <h2>Usage</h2>
+    <pre><code><span class="cmt"># Export to GLB (binary, self-contained)</span>
+./cmake-build-debug/mc3togltf/mc3togltf test/house.mc3.xml /tmp/house.glb
+
+<span class="cmt"># Export to glTF JSON (+ external .bin)</span>
+./cmake-build-debug/mc3togltf/mc3togltf test/house.mc3.xml /tmp/house.gltf
+
+<span class="cmt"># Allow approximate CSG export (children as separate meshes)</span>
+./cmake-build-debug/mc3togltf/mc3togltf --allow-approximate-csg scene.mc3.xml out.glb</code></pre>
+
+    <h2>Building</h2>
+    <p><code>mc3togltf</code> is included in the top-level build and builds automatically with <code>ninja -C cmake-build-debug</code>. The binary lands at <code>cmake-build-debug/mc3togltf/mc3togltf</code>.</p>
+    <p>The converter has no dependency on CNA, ImGui, or any graphics library — only the core <code>mc3</code> library and tinyxml2.</p>
+
+    <h2>Export Support Matrix</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Feature</th><th>Exported</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Box, Cube</td><td>✅</td><td></td></tr>
+          <tr><td>Sphere</td><td>✅</td><td></td></tr>
+          <tr><td>Cylinder, Cone</td><td>✅</td><td></td></tr>
+          <tr><td>Plane</td><td>✅</td><td><code>size</code> is vec2 (W × D)</td></tr>
+          <tr><td>Torus, Capsule, Disk</td><td>✅</td><td></td></tr>
+          <tr><td>Grid, Ico-sphere</td><td>✅</td><td></td></tr>
+          <tr><td>Extrude (all path types)</td><td>✅</td><td></td></tr>
+          <tr><td>Mesh (<code>src=</code> OBJ)</td><td>✅</td><td>OBJ loaded at export time</td></tr>
+          <tr><td>Materials (PBR, textures)</td><td>✅</td><td></td></tr>
+          <tr><td>Lights, Cameras</td><td>✅</td><td></td></tr>
+          <tr><td>Instances (definitions)</td><td>✅</td><td>Expanded to meshes at export</td></tr>
+          <tr><td>Animation: position/rotation/scale</td><td>✅</td><td>Exported as glTF <code>animations[]</code></td></tr>
+          <tr><td>Animation: visible, deform.*, material.*</td><td>❌</td><td>No glTF equivalent; silently skipped</td></tr>
+          <tr><td>CSG (union/difference/intersection)</td><td>⚠️</td><td>Hard fail by default; use <code>--allow-approximate-csg</code> to export children as separate meshes</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Key Source Files</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>File</th><th>Role</th></tr></thead>
+        <tbody>
+          <tr><td><code>src/main.cpp</code></td><td>CLI entry point: parse args, call <code>Mc3Document::loadFromFile()</code>, call <code>GltfExporter</code>, write output.</td></tr>
+          <tr><td><code>src/GltfExporter.hpp/.cpp</code></td><td>Converts an MC3 document to glTF JSON or GLB. Handles geometry, materials, textures, and animations.</td></tr>
+          <tr><td><code>src/MeshBuilder.hpp/.cpp</code></td><td>Tessellates MC3 objects (primitives, extrusions, groups) into triangle meshes for glTF accessors.</td></tr>
+          <tr><td><code>src/MathUtils.hpp</code></td><td>Inline math: Euler → quaternion, matrix operations.</td></tr>
+          <tr><td><code>test/gltf_test.py</code></td><td>Python test suite: 39 assertions on the output glTF/GLB JSON.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Export Pipeline</h2>
+    <div class="arch-diagram">
+      <pre>
+.mc3.xml
+  │
+  ▼ Mc3Document::loadFromFile()   (shared core mc3 library)
+MC3 Document (in-memory)
+  │
+  ▼ GltfExporter::exportDocument()
+  │
+  ├── For each object: MeshBuilder → triangulated geometry
+  │     → glTF mesh / primitive / accessor / bufferView
+  │
+  ├── For each material → glTF material (PBR metallic-roughness)
+  │
+  ├── For each texture → glTF image + sampler + texture
+  │
+  ├── For each Mc3Action → glTF animation
+  │     channels: position (VEC3), rotation (VEC4 quaternion), scale (VEC3)
+  │     cubic bezier → sampled at 30 fps → LINEAR glTF interpolation
+  │
+  └── Write JSON header + binary buffer
+        .gltf → JSON file + separate .bin
+        .glb  → single binary envelope (JSON chunk + BIN chunk)
+</pre>
+    </div>
+
+    <h2>Animation Export Notes</h2>
+    <ul>
+      <li>Position, rotation, and scale channels are exported as glTF <code>animations[]</code>.</li>
+      <li>Individual per-component MC3 channels (e.g., <code>position.y</code> only) are merged into VEC3/VEC4 at export time; non-animated components fall back to the object's base transform value.</li>
+      <li>Cubic Bézier channels are <strong>densely sampled at 30 fps</strong> and exported as <code>LINEAR</code> glTF interpolation (glTF has no native cubic Bézier).</li>
+      <li>The <code>visible</code>, <code>deform.*</code>, and <code>material.*</code> properties have no glTF equivalent and are silently skipped during export.</li>
+    </ul>
+
+    <h2>Test Suite</h2>
+    <p><code>mc3togltf/test/gltf_test.py</code> contains 39 Python assertions. Registered as a CTest test (top-level build includes mc3togltf):</p>
+    <pre><code><span class="cmt"># Run via CTest (from the main cmake-build-debug)</span>
+ctest --test-dir cmake-build-debug -V -R mc3togltf
+
+<span class="cmt"># Run directly</span>
+python3 mc3togltf/test/gltf_test.py \
+    cmake-build-debug/mc3togltf/mc3togltf \
+    test/animation_test.mc3.xml \
+    test/house.mc3.xml</code></pre>
+
+    <h2>Known Limitations</h2>
+    <div class="callout todo">
+      <span class="callout-icon">📋</span>
+      <div class="callout-body">
+        <ul>
+          <li>CSG boolean geometry is <strong>not</strong> evaluated during export (Manifold not linked). By default, any CSG node causes an error. Pass <code>--allow-approximate-csg</code> to export child primitives as separate meshes instead (geometrically incorrect).</li>
+          <li>UV mapping overrides from <code>&lt;uv_mapping&gt;</code> are not yet applied during mesh tessellation.</li>
+          <li><code>visible</code>, <code>deform.*</code>, and <code>material.*</code> animation channels are silently skipped — no glTF equivalent.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="page-nav">
+      <a href="mc3-library.html" class="prev">MC3 Library</a>
+      <a href="editor.html" class="next">Editor</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

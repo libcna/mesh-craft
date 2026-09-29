@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Architecture — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../users/index.html" class="">Users</a><a href="../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="index.html">Overview</a>
+      <a href="getting-started.html">Getting Started</a>
+      <a href="build.html">Build &amp; Run</a>
+      <a href="project-structure.html">Project Structure</a>
+      <a href="architecture.html" class="active">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="modules/index.html">All Modules</a>
+      <a href="modules/mc3-library.html">MC3 Library</a>
+      <a href="modules/mc3togltf.html">mc3togltf</a>
+      <a href="modules/editor.html">Editor</a>
+      <a href="modules/renderer.html">Renderer</a>
+      <a href="modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="classes/index.html">All Classes</a>
+      <a href="classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="classes/Mc3Document.html">Mc3Document</a>
+      <a href="classes/Mc3Object.html">Mc3Object</a>
+      <a href="classes/SceneRenderer.html">SceneRenderer</a>
+      <a href="classes/EditorCamera.html">EditorCamera</a>
+      <a href="classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="api/mc3-format.html">MC3 Format</a>
+      <a href="api/mc3-objects.html">Object Types</a>
+      <a href="api/mc3-materials.html">Materials &amp; Textures</a>
+      <a href="api/mc3-animation.html">Animation</a>
+      <a href="api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="tutorials/index.html">All Tutorials</a>
+      <a href="tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="tutorials/loading-scene.html">Loading a Scene</a>
+      <a href="tutorials/csg-operations.html">CSG Operations</a>
+      <a href="tutorials/export-gltf.html">Export to glTF/GLB</a>
+      <a href="tutorials/animation.html">Keyframe Animation</a>
+      <a href="tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="internals/index.html">Overview</a>
+      <a href="internals/data-flow.html">Data Flow</a>
+      <a href="internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="internals/csg-engine.html">CSG Engine</a>
+      <a href="internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="index.html">Developers</a><span class="sep">/</span><span>Architecture</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Architecture</h1>
+      <p class="subtitle">How MeshCraft's major subsystems fit together and communicate.</p>
+    </div>
+
+    <h2>Subsystem Overview</h2>
+
+    <div class="arch-diagram">
+      <pre>
+┌─────────────────────────────────────────────────────────────────┐
+│                    MeshCraftApplication                          │
+│   (CNA Game subclass — owns all editor state and orchestrates)  │
+│                                                                 │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
+│  │ EditorCamera │  │ SelectionMgr │  │   TransformGizmo     │  │
+│  └──────────────┘  └──────────────┘  └──────────────────────┘  │
+│                                                                 │
+│  ┌──────────────────┐   ┌─────────────────────────────────┐    │
+│  │   GridRenderer   │   │       SceneRenderer              │    │
+│  └──────────────────┘   │  (unit meshes, CSG, textures,   │    │
+│                          │   gizmos, edge overlay, anim)   │    │
+│                          └─────────────────────────────────┘    │
+│                                                                 │
+│  ┌──────────────────────┐   ┌───────────────────────────────┐  │
+│  │  SceneHierarchyPanel │   │       PropertiesPanel         │  │
+│  │  (ImGui left panel)  │   │   (ImGui right panel)         │  │
+│  └──────────────────────┘   └───────────────────────────────┘  │
+│                                                                 │
+│  Timeline Panel (Ctrl+T)   Menu Bar + Toolbar   Status Bar     │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │ owns
+                           ▼
+                ┌──────────────────┐
+                │   Mc3Document    │   ← pure C++, no graphics
+                │  (mc3 library)   │
+                │  objects, mats,  │
+                │  lights, cameras,│
+                │  actions, defs   │
+                └──────────────────┘
+                           │ serialized by
+                           ▼
+               ┌────────────────────┐
+               │  Mc3XmlParser /    │
+               │  Mc3XmlWriter      │
+               └────────────────────┘
+
+                           │ exported by (separate binary)
+                           ▼
+               ┌────────────────────┐
+               │   mc3togltf        │
+               │  (CLI converter)   │
+               │  → glTF 2.0 / GLB  │
+               └────────────────────┘
+
+═══════════════ External Frameworks ═══════════════════════════════
+  CNA: SDL3 window, GL context, BasicEffect, SpriteBatch, Input
+  Dear ImGui v1.91.6: all UI panels (SDL3 + OpenGL ES 3 backends)
+  Manifold v3: CSG boolean mesh evaluation
+  tinyobjloader: OBJ mesh loading for viewport
+  tinyxml2: XML parsing (via sharp-runtime)
+</pre>
+    </div>
+
+    <h2>Application Layer</h2>
+    <p>
+      <a href="classes/MeshCraftApplication.html"><code>MeshCraftApplication</code></a> (<code>src/MeshCraft/MeshCraftApplication.cpp</code>) is the central class. It subclasses CNA's <code>Microsoft::Xna::Framework::Game</code> and owns:
+    </p>
+    <ul>
+      <li>The complete scene data (<code>Mc3Document document_</code>)</li>
+      <li>All editor state: camera, selection, active tool, gizmo, animation playback</li>
+      <li>All renderers (GridRenderer, SceneRenderer)</li>
+      <li>All UI panels (SceneHierarchyPanel, PropertiesPanel)</li>
+      <li>Undo/redo stacks</li>
+      <li>Clipboard, recent files, file dialog state</li>
+    </ul>
+
+    <h2>The Game Loop</h2>
+    <p>MeshCraft uses the CNA game loop model — a fixed-step update/draw cycle:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Override</th><th>What happens</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>LoadContent()</code></td>
+            <td>Creates renderers, loads <code>Mc3Document</code> from the path given on the command line (or creates an empty scene), initialises ImGui (SDL3 + OpenGL ES 3 backends).</td>
+          </tr>
+          <tr>
+            <td><code>BeginDraw()</code></td>
+            <td>Calls <code>ImGui::NewFrame()</code> to start an ImGui frame before the 3D scene is rendered.</td>
+          </tr>
+          <tr>
+            <td><code>Update()</code></td>
+            <td>Polls <code>Keyboard</code> and <code>Mouse</code>; processes shortcuts; handles viewport mouse (orbit, pan, zoom, picking, gizmo drag); advances animation playback clock.</td>
+          </tr>
+          <tr>
+            <td><code>Draw()</code></td>
+            <td>Clears the frame; evaluates animation overrides; renders the 3D scene via <code>SceneRenderer</code> and grid via <code>GridRenderer</code>; draws the ImGui UI (<code>drawImGuiUi()</code> + <code>drawTimelinePanel()</code>).</td>
+          </tr>
+          <tr>
+            <td><code>EndDraw()</code></td>
+            <td>Calls <code>ImGui::Render()</code> + <code>ImGui_ImplOpenGL3_RenderDrawData()</code>, optionally writes auto-screenshot, then calls <code>Game::EndDraw()</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Scene Data Layer (mc3 Library)</h2>
+    <p>
+      The <a href="modules/mc3-library.html">mc3 sublibrary</a> is entirely pure C++ — no graphics, no windowing, no ImGui. It defines the in-memory representation of a scene and handles XML serialization.
+    </p>
+    <div class="arch-diagram">
+      <pre>
+Mc3Document
+├── objects: vector&lt;shared_ptr&lt;Mc3Object&gt;&gt;   ← scene graph roots
+├── definitions: map&lt;string, shared_ptr&lt;Mc3Object&gt;&gt;
+├── materials: map&lt;string, Mc3Material&gt;
+├── textures:  map&lt;string, Mc3Texture&gt;
+├── lights:    vector&lt;Mc3Light&gt;
+├── cameras:   vector&lt;Mc3Camera&gt;
+├── actions:   map&lt;string, Mc3Action&gt;        ← animation clips
+└── environment: optional&lt;Mc3Environment&gt;
+
+Mc3Object (scene graph node)
+├── type: ObjectType   (Box, Sphere, Cylinder, Cone, Plane,
+│                       Mesh, Extrude, Group, Instance,
+│                       Union, Difference, Intersection, Area)
+├── transform: Mc3Transform   (position, rotation, scale, pivot)
+├── material: string          (IDREF into Mc3Document.materials)
+├── primitive: optional&lt;Mc3Primitive&gt;
+├── extrude:   optional&lt;Mc3Extrude&gt;
+├── csgOperation: optional&lt;Mc3CsgOperation&gt;
+└── children: vector&lt;shared_ptr&lt;Mc3Object&gt;&gt;
+</pre>
+    </div>
+
+    <h2>Rendering Layer</h2>
+    <p>
+      <a href="classes/SceneRenderer.html"><code>SceneRenderer</code></a> traverses the <code>Mc3Document.objects</code> tree recursively. For each node it:
+    </p>
+    <ol>
+      <li>Computes a world matrix from the object's transform (with pivot compensation)</li>
+      <li>Applies animation overrides if a clip is playing</li>
+      <li>Selects the appropriate pre-built unit mesh (box, sphere, cylinder, cone, plane)</li>
+      <li>For CSG nodes, evaluates real boolean geometry via <strong>Manifold</strong> and caches the result</li>
+      <li>For <code>&lt;mesh&gt;</code> nodes, loads the OBJ via <strong>tinyobjloader</strong> and caches it</li>
+      <li>Applies the material color or texture if available</li>
+      <li>Calls <code>BasicEffect</code> to render with lighting</li>
+    </ol>
+    <p>The <a href="classes/EditorCamera.html"><code>EditorCamera</code></a> provides view and projection matrices; these are passed into every render call.</p>
+
+    <h2>Editor Interaction Layer</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Component</th><th>Role</th></tr></thead>
+        <tbody>
+          <tr><td><a href="classes/EditorCamera.html"><code>EditorCamera</code></a></td><td>Orbit/pan/zoom model. Computes view + projection matrices and screen-ray directions for picking.</td></tr>
+          <tr><td><code>SelectionManager</code></td><td>Holds a set of <code>shared_ptr&lt;Mc3Object&gt;</code>. Supports single and multi-select (Ctrl+click, box-drag, Ctrl+A).</td></tr>
+          <tr><td><code>TransformGizmo</code></td><td>Tracks which gizmo mode (Move/Scale/Rotate) and which axis is active. Drag state is resolved in <code>MeshCraftApplication::handleMouseInput()</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>UI Layer (Dear ImGui)</h2>
+    <p>All UI is drawn with <strong>Dear ImGui</strong> (v1.91.6) using the SDL3 + OpenGL ES 3 backends. SDL events are forwarded to ImGui via <code>SDL_AddEventWatch</code>.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Panel</th><th>Location</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Menu Bar</td><td>Top</td><td>File, Edit, Add, View menus</td></tr>
+          <tr><td>Toolbar</td><td>Below menu</td><td>Tool switching + add-primitive buttons + edge overlay toggle</td></tr>
+          <tr><td>Hierarchy Panel</td><td>Left (220 px)</td><td>Recursive object tree, visibility toggle, drag-and-drop reparenting, inline rename</td></tr>
+          <tr><td>Properties Panel</td><td>Right (220 px)</td><td>Name, position/rotation/scale, material, collision, tags; tabs for Lights / Cameras / Textures / Materials / Defs</td></tr>
+          <tr><td>Viewport</td><td>Center</td><td>3D scene + gizmos; uses raw GL viewport/scissor for proper clipping</td></tr>
+          <tr><td>Timeline Panel</td><td>Bottom (190 px, toggle)</td><td>Action dropdown, play/pause/stop, time scrubber, per-channel keyframe rows</td></tr>
+          <tr><td>Status Bar</td><td>Bottom (22 px)</td><td>Object count, selection count, timed status messages</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Important Invariants</h2>
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>Key constraints to preserve</strong>
+        <ul>
+          <li><code>Mc3Document.materials</code> is <code>std::map&lt;string, Mc3Material&gt;</code> — iterate with structured bindings.</li>
+          <li><code>Mc3Material</code> uses <code>baseColor</code> (float[4]), not <code>diffuse</code>.</li>
+          <li>ImGui panels use <code>NoMove | NoResize | NoBringToFrontOnFocus</code> flags — do not make them floating.</li>
+          <li>Viewport rect is <code>[kLeftPanelW, imguiTopH_]</code> to <code>[W - kRightPanelW, H - kStatusH]</code>.</li>
+          <li><code>pendingScreenshot_</code> flag is set in <code>Draw()</code> and consumed in <code>EndDraw()</code> after ImGui renders.</li>
+          <li><code>Color</code> (CNA type) has no default constructor — always init with 4 args: <code>Color(r, g, b, a)</code>.</li>
+          <li>Call <code>pushUndo()</code> before any mutation of <code>document_</code>.</li>
+          <li>Do not add <code>${meta-gl_SOURCE_DIR}/include</code> to CMakeLists.txt — triggers a full CNA recompile.</li>
+          <li>Do not change <code>Mc3Document</code> public API without checking <code>mc3togltf</code> and all test XMLs.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>External Dependency Graph</h2>
+    <div class="arch-diagram">
+      <pre>
+MeshCraft (executable)
+├── CNA                 ← sibling repo ../cna
+│   └── SHARP_RUNTIME   ← sibling repo ../sharp-runtime
+│       └── tinyxml2    (bundled)
+├── Mc3                 ← mc3/ sublibrary
+│   └── tinyxml2        (same instance, guarded by CMake alias)
+├── ImGui v1.91.6       (FetchContent)
+├── Manifold v3         (FetchContent)
+└── tinyobjloader v2    (FetchContent)
+
+mc3togltf (separate executable)
+├── Mc3XmlParser        (local copy of mc3 parser)
+├── GltfExporter
+└── MeshBuilder
+    └── (no CNA, no ImGui, no Manifold)
+</pre>
+    </div>
+
+    <div class="page-nav">
+      <a href="project-structure.html" class="prev">Project Structure</a>
+      <a href="modules/index.html" class="next">Modules</a>
+    </div>
+  </div>
+</div>
+<script src="../assets/script.js"></script>
+</body>
+</html>

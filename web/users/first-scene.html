@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Your First Scene — MeshCraft User Guide</title>
+<link rel="stylesheet" href="../assets/style.css"/>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <a href="../index.html">
+      <div class="logo-icon">M</div>
+      <div class="logo-text">
+        <span class="logo-name">Mesh Craft</span>
+        <span class="logo-sub">User Guide</span>
+      </div>
+    </a>
+  </div>
+  <div class="section-switch"><a href="index.html" class="current">Users</a><a href="../developers/index.html" class="">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Start Here</div>
+      <a href="index.html">Overview</a>
+      <a href="installing.html">Installing &amp; Running</a>
+      <a href="interface-tour.html">Interface Tour</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Learn the Basics</div>
+      <a href="first-scene.html" class="active">Your First Scene</a>
+      <a href="shapes-and-tools.html">Shapes &amp; Tools</a>
+      <a href="materials-and-lighting.html">Materials &amp; Lighting</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Go Further</div>
+      <a href="csg.html">Combining Shapes (CSG)</a>
+      <a href="animation.html">Keyframe Animation</a>
+      <a href="walk-mode.html">Walk Mode</a>
+      <a href="exporting.html">Exporting Your Scene</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Reference</div>
+      <a href="keyboard-shortcuts.html">Keyboard Shortcuts</a>
+      <a href="faq.html">FAQ &amp; Troubleshooting</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License
+  </div>
+</aside>
+
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb">
+      <a href="index.html">Users</a>
+      <span class="sep">/</span>
+      <span>Your First Scene</span>
+    </div>
+    <div class="topbar-search">
+      <input type="search" id="searchInput" placeholder="Search docs… (/)"/>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+    <div class="page-header">
+      <h1>Your First Scene</h1>
+      <p class="subtitle">Place a shape, move it, color it, and save your work — five minutes, start to finish.</p>
+    </div>
+
+    <ol class="steps">
+      <li>
+        <span class="step-title">Start a new scene</span>
+        Press <kbd>Ctrl+N</kbd>, or use <strong>File → New</strong>. You'll get an empty viewport with a ground grid.
+      </li>
+      <li>
+        <span class="step-title">Add a shape</span>
+        Click the <code>+Box</code> button in the toolbar, or press <kbd>F1</kbd>. A box appears at the
+        center of the scene and is automatically selected. (<kbd>F2</kbd>–<kbd>F5</kbd> add a Sphere,
+        Cylinder, Cone, and Plane; everything else is under the <strong>Add</strong> menu.)
+      </li>
+      <li>
+        <span class="step-title">Look around</span>
+        <strong>Middle-mouse drag</strong> orbits the camera, <strong>right-mouse drag</strong> pans it,
+        and the <strong>scroll wheel</strong> zooms. Press <kbd>F</kbd> at any time to snap the camera
+        back to your selection.
+      </li>
+      <li>
+        <span class="step-title">Move it</span>
+        Press <kbd>G</kbd> (or click <strong>Move</strong> in the toolbar), then drag one of the gizmo's
+        colored arrows to slide the box along that axis. Click away from any arrow and drag to move
+        freely in the view plane.
+      </li>
+      <li>
+        <span class="step-title">Rotate and scale it</span>
+        Press <kbd>R</kbd> for Rotate or <kbd>S</kbd> for Scale — same idea, drag a ring or handle.
+        Hold <kbd>Ctrl</kbd> while rotating to snap to 15°/45°/90° angles.
+      </li>
+      <li>
+        <span class="step-title">Made a mistake? Undo it</span>
+        <kbd>Ctrl+Z</kbd> undoes, <kbd>Ctrl+Y</kbd> redoes — up to 20 steps back, covering every kind of edit.
+      </li>
+      <li>
+        <span class="step-title">Give it a color</span>
+        With the box selected, open the <strong>Mat</strong> tab (or the Properties panel on the right)
+        and change its base color. See <a href="materials-and-lighting.html">Materials &amp; Lighting</a>
+        for roughness, metallic, and glow.
+      </li>
+      <li>
+        <span class="step-title">Add a second shape and combine them</span>
+        Try <kbd>F2</kbd> for a sphere, move it so it overlaps the box, then peek at
+        <a href="csg.html">Combining Shapes (CSG)</a> to cut or merge them together.
+      </li>
+      <li>
+        <span class="step-title">Save your scene</span>
+        <kbd>Ctrl+S</kbd> saves; the first time, you'll be asked for a filename ending in
+        <code>.mc3.xml</code>. <kbd>Ctrl+Shift+S</kbd> is Save As, for saving a copy under a new name.
+      </li>
+    </ol>
+
+    <div class="screenshot wide">
+      <img src="../assets/images/screenshots/showcase-blupi-car.png" alt="A stylized cartoon car built from a handful of MeshCraft primitives — boxes, cylinders, and spheres."/>
+      <figcaption>This entire car is boxes, cylinders, and spheres — the same building blocks you just used.</figcaption>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <strong>Handy habits</strong>
+        <p>Hold <kbd>Shift</kbd> while dragging with the Move tool to snap to another object's position. Toggle the gizmo between world-space and local-space axes with the World/Local button in the toolbar. Press <kbd>Ctrl+D</kbd> to duplicate the selection instead of building the same shape twice.</p>
+      </div>
+    </div>
+
+    <div class="page-nav">
+      <a href="interface-tour.html" class="prev">Interface Tour</a>
+      <a href="shapes-and-tools.html" class="next">Shapes &amp; Tools</a>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Internals Overview — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section"><div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a><a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a><a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a><a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a><a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a><a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a><a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a><a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a><a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Internals</div>
+      <a href="index.html" class="active">Overview</a><a href="data-flow.html">Data Flow</a>
+      <a href="rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="csg-engine.html">CSG Engine</a><a href="undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><span>Internals</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Developer Internals</h1>
+      <p class="subtitle">Deep-dive reference for contributors: how data flows, how rendering works, and how subsystems are implemented.</p>
+    </div>
+
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <p>This section targets contributors and developers who need to modify MeshCraft internals. End users and format consumers should start with <a href="../tutorials/index.html">Tutorials</a> or the <a href="../api/mc3-format.html">Format Reference</a>.</p>
+      </div>
+    </div>
+
+    <h2>What This Section Covers</h2>
+    <div class="card-grid">
+      <a href="data-flow.html" class="card">
+        <div class="card-icon">🔄</div>
+        <div class="card-title">Data Flow</div>
+        <div class="card-desc">How a user action moves from UI input through the scene model to disk and back. The lifecycle of an <code>Mc3Document</code>.</div>
+      </a>
+      <a href="rendering-pipeline.html" class="card">
+        <div class="card-icon">🎨</div>
+        <div class="card-title">Rendering Pipeline</div>
+        <div class="card-desc">How SceneRenderer traverses the scene graph, builds GPU meshes, applies transforms, and composites the final viewport image.</div>
+      </a>
+      <a href="csg-engine.html" class="card">
+        <div class="card-icon">⚙️</div>
+        <div class="card-title">CSG Engine</div>
+        <div class="card-desc">How Manifold v3 is integrated, how the mesh cache works, and how the fallback rendering path handles failed boolean evaluations.</div>
+      </a>
+      <a href="undo-redo.html" class="card">
+        <div class="card-icon">↩️</div>
+        <div class="card-title">Undo/Redo System</div>
+        <div class="card-desc">The 20-step deep-copy snapshot stack: what gets copied, when, and the trade-offs of full-document snapshots vs. command patterns.</div>
+      </a>
+    </div>
+
+    <h2>Key Design Principles</h2>
+    <p>Understanding these principles will make the codebase easier to navigate:</p>
+
+    <h3>Single source of truth: Mc3Document</h3>
+    <p>
+      All scene state lives in a single <code>Mc3Document</code> instance owned by <code>MeshCraftApplication</code>.
+      There is no secondary "editor model" — the UI panels read directly from and write directly to <code>Mc3Document</code>.
+      The renderer reads the same document every frame. This eliminates synchronisation bugs at the cost of requiring defensive coding around mutations.
+    </p>
+
+    <h3>Immediate mode UI (Dear ImGui)</h3>
+    <p>
+      All UI panels are rebuilt from scratch every frame by ImGui. There is no retained widget tree. Panel state (expanded nodes, selected tab, etc.) is stored in plain C++ member variables of <code>MeshCraftApplication</code>, not in the document.
+    </p>
+
+    <h3>Undo = full document snapshot</h3>
+    <p>
+      Rather than a command/inverse-command pattern, every mutation pushes a deep copy of the entire <code>Mc3Document</code> onto the undo stack before making changes. This is simple to implement correctly but has an O(scene size) cost per edit. See <a href="undo-redo.html">Undo/Redo</a> for details.
+    </p>
+
+    <h3>Caching is per-object-pointer</h3>
+    <p>
+      <code>SceneRenderer</code> caches GPU meshes and CSG results in <code>std::unordered_map</code> keyed by <code>Mc3Object*</code> pointer. The cache is invalidated globally on each undo push (since a new deep-copy creates new pointers). This is safe but means large scenes with many CSG nodes will re-evaluate all CSG on every edit.
+    </p>
+
+    <h3>CNA game loop</h3>
+    <p>
+      <code>MeshCraftApplication</code> inherits from the CNA framework's <code>Application</code> class. CNA provides the SDL3 window, OpenGL ES 3.2 context (via EasyGL), and the fixed game loop: <code>LoadContent → [BeginDraw → Update → Draw → EndDraw] × ∞</code>. MeshCraft overrides each of these virtual methods.
+    </p>
+
+    <h2>Important Invariants</h2>
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <ul>
+          <li>Push to the undo stack <strong>before</strong> every mutation, never after.</li>
+          <li>Never hold raw pointers to <code>Mc3Object</code> across undo/redo boundaries — the pointer will dangle.</li>
+          <li>All MC3 object names must be unique within a document (required for animation target lookup).</li>
+          <li>The CSG cache is keyed by <code>Mc3Object*</code>. If you copy an object, the copy gets a new address and starts with an empty cache entry.</li>
+          <li><code>Mc3Document.version</code> defaults to <code>"0.1"</code> in code even though the active format is v0.3. This is a known inconsistency — do not rely on the version string for feature detection.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Interface Tour — MeshCraft User Guide</title>
+<link rel="stylesheet" href="../assets/style.css"/>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <a href="../index.html">
+      <div class="logo-icon">M</div>
+      <div class="logo-text">
+        <span class="logo-name">Mesh Craft</span>
+        <span class="logo-sub">User Guide</span>
+      </div>
+    </a>
+  </div>
+  <div class="section-switch"><a href="index.html" class="current">Users</a><a href="../developers/index.html" class="">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Start Here</div>
+      <a href="index.html">Overview</a>
+      <a href="installing.html">Installing &amp; Running</a>
+      <a href="interface-tour.html" class="active">Interface Tour</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Learn the Basics</div>
+      <a href="first-scene.html">Your First Scene</a>
+      <a href="shapes-and-tools.html">Shapes &amp; Tools</a>
+      <a href="materials-and-lighting.html">Materials &amp; Lighting</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Go Further</div>
+      <a href="csg.html">Combining Shapes (CSG)</a>
+      <a href="animation.html">Keyframe Animation</a>
+      <a href="walk-mode.html">Walk Mode</a>
+      <a href="exporting.html">Exporting Your Scene</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Reference</div>
+      <a href="keyboard-shortcuts.html">Keyboard Shortcuts</a>
+      <a href="faq.html">FAQ &amp; Troubleshooting</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License
+  </div>
+</aside>
+
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb">
+      <a href="index.html">Users</a>
+      <span class="sep">/</span>
+      <span>Interface Tour</span>
+    </div>
+    <div class="topbar-search">
+      <input type="search" id="searchInput" placeholder="Search docs… (/)"/>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+    <div class="page-header">
+      <h1>A Tour of the Interface</h1>
+      <p class="subtitle">What every panel, button, and toolbar does — using real screenshots of the editor.</p>
+    </div>
+
+    <div class="screenshot wide">
+      <img src="../assets/images/screenshots/hero-garden-house.png" alt="The MeshCraft editor with numbered regions: menu bar, toolbar, hierarchy panel, viewport, properties panel, status bar."/>
+      <figcaption>The full editor window. Every region is explained below.</figcaption>
+    </div>
+
+    <h2>1. Menu Bar</h2>
+    <p>Along the very top: <strong>File</strong>, <strong>Edit</strong>, <strong>Add</strong>, <strong>View</strong>, <strong>Help</strong>. This is where you'll find New, Open, Save, Export, Undo/Redo, and every command to add a new shape or CSG operation to the scene.</p>
+
+    <h2>2. Toolbar</h2>
+    <p>Below the menu bar:</p>
+    <ul>
+      <li><strong>Select / Move / Rotate / Scale</strong> — the four transform tools. Click one, or use its shortcut (<kbd>Q</kbd>, <kbd>G</kbd>, <kbd>R</kbd>, <kbd>S</kbd>).</li>
+      <li><strong>Ruler</strong> — the measurement tool; click two points in the viewport to see the distance between them.</li>
+      <li><strong>Colored quick-add buttons</strong> (<code>+Box</code>, <code>+Sph</code>, <code>+Cyl</code>, <code>+Con</code>, <code>+Pln</code>, <code>+Tor</code>, <code>+Cap</code>, <code>+Dsk</code>…) — one click drops that primitive shape into the scene.</li>
+    </ul>
+
+    <h2>3. Left Panel — Hierarchy &amp; Scene Data</h2>
+    <p>
+      This panel is tabbed. The tab labels shrink to a single letter when the panel is narrow — widen
+      the panel or hover to see the full name:
+    </p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tab</th><th>What it shows</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Scene</strong></td><td>The object hierarchy — every shape, group, and CSG node in your scene, nestable like folders. Search and filter by type (Prim / Mesh / Grp / Inst) or material at the top.</td></tr>
+          <tr><td><strong>Lights</strong></td><td>Every light in the scene and its properties.</td></tr>
+          <tr><td><strong>Env</strong></td><td>Environment settings — background color, fog.</td></tr>
+          <tr><td><strong>Cam</strong></td><td>Cameras defined in the scene.</td></tr>
+          <tr><td><strong>Tex</strong></td><td>Textures loaded into the scene.</td></tr>
+          <tr><td><strong>Defs</strong></td><td>Reusable object definitions (for placing many instances of the same thing).</td></tr>
+          <tr><td><strong>Mat</strong></td><td>Materials — the color/shine/glow presets your objects use.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Click an object's name in the <strong>Scene</strong> tab to select it — the same as clicking it in the 3D viewport.</p>
+
+    <h2>4. The 3D Viewport</h2>
+    <p>The large center area is your 3D view.</p>
+    <ul>
+      <li><strong>Front / Top / Right / Persp / Persp-FPS</strong> buttons snap the camera to a preset angle.</li>
+      <li>A small overlay in the corner shows live stats: camera name, object/vertex/triangle counts, and what's currently selected.</li>
+      <li>Selected objects get a colored outline, and a transform gizmo (arrows/rings/handles) appears on them when the Move, Rotate, or Scale tool is active.</li>
+    </ul>
+    <p>See <a href="first-scene.html">Your First Scene</a> for how to orbit, pan, and zoom the camera.</p>
+
+    <h2>5. Right Panel — Properties</h2>
+    <p>
+      Shows details for whatever is selected — an object's position/rotation/scale, its material, or
+      (when nothing is selected) the overall scene's name, units, coordinate system, background, and
+      fog settings.
+    </p>
+
+    <div class="screenshot wide">
+      <img src="../assets/images/screenshots/interface-house.png" alt="The MeshCraft editor's Properties panel showing Scene Properties: name, unit, coordinate system, default camera, environment background color and fog."/>
+      <figcaption>The Properties panel with nothing selected — showing scene-wide settings.</figcaption>
+    </div>
+
+    <h2>6. Status Bar</h2>
+    <p>The thin strip along the bottom shows quick context, such as the total object count or a warning (for example, that a newer autosave was found for the file you just opened).</p>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <p>Every panel arrangement described here is also listed with its keyboard shortcut in the <a href="keyboard-shortcuts.html">Keyboard Shortcuts</a> cheat sheet.</p>
+      </div>
+    </div>
+
+    <div class="page-nav">
+      <a href="installing.html" class="prev">Installing &amp; Running</a>
+      <a href="first-scene.html" class="next">Your First Scene</a>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/script.js"></script>
+</body>
+</html>

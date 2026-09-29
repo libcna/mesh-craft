@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Mc3Animation — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="index.html">All Classes</a>
+      <a href="MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="Mc3Document.html">Mc3Document</a><a href="Mc3Object.html">Mc3Object</a>
+      <a href="SceneRenderer.html">SceneRenderer</a><a href="EditorCamera.html">EditorCamera</a>
+      <a href="Mc3Animation.html" class="active">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a><a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a><a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a><a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a><a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a><a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Classes</a><span class="sep">/</span><span>Mc3Animation</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Animation Types (<code>Mc3Animation.hpp</code>)</h1>
+      <p class="subtitle">Keyframe animation data model: <code>Mc3Action</code>, <code>Mc3Channel</code>, <code>Mc3Keyframe</code>, and the channel evaluator.</p>
+    </div>
+
+    <h4>Header</h4><p><code>mc3/include/MeshCraft/Mc3/Mc3Animation.hpp</code></p>
+    <h4>Namespace</h4><p><code>MeshCraft::Mc3</code></p>
+
+    <h2>Types Overview</h2>
+    <pre><code><span class="kw">enum class</span> <span class="cls">Interpolation</span> { Step, Linear, CubicBezier };
+
+<span class="kw">enum class</span> <span class="cls">AnimatedProperty</span> {
+    PositionX, PositionY, PositionZ,
+    RotationX, RotationY, RotationZ,
+    ScaleX, ScaleY, ScaleZ,
+    Visible,
+    DeformX, DeformY, DeformZ,
+    MaterialBaseColorR, MaterialBaseColorG, MaterialBaseColorB, MaterialBaseColorA,
+    MaterialRoughness, MaterialMetallic,
+    MaterialEmissiveR, MaterialEmissiveG, MaterialEmissiveB,
+};
+
+<span class="kw">struct</span> <span class="cls">Mc3BezierHandle</span> { <span class="kw">float</span> dt, dv; };
+
+<span class="kw">struct</span> <span class="cls">Mc3Keyframe</span> {
+    <span class="kw">float</span>          time;
+    <span class="kw">float</span>          value;
+    Interpolation  interpolation;   <span class="cmt">// applies to the segment AFTER this keyframe</span>
+    Mc3BezierHandle handleLeft;     <span class="cmt">// in-tangent (dt negative)</span>
+    Mc3BezierHandle handleRight;    <span class="cmt">// out-tangent (dt positive)</span>
+};
+
+<span class="kw">struct</span> <span class="cls">Mc3Channel</span> {
+    <span class="kw">string</span>         targetObject;   <span class="cmt">// name of the Mc3Object to animate</span>
+    AnimatedProperty property;
+    <span class="kw">vector</span>&lt;Mc3Keyframe&gt; keyframes; <span class="cmt">// must be sorted ascending by time</span>
+};
+
+<span class="kw">struct</span> <span class="cls">Mc3Action</span> {
+    <span class="kw">string</span> name;
+    <span class="kw">float</span>  duration;   <span class="cmt">// clip length in seconds</span>
+    <span class="kw">bool</span>   loop;
+    <span class="kw">vector</span>&lt;Mc3Channel&gt; channels;
+};</code></pre>
+
+    <h2>Free Functions</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Signature</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>const char* animatedPropertyName(AnimatedProperty)</code></td>
+            <td>Returns the string name used in XML (e.g., <code>"position.x"</code>). Used by the XML writer.</td>
+          </tr>
+          <tr>
+            <td><code>optional&lt;AnimatedProperty&gt; animatedPropertyFromName(const string&amp;)</code></td>
+            <td>Parses a string name back to the enum. Returns nullopt on unknown names. Used by the XML parser.</td>
+          </tr>
+          <tr>
+            <td><code>float evaluateChannel(const Mc3Channel&amp;, float time)</code></td>
+            <td>Evaluates the channel at the given time. Returns 0.0f for empty channels. Clamps to the first/last keyframe outside the range. Applies Step, Linear, or Cubic Bézier interpolation as specified by the preceding keyframe's <code>interpolation</code> field.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Interpolation Modes</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Mode</th><th>Behaviour</th></tr></thead>
+        <tbody>
+          <tr><td><code>Step</code></td><td>Value jumps instantly at the next keyframe. Suitable for binary properties like <code>visible</code>.</td></tr>
+          <tr><td><code>Linear</code></td><td>Linear interpolation between consecutive keyframe values.</td></tr>
+          <tr><td><code>CubicBezier</code></td><td>Smooth cubic curve. The tangent handles (<code>handleLeft</code>/<code>handleRight</code>) are offsets from the keyframe's (time, value). When exported to glTF, cubic channels are sampled at 30 fps and written as LINEAR.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Animatable Properties — glTF Export</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Property</th><th>glTF export</th></tr></thead>
+        <tbody>
+          <tr><td><code>position.x/y/z</code></td><td>→ <code>translation</code> VEC3</td></tr>
+          <tr><td><code>rotation.x/y/z</code></td><td>→ <code>rotation</code> quaternion VEC4 (converted from Euler)</td></tr>
+          <tr><td><code>scale.x/y/z</code></td><td>→ <code>scale</code> VEC3</td></tr>
+          <tr><td><code>visible</code></td><td>Not exported (no glTF equivalent)</td></tr>
+          <tr><td><code>deform.*</code></td><td>Not exported</td></tr>
+          <tr><td><code>material.*</code></td><td>Not exported</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Usage Example (evaluation)</h2>
+    <pre><code><span class="cmt">// Get the Y position of "BouncingBox" at time 1.5</span>
+<span class="kw">const</span> Mc3Action&amp; action = doc.actions.at("Bounce");
+<span class="kw">for</span> (<span class="kw">const auto</span>&amp; ch : action.channels) {
+    <span class="kw">if</span> (ch.targetObject == "BouncingBox" &amp;&amp;
+        ch.property == AnimatedProperty::PositionY) {
+        <span class="kw">float</span> y = evaluateChannel(ch, 1.5f);
+    }
+}</code></pre>
+
+    <div class="page-nav">
+      <a href="EditorCamera.html" class="prev">EditorCamera</a>
+      <a href="../api/mc3-format.html" class="next">MC3 Format Reference</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

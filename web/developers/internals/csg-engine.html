@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CSG Engine — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section"><div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a><a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a><a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a><a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a><a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a><a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a><a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a><a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a><a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Internals</div>
+      <a href="index.html">Overview</a><a href="data-flow.html">Data Flow</a>
+      <a href="rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="csg-engine.html" class="active">CSG Engine</a><a href="undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Internals</a><span class="sep">/</span><span>CSG Engine</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>CSG Engine</h1>
+      <p class="subtitle">How MeshCraft integrates Manifold v3 for boolean mesh operations, caches results, and handles failure cases.</p>
+    </div>
+
+    <h2>Library: Manifold v3</h2>
+    <p>
+      MeshCraft uses <a href="https://github.com/elalish/manifold" target="_blank"><strong>Manifold v3</strong></a> for Constructive Solid Geometry evaluation. Manifold is a C++17 library that performs robust boolean mesh operations on watertight polygon meshes. It is included via CMake <code>FetchContent</code> at configure time.
+    </p>
+    <pre><code>FetchContent_Declare(manifold
+  GIT_REPOSITORY https://github.com/elalish/manifold.git
+  GIT_TAG        v3.x.x
+)
+FetchContent_MakeAvailable(manifold)</code></pre>
+
+    <h2>CSG Evaluation Pipeline</h2>
+    <pre class="arch-diagram">
+SceneRenderer::resolveCsgMesh(Mc3Object* csgNode)
+        │
+        ├─ 1. check csgCache_[csgNode]
+        │       hit → return cached RenderMesh
+        │
+        └─ 2. cache miss → evaluate:
+               │
+               ├─ a. collect children:
+               │       base children  → list of Manifold meshes
+               │       role="cutter"  → list of cutter meshes
+               │
+               ├─ b. tessellate each child primitive into Manifold::Mesh
+               │       (same geometry as rendering, converted to Manifold format)
+               │
+               ├─ c. apply child transforms → build per-child Manifold object
+               │
+               ├─ d. execute boolean:
+               │       Union        → Manifold::BatchBoolean(meshes, OpType::Add)
+               │       Difference   → base.Boolean(cutters, OpType::Subtract)
+               │       Intersection → Manifold::BatchBoolean(meshes, OpType::Intersect)
+               │
+               ├─ e. extract result triangles → upload to GPU as RenderMesh
+               │
+               └─ f. store in csgCache_[csgNode]
+    </pre>
+
+    <h2>Child Roles</h2>
+    <p>Children of a CSG node can optionally carry a <code>role</code> attribute:</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>role value</th><th>Behaviour in Difference</th><th>Behaviour in Union / Intersection</th></tr></thead>
+      <tbody>
+        <tr><td><em>(absent)</em></td><td>Base solid (kept minus cutters)</td><td>Participates in operation</td></tr>
+        <tr><td><code>cutter</code></td><td>Subtracted from all base solids</td><td>Ignored (no effect)</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>Mesh Cache Lifecycle</h2>
+    <p>The CSG cache is an <code>std::unordered_map&lt;Mc3Object*, manifold::Manifold&gt;</code> inside <code>SceneRenderer</code>. Cache entries are:</p>
+    <ul>
+      <li><strong>Created</strong> lazily on first render of a CSG node.</li>
+      <li><strong>Invalidated</strong> globally when <code>MeshCraftApplication::pushUndo()</code> is called. Because <code>pushUndo</code> deep-copies the <code>Mc3Document</code>, all <code>Mc3Object*</code> pointers change — the old cache entries are stale and must be evicted. The renderer calls <code>clearCaches()</code> immediately after each undo push.</li>
+      <li><strong>Not invalidated</strong> during animation playback — animation applies transform overrides that do not change geometry, so the cached CSG result remains correct.</li>
+    </ul>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <p>CSG evaluation can be expensive for complex meshes (high segment counts). Every edit in a scene with many CSG nodes triggers <code>clearCaches()</code> + re-evaluation on the next frame. If the editor feels slow after edits, CSG complexity is the most likely cause.</p>
+      </div>
+    </div>
+
+    <h2>Fallback Rendering</h2>
+    <p>If Manifold returns an empty mesh (e.g., non-overlapping operands, degenerate input), <code>resolveCsgMesh()</code> falls back to rendering each child individually as if the parent were a plain group. The fallback is transparent to the user except that no boolean operation is visible.</p>
+    <p>Conditions that trigger the fallback:</p>
+    <ul>
+      <li>Manifold result has zero triangles (operands do not overlap for Intersection / Difference).</li>
+      <li>Input mesh is non-watertight (open surface, e.g., a Plane with no thickness).</li>
+      <li>Numerical precision issues with very thin or coplanar geometry.</li>
+    </ul>
+
+    <h2>Nested CSG</h2>
+    <p>CSG nodes can be nested arbitrarily. The renderer resolves them bottom-up during the DFS traversal: leaf CSG nodes are evaluated first, their results are used as Manifold mesh inputs to parent CSG nodes.</p>
+
+    <h2>CSG and mc3togltf</h2>
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <p>The <code>mc3togltf</code> exporter does <strong>not</strong> link against Manifold and does not resolve CSG geometry. It exports CSG child objects as individual glTF meshes. Implementing CSG resolution in the exporter is a planned future improvement.</p>
+      </div>
+    </div>
+
+    <h2>Primitives → Manifold Conversion</h2>
+    <p>Before passing geometry to Manifold, the renderer converts MeshCraft primitives to Manifold's mesh format. This involves tessellating the primitive into a triangle soup and applying the object's transform matrix to all vertices. Manifold requires:</p>
+    <ul>
+      <li>Consistent winding order (CCW, same as OpenGL convention).</li>
+      <li>Watertight mesh (no boundary edges).</li>
+      <li>No degenerate triangles (zero-area faces).</li>
+    </ul>
+    <p>Planes are inherently not watertight (they have no volume) and cannot be used as CSG operands. The renderer skips plane children of CSG nodes with a warning.</p>
+
+    <div class="page-nav">
+      <a href="rendering-pipeline.html" class="prev">Rendering Pipeline</a>
+      <a href="undo-redo.html" class="next">Undo/Redo System</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

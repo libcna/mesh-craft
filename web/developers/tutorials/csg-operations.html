@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CSG Operations — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section"><div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a><a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a><a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a><a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a><a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a><a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Tutorials</div>
+      <a href="index.html">All Tutorials</a>
+      <a href="minimal-example.html">Minimal Scene</a>
+      <a href="loading-scene.html">Loading a Scene</a>
+      <a href="csg-operations.html" class="active">CSG Operations</a>
+      <a href="export-gltf.html">Export to glTF/GLB</a>
+      <a href="animation.html">Keyframe Animation</a>
+      <a href="complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Tutorials</a><span class="sep">/</span><span>CSG Operations</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Tutorial: CSG Operations</h1>
+      <p class="subtitle">Combine primitive shapes with Union, Difference, and Intersection for complex geometry.</p>
+    </div>
+
+    <h2>What is CSG?</h2>
+    <p>
+      <strong>Constructive Solid Geometry (CSG)</strong> lets you combine primitive shapes using Boolean set operations. MeshCraft supports three operations:
+    </p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Operation</th><th>Element</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>Union</td><td><code>&lt;union&gt;</code></td><td>All children merged into one solid (OR)</td></tr>
+        <tr><td>Difference</td><td><code>&lt;difference&gt;</code></td><td>Children marked <code>role="cutter"</code> are subtracted from the rest (NOT)</td></tr>
+        <tr><td>Intersection</td><td><code>&lt;intersection&gt;</code></td><td>Only the overlapping volume of all children (AND)</td></tr>
+      </tbody>
+    </table></div>
+    <p>CSG is evaluated using the <strong>Manifold v3</strong> library, which produces real boolean geometry. The result is cached and re-evaluated when the scene is modified.</p>
+
+    <h2>Example: Box Minus Sphere (Difference)</h2>
+    <pre><code>&lt;<span class="tag">difference</span> <span class="atr">name</span>=<span class="val">"HollowBox"</span> <span class="atr">material</span>=<span class="val">"stone"</span>&gt;
+  &lt;<span class="tag">box</span>    <span class="atr">name</span>=<span class="val">"body"</span>   <span class="atr">size</span>=<span class="val">"2 2 2"</span>/&gt;
+  &lt;<span class="tag">sphere</span> <span class="atr">name</span>=<span class="val">"cavity"</span> <span class="atr">radius</span>=<span class="val">"0.9"</span> <span class="atr">role</span>=<span class="val">"cutter"</span>/&gt;
+&lt;/<span class="tag">difference</span>&gt;</code></pre>
+    <p>The box has a spherical cavity carved out. The key is <code>role="cutter"</code> on the sphere — without it, the sphere would not be treated as a subtractor.</p>
+
+    <h2>Example: Two Spheres Merged (Union)</h2>
+    <pre><code>&lt;<span class="tag">union</span> <span class="atr">name</span>=<span class="val">"TwoSpheres"</span> <span class="atr">material</span>=<span class="val">"glass"</span>&gt;
+  &lt;<span class="tag">sphere</span> <span class="atr">name</span>=<span class="val">"left"</span>  <span class="atr">radius</span>=<span class="val">"0.6"</span> <span class="atr">position</span>=<span class="val">"-0.4 0 0"</span>/&gt;
+  &lt;<span class="tag">sphere</span> <span class="atr">name</span>=<span class="val">"right"</span> <span class="atr">radius</span>=<span class="val">"0.6"</span> <span class="atr">position</span>=<span class="val">" 0.4 0 0"</span>/&gt;
+&lt;/<span class="tag">union</span>&gt;</code></pre>
+
+    <h2>Example: Box ∩ Sphere (Intersection)</h2>
+    <pre><code>&lt;<span class="tag">intersection</span> <span class="atr">name</span>=<span class="val">"RoundedBlock"</span> <span class="atr">material</span>=<span class="val">"metal"</span>&gt;
+  &lt;<span class="tag">box</span>    <span class="atr">name</span>=<span class="val">"block"</span>  <span class="atr">size</span>=<span class="val">"1.5 1.5 1.5"</span>/&gt;
+  &lt;<span class="tag">sphere</span> <span class="atr">name</span>=<span class="val">"sphere"</span> <span class="atr">radius</span>=<span class="val">"0.9"</span>/&gt;
+&lt;/<span class="tag">intersection</span>&gt;</code></pre>
+    <p>Only the volume inside both the box and sphere is kept — producing a rounded cube.</p>
+
+    <h2>Adding CSG from the Editor</h2>
+    <p>Use the <strong>Add</strong> menu: <strong>Add → CSG → Union / Difference / Intersection</strong>.</p>
+    <p>A new CSG node appears in the hierarchy. You can then drag existing objects into it, or add new primitive children via the Add menu or keyboard shortcuts while the CSG node is selected in the hierarchy.</p>
+
+    <h2>Nested CSG</h2>
+    <p>CSG operations can be nested — a <code>&lt;difference&gt;</code> child can itself be a <code>&lt;union&gt;</code>:</p>
+    <pre><code>&lt;<span class="tag">difference</span> <span class="atr">name</span>=<span class="val">"Complex"</span>&gt;
+  &lt;<span class="tag">union</span> <span class="atr">name</span>=<span class="val">"Base"</span>&gt;
+    &lt;<span class="tag">box</span>    <span class="atr">name</span>=<span class="val">"a"</span> <span class="atr">size</span>=<span class="val">"2 1 2"</span>/&gt;
+    &lt;<span class="tag">sphere</span> <span class="atr">name</span>=<span class="val">"b"</span> <span class="atr">radius</span>=<span class="val">"0.7"</span> <span class="atr">position</span>=<span class="val">"0 0.8 0"</span>/&gt;
+  &lt;/<span class="tag">union</span>&gt;
+  &lt;<span class="tag">cylinder</span> <span class="atr">name</span>=<span class="val">"hole"</span> <span class="atr">radius</span>=<span class="val">"0.3"</span> <span class="atr">height</span>=<span class="val">"3"</span> <span class="atr">role</span>=<span class="val">"cutter"</span>/&gt;
+&lt;/<span class="tag">difference</span>&gt;</code></pre>
+
+    <h2>Test Scene</h2>
+    <p>The repository includes <code>test/csg_test.mc3.xml</code> with three CSG examples you can open directly:</p>
+    <pre><code>./cmake-build-debug/MeshCraft test/csg_test.mc3.xml</code></pre>
+
+    <h2>CSG Limitations</h2>
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <ul>
+          <li>CSG is evaluated by the Manifold library, which requires non-degenerate, watertight meshes. Very thin or coplanar surfaces may produce unexpected results.</li>
+          <li>CSG meshes are cached per <code>Mc3Object*</code>. The cache is cleared on every edit (undo push). If you have many complex CSG objects, edits may feel slightly slower.</li>
+          <li>The CSG result falls back to rendering children individually if Manifold returns an empty mesh.</li>
+          <li>CSG geometry is <strong>not</strong> resolved when exporting via <code>mc3togltf</code> — the individual child primitives are exported as separate glTF meshes. This limitation may be addressed in a future release.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="page-nav">
+      <a href="loading-scene.html" class="prev">Loading a Scene</a>
+      <a href="export-gltf.html" class="next">Export to glTF/GLB</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

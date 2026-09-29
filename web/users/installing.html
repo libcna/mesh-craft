@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Installing &amp; Running — MeshCraft User Guide</title>
+<link rel="stylesheet" href="../assets/style.css"/>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <a href="../index.html">
+      <div class="logo-icon">M</div>
+      <div class="logo-text">
+        <span class="logo-name">Mesh Craft</span>
+        <span class="logo-sub">User Guide</span>
+      </div>
+    </a>
+  </div>
+  <div class="section-switch"><a href="index.html" class="current">Users</a><a href="../developers/index.html" class="">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Start Here</div>
+      <a href="index.html">Overview</a>
+      <a href="installing.html" class="active">Installing &amp; Running</a>
+      <a href="interface-tour.html">Interface Tour</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Learn the Basics</div>
+      <a href="first-scene.html">Your First Scene</a>
+      <a href="shapes-and-tools.html">Shapes &amp; Tools</a>
+      <a href="materials-and-lighting.html">Materials &amp; Lighting</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Go Further</div>
+      <a href="csg.html">Combining Shapes (CSG)</a>
+      <a href="animation.html">Keyframe Animation</a>
+      <a href="walk-mode.html">Walk Mode</a>
+      <a href="exporting.html">Exporting Your Scene</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Reference</div>
+      <a href="keyboard-shortcuts.html">Keyboard Shortcuts</a>
+      <a href="faq.html">FAQ &amp; Troubleshooting</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License
+  </div>
+</aside>
+
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb">
+      <a href="index.html">Users</a>
+      <span class="sep">/</span>
+      <span>Installing &amp; Running</span>
+    </div>
+    <div class="topbar-search">
+      <input type="search" id="searchInput" placeholder="Search docs… (/)"/>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+    <div class="page-header">
+      <h1>Installing &amp; Running MeshCraft</h1>
+      <p class="subtitle">How to get the editor onto your computer and open it for the first time.</p>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>MeshCraft is early, actively-developed software</strong>
+        <p>There isn't a one-click installer yet — MeshCraft is currently distributed as something you (or a developer on your team) build from source. Here's what that means for you today, and how it will get simpler over time.</p>
+      </div>
+    </div>
+
+    <h2>Getting the program onto your computer</h2>
+    <p>There are two common situations:</p>
+
+    <h3>Someone already built it for you</h3>
+    <p>
+      If a developer on your team has already built MeshCraft, they will hand you a single program
+      file (on Linux, simply named <code>MeshCraft</code>). Once you have that file, using it does
+      <strong>not</strong> require any programming, compiling, or command-line knowledge — everything
+      from here on is point-and-click.
+    </p>
+
+    <h3>Nobody has built it yet</h3>
+    <p>
+      MeshCraft doesn't yet publish ready-to-download builds for each platform. If you don't have a
+      developer to build it for you, the <a href="../developers/getting-started.html">Developer
+      Getting Started guide</a> has the exact steps someone with a C++ toolchain can follow — it
+      usually takes a few minutes once the required tools are installed.
+    </p>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <p>There's also a browser (WASM) build in progress, which would let you try MeshCraft without installing anything at all. Check the project's <a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub page</a> for the latest status.</p>
+      </div>
+    </div>
+
+    <h2>Opening the editor</h2>
+    <ol class="steps">
+      <li><span class="step-title">Start with an empty scene</span>Run the <code>MeshCraft</code> program with no arguments and it opens a new, empty scene ready for you to build in.</li>
+      <li><span class="step-title">Open an existing scene</span>Use <strong>File → Open</strong> from the menu bar, or pass a <code>.mc3.xml</code> file to the program when you launch it (a developer can set this up as a "double-click to open" association on your system).</li>
+      <li><span class="step-title">Start creating</span>Once the window appears, you're looking at the same interface described in the <a href="interface-tour.html">Interface Tour</a>.</li>
+    </ol>
+
+    <h2>Where your work is saved</h2>
+    <p>
+      A MeshCraft scene is a single file ending in <code>.mc3.xml</code>. It's plain text, so it's
+      safe to back it up, email it, or put it under version control just like any document.
+    </p>
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <strong>Autosave has your back</strong>
+        <p>MeshCraft periodically autosaves your open scene to a backup file. If the editor closes unexpectedly and reopens a scene with a newer autosave available, it will ask before loading it — so a crash doesn't have to mean lost work. Still, get in the habit of pressing <kbd>Ctrl+S</kbd> often.</p>
+      </div>
+    </div>
+
+    <h2>Supported platforms today</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Platform</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Linux</td><td><span class="badge done">Working</span></td></tr>
+          <tr><td>Browser (WASM)</td><td><span class="badge done">Working</span></td></tr>
+          <tr><td>macOS</td><td><span class="badge planned">Planned</span></td></tr>
+          <tr><td>Windows</td><td><span class="badge planned">Planned</span></td></tr>
+          <tr><td>Android</td><td><span class="badge planned">Planned</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="page-nav">
+      <a href="index.html" class="prev">Overview</a>
+      <a href="interface-tour.html" class="next">Interface Tour</a>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/script.js"></script>
+</body>
+</html>

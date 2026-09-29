@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Interactive Actions &amp; States — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a>
+      <a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a><a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a><a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="mc3-format.html">MC3 Format</a>
+      <a href="mc3-objects.html">Object Types</a>
+      <a href="mc3-materials.html">Materials &amp; Textures</a>
+      <a href="mc3-animation.html">Animation</a>
+      <a href="mc3-interactive.html" class="active">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a><a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a><a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a><a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="mc3-format.html">Format</a><span class="sep">/</span><span>Interactive Actions</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Interactive Actions &amp; States</h1>
+      <p class="subtitle">Describe runtime-interactive behaviour — doors that open, drawers that slide, lights that switch — directly in the MC3 source file.</p>
+      <div class="tags">
+        <span class="badge planned">Game-runtime feature</span>
+        <span class="badge done">State machine</span>
+        <span class="badge done">Trigger system</span>
+      </div>
+    </div>
+
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <strong>Two animation systems</strong>
+        <p>MC3 has two complementary animation concepts:</p>
+        <ul>
+          <li><strong>Keyframe animation</strong> (the <code>&lt;actions&gt;</code> / <code>&lt;channel&gt;</code> / <code>&lt;keyframe&gt;</code> system) — timecoded curves exported to glTF. See <a href="mc3-animation.html">Animation Reference</a>.</li>
+          <li><strong>Interactive state actions</strong> (this page) — named transforms and state-machine transitions triggered by in-game events (player interaction, collision, signals). These are stored in <code>&lt;actions&gt;</code> with a different schema and are intended for runtime game engines.</li>
+        </ul>
+        <p>The two systems share the <code>&lt;actions&gt;</code> top-level element name but differ in internal structure — keyframe actions contain <code>&lt;channel&gt;</code> children; interactive actions contain <code>type</code> attributes on the action itself.</p>
+      </div>
+    </div>
+
+    <h2>Object States</h2>
+    <p>
+      Any object can declare a set of named configurations using the <code>&lt;states&gt;</code> child element.
+      Each <code>&lt;state&gt;</code> is a partial override of the object's attributes that the runtime applies
+      when the object enters that state.
+    </p>
+    <pre><code>&lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"FrontDoor"</span>
+     <span class="atr">size</span>=<span class="val">"1 2.1 0.08"</span>
+     <span class="atr">pivot</span>=<span class="val">"-0.5 0 0"</span>
+     <span class="atr">material</span>=<span class="val">"painted_wood"</span>
+     <span class="atr">state</span>=<span class="val">"closed"</span>&gt;
+  &lt;<span class="tag">states</span>&gt;
+    &lt;<span class="tag">state</span> <span class="atr">id</span>=<span class="val">"closed"</span> <span class="atr">rotation</span>=<span class="val">"0 0 0"</span>/&gt;
+    &lt;<span class="tag">state</span> <span class="atr">id</span>=<span class="val">"open"</span>   <span class="atr">rotation</span>=<span class="val">"0 90 0"</span>/&gt;
+  &lt;/<span class="tag">states</span>&gt;
+&lt;/<span class="tag">box</span>&gt;</code></pre>
+
+    <h3><code>&lt;states&gt;</code> element</h3>
+    <p>Placed as a direct child of any object element. Contains one or more <code>&lt;state&gt;</code> children.</p>
+
+    <h3><code>&lt;state&gt;</code> attributes</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>string</td><td>Unique state name within this object. Referenced by <code>set_state</code> actions.</td></tr>
+        <tr><td><code>rotation</code></td><td>vec3</td><td>Overrides the object rotation when in this state.</td></tr>
+        <tr><td><code>position</code></td><td>vec3</td><td>Overrides position.</td></tr>
+        <tr><td><code>scale</code></td><td>vec3</td><td>Overrides scale.</td></tr>
+        <tr><td><code>visible</code></td><td>boolean</td><td>Overrides visibility.</td></tr>
+        <tr><td><code>material</code></td><td>IDREF</td><td>Overrides the material reference.</td></tr>
+      </tbody>
+    </table></div>
+
+    <p>The <code>state</code> attribute on the object element (e.g., <code>state="closed"</code>) sets the <strong>initial active state</strong>. When no state is set, the object's base attributes apply.</p>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <p>For rotating doors and lids, combine <code>&lt;states&gt;</code> with the <code>pivot</code> attribute to set the rotation axis correctly. Example: a door with <code>pivot="-0.5 0 0"</code> rotates around its left edge.</p>
+      </div>
+    </div>
+
+    <h2>Interactive Actions</h2>
+    <p>
+      Interactive actions describe what happens when an object state changes or a trigger fires.
+      They are declared in the top-level <code>&lt;actions&gt;</code> element with a <code>type</code> attribute
+      that determines the kind of transform or state change.
+    </p>
+
+    <h3>Action attributes (common)</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>string</td><td>Unique action identifier. Used in sequences and toggle definitions.</td></tr>
+        <tr><td><code>target</code></td><td>string</td><td>Object <code>name</code> to act on. Omit for <code>sequence</code> and <code>parallel</code> types.</td></tr>
+        <tr><td><code>type</code></td><td>string</td><td>Action type (see table below).</td></tr>
+        <tr><td><code>duration</code></td><td>float</td><td>Transition duration in seconds. Default: <code>0</code> (instant).</td></tr>
+        <tr><td><code>easing</code></td><td>string</td><td><code>linear</code>, <code>ease_in</code>, <code>ease_out</code>, <code>ease_in_out</code>. Default: <code>linear</code>.</td></tr>
+        <tr><td><code>relative</code></td><td>boolean</td><td>Whether the transform is relative to current state. Default depends on type.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>Action Types</h2>
+
+    <h3><code>rotate</code></h3>
+    <p>Rotates the target object. Use with <code>pivot</code> on the target for door/lid motion.</p>
+    <pre><code>&lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"open_door"</span> <span class="atr">target</span>=<span class="val">"FrontDoor"</span> <span class="atr">type</span>=<span class="val">"rotate"</span>
+        <span class="atr">axis</span>=<span class="val">"y"</span> <span class="atr">angle</span>=<span class="val">"90"</span> <span class="atr">duration</span>=<span class="val">"0.6"</span> <span class="atr">easing</span>=<span class="val">"ease_out"</span>/&gt;</code></pre>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>axis</code></td><td><code>x</code>, <code>y</code>, or <code>z</code> — local axis of rotation.</td></tr>
+        <tr><td><code>angle</code></td><td>Rotation angle in degrees.</td></tr>
+        <tr><td><code>rotation</code></td><td>Alternative: Euler vec3 (<code>"0 90 0"</code>).</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3><code>translate</code></h3>
+    <p>Moves the target object by an offset.</p>
+    <pre><code>&lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"slide_drawer"</span> <span class="atr">target</span>=<span class="val">"Drawer"</span> <span class="atr">type</span>=<span class="val">"translate"</span>
+        <span class="atr">offset</span>=<span class="val">"0 0 0.4"</span> <span class="atr">duration</span>=<span class="val">"0.4"</span> <span class="atr">easing</span>=<span class="val">"ease_in_out"</span>/&gt;</code></pre>
+
+    <h3><code>set_position</code></h3>
+    <p>Sets the absolute world position of the target.</p>
+    <pre><code>&lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"reset_chair"</span> <span class="atr">target</span>=<span class="val">"ChairA"</span> <span class="atr">type</span>=<span class="val">"set_position"</span>
+        <span class="atr">position</span>=<span class="val">"1 0 2"</span> <span class="atr">duration</span>=<span class="val">"0.3"</span>/&gt;</code></pre>
+
+    <h3><code>scale</code></h3>
+    <p>Changes the scale of the target.</p>
+    <pre><code>&lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"grow_platform"</span> <span class="atr">target</span>=<span class="val">"Platform"</span> <span class="atr">type</span>=<span class="val">"scale"</span>
+        <span class="atr">scale</span>=<span class="val">"2 1 2"</span> <span class="atr">duration</span>=<span class="val">"1.0"</span>/&gt;</code></pre>
+
+    <h3><code>set_visible</code></h3>
+    <p>Shows or hides the target object.</p>
+    <pre><code>&lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"hide_wall"</span> <span class="atr">target</span>=<span class="val">"SecretWall"</span> <span class="atr">type</span>=<span class="val">"set_visible"</span> <span class="atr">visible</span>=<span class="val">"false"</span>/&gt;</code></pre>
+
+    <h3><code>set_material</code></h3>
+    <p>Swaps the material on the target.</p>
+    <pre><code>&lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"turn_lamp_on"</span> <span class="atr">target</span>=<span class="val">"LampBulb"</span> <span class="atr">type</span>=<span class="val">"set_material"</span>
+        <span class="atr">material</span>=<span class="val">"glowing_yellow"</span>/&gt;</code></pre>
+
+    <h3><code>set_state</code></h3>
+    <p>Transitions the target object to a named state. The object must have a matching <code>&lt;states&gt;</code> block.</p>
+    <pre><code>&lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"open_front_door"</span> <span class="atr">target</span>=<span class="val">"FrontDoor"</span> <span class="atr">type</span>=<span class="val">"set_state"</span>
+        <span class="atr">state</span>=<span class="val">"open"</span> <span class="atr">duration</span>=<span class="val">"0.6"</span> <span class="atr">easing</span>=<span class="val">"ease_out"</span>/&gt;
+
+&lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"close_front_door"</span> <span class="atr">target</span>=<span class="val">"FrontDoor"</span> <span class="atr">type</span>=<span class="val">"set_state"</span>
+        <span class="atr">state</span>=<span class="val">"closed"</span> <span class="atr">duration</span>=<span class="val">"0.6"</span> <span class="atr">easing</span>=<span class="val">"ease_in"</span>/&gt;</code></pre>
+
+    <h3><code>toggle</code></h3>
+    <p>Syntactic sugar that cycles through named states in order, wrapping after the last. Each invocation advances one step.</p>
+    <pre><code>&lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"toggle_door"</span> <span class="atr">type</span>=<span class="val">"toggle"</span>&gt;
+  &lt;<span class="tag">state</span> <span class="atr">id</span>=<span class="val">"closed"</span> <span class="atr">target</span>=<span class="val">"FrontDoor"</span> <span class="atr">type</span>=<span class="val">"rotate"</span> <span class="atr">axis</span>=<span class="val">"y"</span> <span class="atr">angle</span>=<span class="val">"0"</span>  <span class="atr">duration</span>=<span class="val">"0.5"</span>/&gt;
+  &lt;<span class="tag">state</span> <span class="atr">id</span>=<span class="val">"open"</span>   <span class="atr">target</span>=<span class="val">"FrontDoor"</span> <span class="atr">type</span>=<span class="val">"rotate"</span> <span class="atr">axis</span>=<span class="val">"y"</span> <span class="atr">angle</span>=<span class="val">"90"</span> <span class="atr">duration</span>=<span class="val">"0.5"</span>/&gt;
+&lt;/<span class="tag">action</span>&gt;</code></pre>
+    <p><code>toggle</code> and <code>&lt;states&gt;</code> are complementary: use <code>&lt;states&gt;</code> on the object to declare named configurations, and a <code>toggle</code> action to cycle through them. Direct <code>set_state</code> actions remain available for explicit targeting.</p>
+
+    <h3><code>sequence</code></h3>
+    <p>Runs child steps one after the other. Each step waits for the previous to complete before starting.</p>
+    <pre><code>&lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"open_and_move"</span> <span class="atr">type</span>=<span class="val">"sequence"</span>&gt;
+  &lt;<span class="tag">step</span> <span class="atr">action</span>=<span class="val">"open_front_door"</span>/&gt;
+  &lt;<span class="tag">step</span> <span class="atr">action</span>=<span class="val">"slide_drawer"</span>/&gt;
+&lt;/<span class="tag">action</span>&gt;</code></pre>
+
+    <h3><code>parallel</code></h3>
+    <p>Runs all child steps simultaneously.</p>
+    <pre><code>&lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"open_double_door"</span> <span class="atr">type</span>=<span class="val">"parallel"</span>&gt;
+  &lt;<span class="tag">step</span> <span class="atr">target</span>=<span class="val">"LeftDoor"</span>  <span class="atr">type</span>=<span class="val">"rotate"</span> <span class="atr">axis</span>=<span class="val">"y"</span> <span class="atr">angle</span>=<span class="val">"-90"</span> <span class="atr">duration</span>=<span class="val">"0.6"</span>/&gt;
+  &lt;<span class="tag">step</span> <span class="atr">target</span>=<span class="val">"RightDoor"</span> <span class="atr">type</span>=<span class="val">"rotate"</span> <span class="atr">axis</span>=<span class="val">"y"</span> <span class="atr">angle</span>=<span class="val">"90"</span>  <span class="atr">duration</span>=<span class="val">"0.6"</span>/&gt;
+&lt;/<span class="tag">action</span>&gt;</code></pre>
+
+    <h2>Triggers</h2>
+    <p>
+      A <code>&lt;trigger&gt;</code> child element on an action describes the condition under which the action fires automatically in a game runtime. Without a trigger the action is <em>manual</em> — it must be explicitly invoked by game code.
+    </p>
+    <pre><code>&lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"open_front_door"</span> <span class="atr">target</span>=<span class="val">"FrontDoor"</span> <span class="atr">type</span>=<span class="val">"set_state"</span>
+        <span class="atr">state</span>=<span class="val">"open"</span> <span class="atr">duration</span>=<span class="val">"0.6"</span>&gt;
+  &lt;<span class="tag">trigger</span> <span class="atr">type</span>=<span class="val">"interact"</span> <span class="atr">prompt</span>=<span class="val">"Open door"</span>/&gt;
+&lt;/<span class="tag">action</span>&gt;</code></pre>
+
+    <h3>Trigger attributes</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Attribute</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>type</code></td><td>string</td><td>Trigger type (see below).</td></tr>
+        <tr><td><code>prompt</code></td><td>string</td><td>UI hint text displayed to the player (used with <code>interact</code>).</td></tr>
+        <tr><td><code>signal</code></td><td>string</td><td>Named signal identifier (used with <code>on_signal</code>).</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Trigger types</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Type</th><th>When it fires</th></tr></thead>
+      <tbody>
+        <tr><td><code>manual</code></td><td>Never automatically — only when game code calls it explicitly. Default when no trigger is present.</td></tr>
+        <tr><td><code>interact</code></td><td>When the player presses an interaction key while looking at or near the target object.</td></tr>
+        <tr><td><code>on_load</code></td><td>Immediately when the scene is loaded into the runtime.</td></tr>
+        <tr><td><code>on_collision</code></td><td>When a physics body collides with the target.</td></tr>
+        <tr><td><code>on_enter_area</code></td><td>When an entity enters an <code>&lt;area&gt;</code> volume.</td></tr>
+        <tr><td><code>on_signal</code></td><td>When game code broadcasts the named signal (see <code>signal</code> attribute).</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4>on_load example — auto-start a windmill</h4>
+    <pre><code>&lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"spin_windmill"</span> <span class="atr">target</span>=<span class="val">"WindmillBlades"</span> <span class="atr">type</span>=<span class="val">"rotate"</span>
+        <span class="atr">axis</span>=<span class="val">"z"</span> <span class="atr">angle</span>=<span class="val">"360"</span> <span class="atr">duration</span>=<span class="val">"4.0"</span>&gt;
+  &lt;<span class="tag">trigger</span> <span class="atr">type</span>=<span class="val">"on_load"</span>/&gt;
+&lt;/<span class="tag">action</span>&gt;</code></pre>
+
+    <h4>on_signal example — open a gate on command</h4>
+    <pre><code>&lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"open_gate"</span> <span class="atr">target</span>=<span class="val">"CastleGate"</span> <span class="atr">type</span>=<span class="val">"translate"</span>
+        <span class="atr">offset</span>=<span class="val">"0 3 0"</span> <span class="atr">duration</span>=<span class="val">"1.5"</span>&gt;
+  &lt;<span class="tag">trigger</span> <span class="atr">type</span>=<span class="val">"on_signal"</span> <span class="atr">signal</span>=<span class="val">"gate_opened"</span>/&gt;
+&lt;/<span class="tag">action</span>&gt;</code></pre>
+
+    <h2>Collision &amp; Physics Attributes</h2>
+    <p>The <code>collision</code> attribute on any object marks it for physics processing:</p>
+    <pre><code>&lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Wall"</span> <span class="atr">size</span>=<span class="val">"10 3 0.3"</span> <span class="atr">collision</span>=<span class="val">"static"</span>/&gt;
+&lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Crate"</span> <span class="atr">size</span>=<span class="val">"1 1 1"</span> <span class="atr">collision</span>=<span class="val">"dynamic"</span>/&gt;
+&lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Door"</span>  <span class="atr">size</span>=<span class="val">"1 2 0.1"</span> <span class="atr">collision</span>=<span class="val">"kinematic"</span>/&gt;</code></pre>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Value</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>none</code></td><td>No collision — object is purely visual. Default.</td></tr>
+        <tr><td><code>static</code></td><td>Immovable solid. Use for floors, walls, terrain.</td></tr>
+        <tr><td><code>dynamic</code></td><td>Full physics body — gravity, collisions, constraints.</td></tr>
+        <tr><td><code>kinematic</code></td><td>Moved by actions/code, not by physics. Use for doors, elevators, platforms.</td></tr>
+        <tr><td><code>trigger</code></td><td>Detects overlap events but does not block movement.</td></tr>
+      </tbody>
+    </table></div>
+
+    <p>The extended <code>&lt;collision&gt;</code> child element allows additional physics properties:</p>
+    <pre><code>&lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Gate"</span>&gt;
+  &lt;<span class="tag">collision</span> <span class="atr">type</span>=<span class="val">"kinematic"</span> <span class="atr">shape</span>=<span class="val">"box"</span> <span class="atr">layer</span>=<span class="val">"environment"</span>&gt;
+    &lt;<span class="tag">mask</span>&gt;player npc&lt;/<span class="tag">mask</span>&gt;
+  &lt;/<span class="tag">collision</span>&gt;
+&lt;/<span class="tag">box</span>&gt;</code></pre>
+
+    <h2>Area Objects</h2>
+    <p>An <code>&lt;area&gt;</code> is an invisible logical volume used for trigger zones, checkpoints, or pathfinding regions. It has no visual geometry.</p>
+    <pre><code>&lt;<span class="tag">area</span> <span class="atr">name</span>=<span class="val">"CheckpointZone"</span> <span class="atr">size</span>=<span class="val">"5 3 5"</span>
+      <span class="atr">position</span>=<span class="val">"0 1.5 10"</span> <span class="atr">tags</span>=<span class="val">"trigger checkpoint"</span>/&gt;</code></pre>
+    <p>Areas are typically paired with <code>on_enter_area</code> triggers on other actions:</p>
+    <pre><code>&lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"unlock_door"</span> <span class="atr">target</span>=<span class="val">"ExitDoor"</span> <span class="atr">type</span>=<span class="val">"set_visible"</span> <span class="atr">visible</span>=<span class="val">"true"</span>&gt;
+  &lt;<span class="tag">trigger</span> <span class="atr">type</span>=<span class="val">"on_enter_area"</span>/&gt;
+&lt;/<span class="tag">action</span>&gt;</code></pre>
+
+    <h2>Complete Interactive Example</h2>
+    <p>A front wall with a door hole cut out, a rotating door with open/close states, a glass window, and a movable chair:</p>
+    <pre><code>&lt;?<span class="tag">xml</span> version=<span class="val">"1.0"</span> encoding=<span class="val">"UTF-8"</span>?&gt;
+&lt;<span class="tag">mc3</span> <span class="atr">version</span>=<span class="val">"0.3"</span> <span class="atr">model</span>=<span class="val">"InteractiveHouse"</span> <span class="atr">unit</span>=<span class="val">"meter"</span>&gt;
+
+  &lt;<span class="tag">textures</span>&gt;
+    &lt;<span class="tag">texture</span> <span class="atr">id</span>=<span class="val">"brick_albedo"</span> <span class="atr">uri</span>=<span class="val">"textures/brick.png"</span>
+             <span class="atr">wrap_u</span>=<span class="val">"repeat"</span> <span class="atr">wrap_v</span>=<span class="val">"repeat"</span>/&gt;
+    &lt;<span class="tag">texture</span> <span class="atr">id</span>=<span class="val">"wood_albedo"</span>  <span class="atr">uri</span>=<span class="val">"textures/wood.png"</span>
+             <span class="atr">wrap_u</span>=<span class="val">"repeat"</span> <span class="atr">wrap_v</span>=<span class="val">"repeat"</span>/&gt;
+  &lt;/<span class="tag">textures</span>&gt;
+
+  &lt;<span class="tag">materials</span>&gt;
+    &lt;<span class="tag">material</span> <span class="atr">id</span>=<span class="val">"brick"</span> <span class="atr">roughness</span>=<span class="val">"0.9"</span>&gt;
+      &lt;<span class="tag">base_color_texture</span>&gt;brick_albedo&lt;/<span class="tag">base_color_texture</span>&gt;
+    &lt;/<span class="tag">material</span>&gt;
+    &lt;<span class="tag">material</span> <span class="atr">id</span>=<span class="val">"painted_wood"</span> <span class="atr">roughness</span>=<span class="val">"0.6"</span>&gt;
+      &lt;<span class="tag">base_color_texture</span>&gt;wood_albedo&lt;/<span class="tag">base_color_texture</span>&gt;
+    &lt;/<span class="tag">material</span>&gt;
+    &lt;<span class="tag">material</span> <span class="atr">id</span>=<span class="val">"glass"</span> <span class="atr">roughness</span>=<span class="val">"0.05"</span> <span class="atr">alpha_mode</span>=<span class="val">"blend"</span>&gt;
+      &lt;<span class="tag">base_color</span>&gt;0.7 0.9 1.0 0.35&lt;/<span class="tag">base_color</span>&gt;
+    &lt;/<span class="tag">material</span>&gt;
+  &lt;/<span class="tag">materials</span>&gt;
+
+  &lt;<span class="tag">definitions</span>&gt;
+    &lt;<span class="tag">definition</span> <span class="atr">id</span>=<span class="val">"SimpleChair"</span>&gt;
+      &lt;<span class="tag">group</span>&gt;
+        &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Seat"</span> <span class="atr">size</span>=<span class="val">"1 0.15 1"</span>    <span class="atr">position</span>=<span class="val">"0 0.55 0"</span>     <span class="atr">material</span>=<span class="val">"painted_wood"</span>/&gt;
+        &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Back"</span> <span class="atr">size</span>=<span class="val">"1 1 0.15"</span>    <span class="atr">position</span>=<span class="val">"0 1.1 0.45"</span>   <span class="atr">material</span>=<span class="val">"painted_wood"</span>/&gt;
+        &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Leg1"</span> <span class="atr">size</span>=<span class="val">"0.1 0.55 0.1"</span> <span class="atr">position</span>=<span class="val">"-0.4 0.275 -0.4"</span> <span class="atr">material</span>=<span class="val">"painted_wood"</span>/&gt;
+        &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Leg2"</span> <span class="atr">size</span>=<span class="val">"0.1 0.55 0.1"</span> <span class="atr">position</span>=<span class="val">" 0.4 0.275 -0.4"</span> <span class="atr">material</span>=<span class="val">"painted_wood"</span>/&gt;
+        &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Leg3"</span> <span class="atr">size</span>=<span class="val">"0.1 0.55 0.1"</span> <span class="atr">position</span>=<span class="val">"-0.4 0.275  0.4"</span> <span class="atr">material</span>=<span class="val">"painted_wood"</span>/&gt;
+        &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"Leg4"</span> <span class="atr">size</span>=<span class="val">"0.1 0.55 0.1"</span> <span class="atr">position</span>=<span class="val">" 0.4 0.275  0.4"</span> <span class="atr">material</span>=<span class="val">"painted_wood"</span>/&gt;
+      &lt;/<span class="tag">group</span>&gt;
+    &lt;/<span class="tag">definition</span>&gt;
+  &lt;/<span class="tag">definitions</span>&gt;
+
+  &lt;<span class="tag">objects</span>&gt;
+
+    <span class="cmt">&lt;!-- Front wall with door hole cut out via CSG difference --&gt;</span>
+    &lt;<span class="tag">difference</span> <span class="atr">name</span>=<span class="val">"FrontWall"</span>&gt;
+      &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"WallBase"</span> <span class="atr">size</span>=<span class="val">"8 3 0.3"</span> <span class="atr">position</span>=<span class="val">"0 1.5 -3"</span> <span class="atr">material</span>=<span class="val">"brick"</span>/&gt;
+      &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"DoorHole"</span> <span class="atr">size</span>=<span class="val">"1.1 2.2 0.5"</span> <span class="atr">position</span>=<span class="val">"0 1.1 -3"</span>
+           <span class="atr">role</span>=<span class="val">"cutter"</span> <span class="atr">visible</span>=<span class="val">"false"</span>/&gt;
+    &lt;/<span class="tag">difference</span>&gt;
+
+    <span class="cmt">&lt;!-- Door — rotates around its left edge (pivot) --&gt;</span>
+    &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"FrontDoor"</span> <span class="atr">size</span>=<span class="val">"1 2.1 0.08"</span>
+         <span class="atr">position</span>=<span class="val">"0 1.05 -3.08"</span>
+         <span class="atr">pivot</span>=<span class="val">"-0.5 0 0"</span>
+         <span class="atr">material</span>=<span class="val">"painted_wood"</span>
+         <span class="atr">collision</span>=<span class="val">"kinematic"</span>
+         <span class="atr">state</span>=<span class="val">"closed"</span>&gt;
+      &lt;<span class="tag">states</span>&gt;
+        &lt;<span class="tag">state</span> <span class="atr">id</span>=<span class="val">"closed"</span> <span class="atr">rotation</span>=<span class="val">"0 0 0"</span>/&gt;
+        &lt;<span class="tag">state</span> <span class="atr">id</span>=<span class="val">"open"</span>   <span class="atr">rotation</span>=<span class="val">"0 90 0"</span>/&gt;
+      &lt;/<span class="tag">states</span>&gt;
+    &lt;/<span class="tag">box</span>&gt;
+
+    <span class="cmt">&lt;!-- Glass window --&gt;</span>
+    &lt;<span class="tag">box</span> <span class="atr">name</span>=<span class="val">"WindowGlass"</span> <span class="atr">size</span>=<span class="val">"1.2 1.0 0.05"</span>
+         <span class="atr">position</span>=<span class="val">"2.2 1.7 -3.08"</span> <span class="atr">material</span>=<span class="val">"glass"</span>/&gt;
+
+    <span class="cmt">&lt;!-- Movable chair from definition --&gt;</span>
+    &lt;<span class="tag">instance</span> <span class="atr">name</span>=<span class="val">"ChairA"</span> <span class="atr">definition</span>=<span class="val">"SimpleChair"</span>
+              <span class="atr">position</span>=<span class="val">"1.5 0 1.5"</span> <span class="atr">rotation</span>=<span class="val">"0 20 0"</span>
+              <span class="atr">collision</span>=<span class="val">"dynamic"</span>/&gt;
+
+  &lt;/<span class="tag">objects</span>&gt;
+
+  &lt;<span class="tag">actions</span>&gt;
+
+    &lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"open_front_door"</span> <span class="atr">target</span>=<span class="val">"FrontDoor"</span>
+            <span class="atr">type</span>=<span class="val">"set_state"</span> <span class="atr">state</span>=<span class="val">"open"</span>
+            <span class="atr">duration</span>=<span class="val">"0.6"</span> <span class="atr">easing</span>=<span class="val">"ease_out"</span>&gt;
+      &lt;<span class="tag">trigger</span> <span class="atr">type</span>=<span class="val">"interact"</span> <span class="atr">prompt</span>=<span class="val">"Open door"</span>/&gt;
+    &lt;/<span class="tag">action</span>&gt;
+
+    &lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"close_front_door"</span> <span class="atr">target</span>=<span class="val">"FrontDoor"</span>
+            <span class="atr">type</span>=<span class="val">"set_state"</span> <span class="atr">state</span>=<span class="val">"closed"</span>
+            <span class="atr">duration</span>=<span class="val">"0.6"</span> <span class="atr">easing</span>=<span class="val">"ease_in"</span>&gt;
+      &lt;<span class="tag">trigger</span> <span class="atr">type</span>=<span class="val">"interact"</span> <span class="atr">prompt</span>=<span class="val">"Close door"</span>/&gt;
+    &lt;/<span class="tag">action</span>&gt;
+
+    &lt;<span class="tag">action</span> <span class="atr">id</span>=<span class="val">"push_chair"</span> <span class="atr">target</span>=<span class="val">"ChairA"</span>
+            <span class="atr">type</span>=<span class="val">"translate"</span> <span class="atr">offset</span>=<span class="val">"1.0 0 0"</span>
+            <span class="atr">duration</span>=<span class="val">"0.4"</span> <span class="atr">easing</span>=<span class="val">"ease_in_out"</span>&gt;
+      &lt;<span class="tag">trigger</span> <span class="atr">type</span>=<span class="val">"on_signal"</span> <span class="atr">signal</span>=<span class="val">"push_chair"</span>/&gt;
+    &lt;/<span class="tag">action</span>&gt;
+
+  &lt;/<span class="tag">actions</span>&gt;
+
+&lt;/<span class="tag">mc3</span>&gt;</code></pre>
+
+    <h2>Best Practices for Interactive Objects</h2>
+    <ul>
+      <li>Always give names to objects that actions reference — unnamed objects cannot be targeted.</li>
+      <li>Use <code>pivot</code> to place the rotation axis correctly (door hinge, lid axis, lever pivot).</li>
+      <li>Mark CSG cutter objects with <code>role="cutter"</code> and <code>visible="false"</code> so they do not appear in the scene.</li>
+      <li>Keep interactive objects (doors, chairs, levers) as <strong>separate</strong> named objects — do not bake them into CSG operations together with the surrounding static geometry.</li>
+      <li>Set <code>collision="kinematic"</code> on objects moved by actions; set <code>collision="static"</code> on immovable walls and floors.</li>
+      <li>Use <code>&lt;definitions&gt;</code> for repeating furniture — instantiate with <code>&lt;instance&gt;</code> at different positions.</li>
+      <li>Prefer <code>set_state</code> over raw <code>rotate</code>/<code>translate</code> when an object has two or more configurations, as it gives the runtime a clear state to query.</li>
+    </ul>
+
+    <h2>Relationship with Keyframe Animation</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th></th><th>Interactive State Actions</th><th>Keyframe Animation</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Schema</strong></td><td><code>&lt;action type="rotate"/set_state/…&gt;</code></td><td><code>&lt;action name="…"&gt;&lt;channel&gt;&lt;keyframe&gt;</code></td></tr>
+        <tr><td><strong>Triggered by</strong></td><td>In-game events (interact, collision, signal)</td><td>Timeline playback, game code</td></tr>
+        <tr><td><strong>Duration/easing</strong></td><td>Per action</td><td>Per keyframe interpolation curve</td></tr>
+        <tr><td><strong>glTF export</strong></td><td>Not exported (runtime-only concept)</td><td>Exported as <code>animations[]</code></td></tr>
+        <tr><td><strong>Best for</strong></td><td>Doors, levers, triggers, state machines</td><td>Character clips, camera paths, continuous motion</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="page-nav">
+      <a href="mc3-animation.html" class="prev">Animation Reference</a>
+      <a href="../tutorials/complete-example.html" class="next">Complete Scene Example</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

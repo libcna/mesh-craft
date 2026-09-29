@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Undo/Redo System — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section"><div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a><a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a><a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a><a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a><a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a><a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a><a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a><a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a><a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-title">Internals</div>
+      <a href="index.html">Overview</a><a href="data-flow.html">Data Flow</a>
+      <a href="rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="csg-engine.html">CSG Engine</a><a href="undo-redo.html" class="active">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Internals</a><span class="sep">/</span><span>Undo/Redo</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Undo/Redo System</h1>
+      <p class="subtitle">The 20-step deep-copy snapshot stack: design, trade-offs, and implementation details.</p>
+    </div>
+
+    <h2>Design: Full-Document Snapshots</h2>
+    <p>
+      MeshCraft uses a <strong>snapshot-based undo model</strong>: before every mutation, the entire <code>Mc3Document</code> is deep-copied and pushed onto a stack. Undo restores the previous copy; redo replays forward copies.
+    </p>
+    <p>This is the simplest correct undo implementation possible. The alternative — a command/inverse-command pattern — requires every mutation to provide a reversible inverse, which is error-prone and requires considerably more code per feature.</p>
+
+    <h2>Data Structures</h2>
+    <pre><code>class MeshCraftApplication : public cna::Application {
+  std::shared_ptr&lt;Mc3Document&gt;  document_;
+  std::vector&lt;Mc3Document&gt;      undoStack_;  // past states
+  std::vector&lt;Mc3Document&gt;      redoStack_;  // future states (cleared on new edit)
+  static constexpr int           MAX_UNDO = 20;
+};</code></pre>
+
+    <h2>Push Protocol</h2>
+    <p>Every editor action that modifies the document follows this exact sequence:</p>
+    <pre><code>void MeshCraftApplication::pushUndo() {
+    if (undoStack_.size() >= MAX_UNDO)
+        undoStack_.erase(undoStack_.begin());     // drop oldest
+    undoStack_.push_back(*document_);             // deep copy current state
+    redoStack_.clear();                           // new branch → forget future
+    renderer_.clearCaches();                      // pointers will change after undo
+}</code></pre>
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <p>Always call <code>pushUndo()</code> <strong>before</strong> mutating the document. Calling it after means the undo stack captures the already-mutated state.</p>
+      </div>
+    </div>
+
+    <h2>Undo (Ctrl+Z)</h2>
+    <pre><code>void MeshCraftApplication::undo() {
+    if (undoStack_.empty()) return;
+    redoStack_.push_back(*document_);        // save current for redo
+    *document_ = undoStack_.back();          // restore previous
+    undoStack_.pop_back();
+    renderer_.clearCaches();
+    selectedObjects_.clear();               // selection may dangle
+}</code></pre>
+
+    <h2>Redo (Ctrl+Shift+Z / Ctrl+Y)</h2>
+    <pre><code>void MeshCraftApplication::redo() {
+    if (redoStack_.empty()) return;
+    undoStack_.push_back(*document_);        // save current for undo
+    *document_ = redoStack_.back();          // restore future
+    redoStack_.pop_back();
+    renderer_.clearCaches();
+    selectedObjects_.clear();
+}</code></pre>
+
+    <h2>Deep Copy Behaviour</h2>
+    <p><code>Mc3Document</code> has a compiler-generated copy constructor that deep-copies all fields because all nested objects are stored by value or <code>std::vector</code>/<code>std::string</code>:</p>
+    <pre><code>struct Mc3Document {
+    std::string              version;
+    std::string              model;
+    std::string              unit;
+    std::string              sourcePath;
+    std::vector&lt;Mc3Light&gt;    lights;
+    std::vector&lt;Mc3Camera&gt;   cameras;
+    std::vector&lt;Mc3Texture&gt;  textures;
+    std::vector&lt;Mc3Material&gt; materials;
+    std::vector&lt;Mc3Object&gt;   definitions;
+    std::vector&lt;Mc3Object&gt;   objects;     // each Mc3Object owns its children
+    std::vector&lt;Mc3Action&gt;   actions;
+};</code></pre>
+    <p>Crucially, <code>Mc3Object.children</code> is a <code>std::vector&lt;Mc3Object&gt;</code> — not pointers. This means the entire scene tree is copied recursively without any manual deep-copy logic. The copy is O(n) in the number of objects × fields per object.</p>
+
+    <h2>Trade-offs</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th></th><th>Snapshot model (current)</th><th>Command pattern (alternative)</th></tr></thead>
+      <tbody>
+        <tr><td>Correctness risk</td><td>Low — only <code>Mc3Document</code> must be copyable</td><td>High — every command must correctly implement its inverse</td></tr>
+        <tr><td>Memory cost per step</td><td>O(entire document)</td><td>O(changed data only)</td></tr>
+        <tr><td>Time cost per edit</td><td>O(n) deep copy</td><td>O(1) record command</td></tr>
+        <tr><td>Maximum history depth</td><td>20 steps (configurable constant)</td><td>Unlimited (or configurable by memory)</td></tr>
+        <tr><td>Implementation complexity</td><td>~30 lines</td><td>Hundreds of lines + one inverse per mutation type</td></tr>
+      </tbody>
+    </table></div>
+    <p>For typical scenes (dozens to a few hundred objects), the 20-step snapshot stack uses at most a few megabytes of RAM. For very large scenes (thousands of objects), memory consumption may become noticeable.</p>
+
+    <h2>Cache Invalidation After Undo/Redo</h2>
+    <p>After every undo or redo operation:</p>
+    <ol>
+      <li><code>renderer_.clearCaches()</code> evicts all GPU mesh caches and the CSG cache. This is necessary because <code>Mc3Object*</code> pointers in the restored document are different addresses from the pre-undo document — all cache lookups would miss or return wrong data.</li>
+      <li><code>selectedObjects_.clear()</code> clears the selection because the selected <code>Mc3Object*</code> pointers now dangle. The user must re-select after undo.</li>
+    </ol>
+
+    <h2>What Is NOT Undoable</h2>
+    <ul>
+      <li><strong>Camera movement</strong> — EditorCamera state is separate from <code>Mc3Document</code> and is not snapshotted.</li>
+      <li><strong>Animation playback position</strong> — timeline scrubber position is not snapshotted.</li>
+      <li><strong>File open/save</strong> — loading a new file clears the undo stack entirely.</li>
+      <li><strong>Panel layout</strong> — panel visibility and sizes are editor state, not document state.</li>
+    </ul>
+
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <p>The undo stack is in RAM only. Closing the editor without saving loses all undo history as well as any unsaved document changes.</p>
+      </div>
+    </div>
+
+    <div class="page-nav">
+      <a href="csg-engine.html" class="prev">CSG Engine</a>
+      <a href="../index.html" class="next">Back to Overview</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

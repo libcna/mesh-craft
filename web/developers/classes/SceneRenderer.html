@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SceneRenderer — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="../modules/index.html">All Modules</a><a href="../modules/mc3-library.html">MC3 Library</a>
+      <a href="../modules/mc3togltf.html">mc3togltf</a><a href="../modules/editor.html">Editor</a>
+      <a href="../modules/renderer.html">Renderer</a><a href="../modules/scene.html">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="index.html">All Classes</a>
+      <a href="MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="Mc3Document.html">Mc3Document</a><a href="Mc3Object.html">Mc3Object</a>
+      <a href="SceneRenderer.html" class="active">SceneRenderer</a>
+      <a href="EditorCamera.html">EditorCamera</a><a href="Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a><a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a><a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a><a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a><a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a><a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Classes</a><span class="sep">/</span><span>SceneRenderer</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1><code>SceneRenderer</code></h1>
+      <p class="subtitle">Renders the full MC3 scene into the 3D viewport using CNA's <code>BasicEffect</code>.</p>
+    </div>
+
+    <h4>Header</h4><p><code>include/MeshCraft/Renderer/SceneRenderer.hpp</code></p>
+    <h4>Source</h4><p><code>src/MeshCraft/Renderer/SceneRenderer.cpp</code></p>
+    <h4>Namespace</h4><p><code>MeshCraft::Renderer</code></p>
+
+    <h2>Public API</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Method</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>SceneRenderer(GraphicsDevice&amp;)</code></td>
+            <td>Constructor. Builds all pre-computed unit meshes (box, sphere, cylinder, cone, plane) and wire shapes. Must be called after the GL context is ready.</td>
+          </tr>
+          <tr>
+            <td><code>draw(doc, view, proj, selected)</code></td>
+            <td>Renders the complete scene. Traverses <code>doc.objects</code> recursively. Also draws light/camera/CSG gizmos.</td>
+          </tr>
+          <tr>
+            <td><code>clearCsgCache()</code></td>
+            <td>Clears the cached Manifold CSG meshes. Must be called after any document mutation (done automatically in <code>pushUndo()</code>).</td>
+          </tr>
+          <tr>
+            <td><code>setAnimOverrides(overrides)</code></td>
+            <td>Injects per-object animation overrides. Called each frame before <code>draw()</code> when an animation is playing.</td>
+          </tr>
+          <tr>
+            <td><code>drawGizmo(obj, view, proj, length)</code></td>
+            <td>Draws the Move gizmo (axis arrows + cube tips) for the given object.</td>
+          </tr>
+          <tr>
+            <td><code>drawScaleGizmo(obj, view, proj, length)</code></td>
+            <td>Draws the Scale gizmo (axis lines + flat-square tips).</td>
+          </tr>
+          <tr>
+            <td><code>drawRotateGizmo(obj, view, proj, length)</code></td>
+            <td>Draws the Rotate gizmo (arc circles in XYZ planes).</td>
+          </tr>
+          <tr>
+            <td><code>drawObjectWireframe(obj, view, proj, color)</code></td>
+            <td>Draws a wireframe bounding box around an object in the given color.</td>
+          </tr>
+          <tr>
+            <td><code>drawLightGizmos(lights, view, proj)</code></td>
+            <td>Draws representative icons for each light in the scene.</td>
+          </tr>
+          <tr>
+            <td><code>drawCameraGizmos(cameras, view, proj)</code></td>
+            <td>Draws camera frustum icons.</td>
+          </tr>
+          <tr>
+            <td><code>drawCsgGizmos(doc, view, proj)</code></td>
+            <td>Draws per-CSG-node colored overlays.</td>
+          </tr>
+          <tr>
+            <td><code>drawEdgeOverlay(doc, view, proj)</code></td>
+            <td>Draws black wireframe lines over all visible objects (Alt+W toggle).</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Private Helper Methods</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Method</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>drawObject(obj, doc, parentWorld, …)</code></td><td>Recursive per-object render. Dispatches by <code>ObjectType</code>.</td></tr>
+          <tr><td><code>drawMesh(mesh, world, view, proj, color)</code></td><td>Renders a <code>RenderMesh</code> with flat color using <code>BasicEffect</code>.</td></tr>
+          <tr><td><code>drawMeshTextured(mesh, world, view, proj, color, tex)</code></td><td>Renders with a texture using <code>BasicEffect</code> in texture+lit mode.</td></tr>
+          <tr><td><code>loadOrGetTexture(absPath)</code></td><td>Lazy-loads and caches a <code>Texture2D</code> from an absolute path.</td></tr>
+          <tr><td><code>loadOrGetMesh(absPath)</code></td><td>Lazy-loads and caches an OBJ file via tinyobjloader.</td></tr>
+          <tr><td><code>objectWorldMatrix(transform)</code></td><td>Builds the local world matrix using the pivot-compensated formula.</td></tr>
+          <tr><td><code>materialColor(matId, doc)</code></td><td>Looks up the <code>baseColor</code> from the document's material map. Returns a default grey if not found.</td></tr>
+          <tr><td><code>isSelected(obj, sel)</code></td><td>Returns true if the object pointer appears in the selection vector.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Caches</h2>
+    <pre><code><span class="kw">map</span>&lt;<span class="kw">string</span>, Texture2D&gt;              textureCache_;   <span class="cmt">// keyed by abs path</span>
+<span class="kw">map</span>&lt;<span class="kw">string</span>, RenderMesh&gt;              meshCache_;      <span class="cmt">// keyed by abs path (OBJ)</span>
+<span class="kw">map</span>&lt;<span class="kw">const</span> Mc3Object*, RenderMesh&gt;    csgMeshCache_;   <span class="cmt">// keyed by object pointer</span>
+<span class="kw">unordered_map</span>&lt;<span class="kw">string</span>, AnimOverride&gt; animOverrides_;  <span class="cmt">// keyed by object name</span></code></pre>
+
+    <p>The CSG cache (<code>csgMeshCache_</code>) is cleared on every <code>pushUndo()</code> call to ensure CSG geometry is re-evaluated after any edit. Texture and mesh caches are never cleared during a session.</p>
+
+    <div class="page-nav">
+      <a href="Mc3Object.html" class="prev">Mc3Object</a>
+      <a href="EditorCamera.html" class="next">EditorCamera</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

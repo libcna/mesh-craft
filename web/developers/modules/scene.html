@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Scene Panels — MeshCraft Developer Docs</title>
+<link rel="stylesheet" href="../../assets/style.css"/>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><div class="logo-icon">M</div><div class="logo-text"><span class="logo-name">Mesh Craft</span><span class="logo-sub">Developer Docs</span></div></a></div>
+    <div class="section-switch"><a href="../../users/index.html" class="">Users</a><a href="../../developers/index.html" class="current">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Documentation</div>
+      <a href="../index.html">Overview</a><a href="../getting-started.html">Getting Started</a>
+      <a href="../build.html">Build &amp; Run</a><a href="../project-structure.html">Project Structure</a>
+      <a href="../architecture.html">Architecture</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Modules</div>
+      <a href="index.html">All Modules</a><a href="mc3-library.html">MC3 Library</a>
+      <a href="mc3togltf.html">mc3togltf</a><a href="editor.html">Editor</a>
+      <a href="renderer.html">Renderer</a><a href="scene.html" class="active">Scene Panels</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Class Reference</div>
+      <a href="../classes/index.html">All Classes</a>
+      <a href="../classes/MeshCraftApplication.html">MeshCraftApplication</a>
+      <a href="../classes/Mc3Document.html">Mc3Document</a><a href="../classes/Mc3Object.html">Mc3Object</a>
+      <a href="../classes/SceneRenderer.html">SceneRenderer</a><a href="../classes/EditorCamera.html">EditorCamera</a>
+      <a href="../classes/Mc3Animation.html">Mc3Animation</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Format Reference</div>
+      <a href="../api/mc3-format.html">MC3 Format</a><a href="../api/mc3-objects.html">Object Types</a>
+      <a href="../api/mc3-materials.html">Materials &amp; Textures</a><a href="../api/mc3-animation.html">Animation</a>
+      <a href="../api/mc3-interactive.html">Interactive Actions</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Tutorials</div>
+      <a href="../tutorials/index.html">All Tutorials</a><a href="../tutorials/minimal-example.html">Minimal Scene</a>
+      <a href="../tutorials/loading-scene.html">Loading a Scene</a><a href="../tutorials/csg-operations.html">CSG Operations</a>
+      <a href="../tutorials/export-gltf.html">Export to glTF/GLB</a><a href="../tutorials/animation.html">Keyframe Animation</a>
+      <a href="../tutorials/complete-example.html">Complete Scene Example</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Internals</div>
+      <a href="../internals/index.html">Overview</a><a href="../internals/data-flow.html">Data Flow</a>
+      <a href="../internals/rendering-pipeline.html">Rendering Pipeline</a>
+      <a href="../internals/csg-engine.html">CSG Engine</a><a href="../internals/undo-redo.html">Undo/Redo</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License</div>
+</aside>
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb"><a href="../index.html">Developers</a><span class="sep">/</span><a href="index.html">Modules</a><span class="sep">/</span><span>Scene Panels</span></div>
+    <div class="topbar-search"><input type="search" id="searchInput" placeholder="Search docs… (/)"/><div id="searchResults"></div></div>
+  </div>
+  <div class="page-body">
+    <div class="page-header">
+      <h1>Scene Panels</h1>
+      <p class="subtitle">The ImGui UI panels for browsing and editing the scene graph.</p>
+    </div>
+
+    <h2>SceneHierarchyPanel (Left Panel)</h2>
+    <p>Located at <code>src/MeshCraft/Scene/SceneHierarchyPanel.cpp</code>. Width: 220 px.</p>
+    <p>Displays the scene's object tree in a scrollable, indented list. Features:</p>
+    <ul>
+      <li><strong>Recursive rendering</strong> with depth indentation and collapse/expand toggles for group-type nodes (Group, CSG, Instance).</li>
+      <li><strong>Type color strip and icon</strong> — each object type has a distinctive left-border color.</li>
+      <li><strong>Click to select</strong>; Ctrl+click for multi-select.</li>
+      <li><strong>Visibility toggle</strong> (eye icon per row).</li>
+      <li><strong>Inline rename</strong>: double-click or right-click → Rename. A text input appears; Enter commits, Escape cancels.</li>
+      <li><strong>Drag-and-drop reparenting</strong>: drag an object onto another to make it a child; drop on the footer area to promote to root.</li>
+      <li><strong>Search filter</strong>: a text field at the top filters the displayed nodes by name.</li>
+      <li><strong>Right-click context menu</strong>: Rename, Delete, Duplicate, Group, etc.</li>
+    </ul>
+
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <p>The hierarchy panel populates <code>hierarchyRows_</code> during its draw call. These rows are then consumed by <code>Update()</code> in the next frame to handle mouse interaction. This intentional 1-frame lag is invisible to users.</p>
+      </div>
+    </div>
+
+    <h2>PropertiesPanel (Right Panel)</h2>
+    <p>Located at <code>src/MeshCraft/Scene/PropertiesPanel.cpp</code>. Width: 220 px.</p>
+    <p>Shows editable properties for the selected object. Organized into tabs:</p>
+
+    <h3>Object Tab</h3>
+    <ul>
+      <li><strong>Name</strong>: click to rename (Enter applies, Escape cancels).</li>
+      <li><strong>Type</strong>: read-only label.</li>
+      <li><strong>Position / Rotation / Scale</strong>: DragFloat3 fields. Click a field to type a value; drag for continuous adjustment.</li>
+      <li><strong>Pivot</strong>: DragFloat3 for the rotation/scale pivot offset.</li>
+      <li><strong>[K] buttons</strong>: insert keyframes at the current animation time for Position, Rotation, Scale, Visible.</li>
+      <li><strong>Material</strong>: color swatch + dropdown to assign from the document's material list.</li>
+      <li><strong>Collision type</strong>: editable string field.</li>
+      <li><strong>Visible</strong>: checkbox.</li>
+      <li><strong>Tags</strong>: editable tag list.</li>
+      <li><strong>Type-specific fields</strong>: radius, height, segments for spheres/cylinders/cones; size for boxes/planes; etc.</li>
+    </ul>
+
+    <h3>Lights Tab</h3>
+    <p>List of scene lights. Create, delete, and edit each light's type, name, color, brightness, position, direction, range, angle, cast_shadows.</p>
+
+    <h3>Cameras Tab</h3>
+    <p>List of scene cameras. Create, delete, and edit position, target, FOV, near/far, projection type.</p>
+
+    <h3>Textures Tab</h3>
+    <p>List of scene textures. Create, delete, edit URI, wrap modes, filter, color space.</p>
+
+    <h3>Materials Tab</h3>
+    <p>Full inline PBR material editor: baseColor RGBA picker, metallic/roughness sliders, emissive color, alpha mode, alpha cutoff, double-sided toggle, and five texture slot dropdowns (base color, normal, metallic-roughness, occlusion, emissive).</p>
+
+    <h3>Defs Tab</h3>
+    <p>Definitions manager. Add/remove definitions; rename (propagates to all Instance references); edit definition's root object transform and type.</p>
+
+    <div class="page-nav">
+      <a href="renderer.html" class="prev">Renderer</a>
+      <a href="../classes/index.html" class="next">Class Reference</a>
+    </div>
+  </div>
+</div>
+<script src="../../assets/script.js"></script>
+</body>
+</html>

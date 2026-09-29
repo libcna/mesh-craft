@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Combining Shapes (CSG) — MeshCraft User Guide</title>
+<link rel="stylesheet" href="../assets/style.css"/>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <a href="../index.html">
+      <div class="logo-icon">M</div>
+      <div class="logo-text">
+        <span class="logo-name">Mesh Craft</span>
+        <span class="logo-sub">User Guide</span>
+      </div>
+    </a>
+  </div>
+  <div class="section-switch"><a href="index.html" class="current">Users</a><a href="../developers/index.html" class="">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Start Here</div>
+      <a href="index.html">Overview</a>
+      <a href="installing.html">Installing &amp; Running</a>
+      <a href="interface-tour.html">Interface Tour</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Learn the Basics</div>
+      <a href="first-scene.html">Your First Scene</a>
+      <a href="shapes-and-tools.html">Shapes &amp; Tools</a>
+      <a href="materials-and-lighting.html">Materials &amp; Lighting</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Go Further</div>
+      <a href="csg.html" class="active">Combining Shapes (CSG)</a>
+      <a href="animation.html">Keyframe Animation</a>
+      <a href="walk-mode.html">Walk Mode</a>
+      <a href="exporting.html">Exporting Your Scene</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Reference</div>
+      <a href="keyboard-shortcuts.html">Keyboard Shortcuts</a>
+      <a href="faq.html">FAQ &amp; Troubleshooting</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License
+  </div>
+</aside>
+
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb">
+      <a href="index.html">Users</a>
+      <span class="sep">/</span>
+      <span>Combining Shapes (CSG)</span>
+    </div>
+    <div class="topbar-search">
+      <input type="search" id="searchInput" placeholder="Search docs… (/)"/>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+    <div class="page-header">
+      <h1>Combining Shapes (CSG)</h1>
+      <p class="subtitle">Cut, merge, and overlap shapes to build things a single primitive can't — no sculpting required.</p>
+    </div>
+
+    <p>
+      CSG stands for <strong>Constructive Solid Geometry</strong> — a fancy name for a simple idea:
+      combine two or more shapes using boolean logic, the same way you'd combine circles in a Venn
+      diagram.
+    </p>
+
+    <div class="screenshot wide">
+      <img src="../assets/images/screenshots/csg-example.png" alt="Three colored shapes in MeshCraft set up for CSG operations: a red rounded shape, a tan wireframe box, and a blue wireframe box."/>
+      <figcaption>Shapes staged for CSG — the hierarchy shows a Difference (ArchHole), a Union (Merged), and an Intersection (RoundedBlock).</figcaption>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">➕</div>
+        <div class="card-title">Union — glue shapes together</div>
+        <div class="card-desc">Merges every shape inside into one solid object, as if you welded them. Good for building complex objects out of overlapping primitives.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">✂️</div>
+        <div class="card-title">Difference — cut a hole</div>
+        <div class="card-desc">Subtracts one shape from another, like a cookie cutter or a drill bit. The shape doing the cutting is marked as the "cutter"; everything else is the base it's cut from.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔗</div>
+        <div class="card-title">Intersection — keep only the overlap</div>
+        <div class="card-desc">Keeps just the volume where all the shapes overlap, discarding the rest — handy for rounding off a box using a sphere, for example.</div>
+      </div>
+    </div>
+
+    <h2>How to do it in the editor</h2>
+    <ol class="steps">
+      <li><span class="step-title">Create a CSG group</span><strong>Add → CSG → Union / Difference / Intersection</strong>. A new CSG node appears in the Scene hierarchy.</li>
+      <li><span class="step-title">Add shapes to it</span>Drag existing objects onto the CSG node in the hierarchy panel, or select the CSG node and add new primitives to it directly.</li>
+      <li><span class="step-title">For a Difference, mark the cutter</span>Select the shape that should do the cutting and mark its role as <strong>cutter</strong> in the Properties panel — everything else in the group is treated as the base material being cut.</li>
+      <li><span class="step-title">Done</span>The viewport updates immediately to show the real, solid result of the boolean operation.</li>
+    </ol>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>A couple of current quirks</strong>
+        <p>The result of a CSG operation currently uses flat shading and takes on the material of the CSG group itself rather than each child's individual material. Not every shape type can be used inside a CSG group when exporting — MeshCraft will tell you clearly if one can't.</p>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <p>CSG groups can be nested — put a Difference inside a Union, for example — for arbitrarily complex shapes built entirely from simple primitives.</p>
+      </div>
+    </div>
+
+    <div class="page-nav">
+      <a href="materials-and-lighting.html" class="prev">Materials &amp; Lighting</a>
+      <a href="animation.html" class="next">Keyframe Animation</a>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/script.js"></script>
+</body>
+</html>

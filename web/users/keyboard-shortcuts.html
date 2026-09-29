@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Keyboard Shortcuts — MeshCraft User Guide</title>
+<link rel="stylesheet" href="../assets/style.css"/>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <a href="../index.html">
+      <div class="logo-icon">M</div>
+      <div class="logo-text">
+        <span class="logo-name">Mesh Craft</span>
+        <span class="logo-sub">User Guide</span>
+      </div>
+    </a>
+  </div>
+  <div class="section-switch"><a href="index.html" class="current">Users</a><a href="../developers/index.html" class="">Developers</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Start Here</div>
+      <a href="index.html">Overview</a>
+      <a href="installing.html">Installing &amp; Running</a>
+      <a href="interface-tour.html">Interface Tour</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Learn the Basics</div>
+      <a href="first-scene.html">Your First Scene</a>
+      <a href="shapes-and-tools.html">Shapes &amp; Tools</a>
+      <a href="materials-and-lighting.html">Materials &amp; Lighting</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Go Further</div>
+      <a href="csg.html">Combining Shapes (CSG)</a>
+      <a href="animation.html">Keyframe Animation</a>
+      <a href="walk-mode.html">Walk Mode</a>
+      <a href="exporting.html">Exporting Your Scene</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Reference</div>
+      <a href="keyboard-shortcuts.html" class="active">Keyboard Shortcuts</a>
+      <a href="faq.html">FAQ &amp; Troubleshooting</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="https://github.com/openeggbert/mesh-craft" target="_blank">GitHub</a> &middot; MIT License
+  </div>
+</aside>
+
+<div id="content">
+  <div class="topbar">
+    <button id="menuToggle" aria-label="Menu">&#9776;</button>
+    <div class="topbar-breadcrumb">
+      <a href="index.html">Users</a>
+      <span class="sep">/</span>
+      <span>Keyboard Shortcuts</span>
+    </div>
+    <div class="topbar-search">
+      <input type="search" id="searchInput" placeholder="Search docs… (/)"/>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+    <div class="page-header">
+      <h1>Keyboard Shortcuts</h1>
+      <p class="subtitle">A one-page cheat sheet for every shortcut in the editor.</p>
+    </div>
+
+    <h2>File</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>Ctrl+N</kbd></td><td>New scene</td></tr>
+          <tr><td><kbd>Ctrl+O</kbd></td><td>Open file</td></tr>
+          <tr><td><kbd>Ctrl+S</kbd></td><td>Save</td></tr>
+          <tr><td><kbd>Ctrl+Shift+S</kbd></td><td>Save As</td></tr>
+          <tr><td><kbd>Ctrl+E</kbd></td><td>Export to glTF/GLB</td></tr>
+          <tr><td><kbd>F11</kbd></td><td>Save a screenshot</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Editing</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>Ctrl+Z</kbd></td><td>Undo (up to 20 steps)</td></tr>
+          <tr><td><kbd>Ctrl+Y</kbd></td><td>Redo</td></tr>
+          <tr><td><kbd>Ctrl+D</kbd></td><td>Duplicate selection</td></tr>
+          <tr><td><kbd>Ctrl+A</kbd></td><td>Select all (or all children in current group)</td></tr>
+          <tr><td><kbd>Ctrl+G</kbd></td><td>Group selected objects</td></tr>
+          <tr><td><kbd>Ctrl+Shift+G</kbd></td><td>Ungroup</td></tr>
+          <tr><td><kbd>Ctrl+X</kbd> / <kbd>Ctrl+C</kbd> / <kbd>Ctrl+V</kbd></td><td>Cut / Copy / Paste</td></tr>
+          <tr><td><kbd>Delete</kbd></td><td>Delete selected objects</td></tr>
+          <tr><td><kbd>Ctrl+Up</kbd> / <kbd>Ctrl+Down</kbd></td><td>Reorder object among its siblings</td></tr>
+          <tr><td><kbd>Ctrl+Shift+P</kbd></td><td>Copy properties from active object to all selected</td></tr>
+          <tr><td><kbd>P</kbd></td><td>Select parent of current object</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Transform tools</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>Q</kbd></td><td>Select tool (no gizmo)</td></tr>
+          <tr><td><kbd>G</kbd></td><td>Move (translate) gizmo</td></tr>
+          <tr><td><kbd>R</kbd></td><td>Rotate gizmo</td></tr>
+          <tr><td><kbd>S</kbd></td><td>Scale gizmo</td></tr>
+          <tr><td><kbd>Shift</kbd> (while dragging)</td><td>Vertex snap to another object</td></tr>
+          <tr><td><kbd>Ctrl</kbd> (while rotating)</td><td>Snap to 15°/45°/90° increments</td></tr>
+          <tr><td>Arrow keys</td><td>Nudge selection ±0.1 on X/Y</td></tr>
+          <tr><td><kbd>Page Up</kbd> / <kbd>Page Down</kbd></td><td>Nudge selection ±0.1 on Z</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Viewport &amp; camera</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Input</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td>Middle-mouse drag</td><td>Orbit</td></tr>
+          <tr><td>Right-mouse drag</td><td>Pan</td></tr>
+          <tr><td>Scroll wheel</td><td>Zoom</td></tr>
+          <tr><td><kbd>F</kbd></td><td>Focus camera on selection</td></tr>
+          <tr><td><kbd>Alt+W</kbd></td><td>Toggle wireframe overlay</td></tr>
+          <tr><td><kbd>B</kbd></td><td>Toggle bounding box display</td></tr>
+          <tr><td>Numpad 1 / 3 / 5 / 7 / 9</td><td>Front / Right / Back / Top / Bottom view</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Adding shapes</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>F1</kbd></td><td>Add Box</td></tr>
+          <tr><td><kbd>F2</kbd></td><td>Add Sphere</td></tr>
+          <tr><td><kbd>F3</kbd></td><td>Add Cylinder</td></tr>
+          <tr><td><kbd>F4</kbd></td><td>Add Cone</td></tr>
+          <tr><td><kbd>F5</kbd></td><td>Add Plane</td></tr>
+          <tr><td>Add menu</td><td>Torus, Capsule, Disk, Grid, Ico-sphere, Extrude, CSG Union/Difference/Intersection</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Animation &amp; other tools</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>Ctrl+T</kbd></td><td>Toggle timeline panel</td></tr>
+          <tr><td><kbd>Space</kbd></td><td>Play / pause animation</td></tr>
+          <tr><td><kbd>K</kbd></td><td>Insert keyframe for selection at current time</td></tr>
+          <tr><td><kbd>Ctrl+P</kbd></td><td>Open Command Palette</td></tr>
+          <tr><td><kbd>M</kbd></td><td>Measurement tool</td></tr>
+          <tr><td><kbd>F5</kbd></td><td>Enter / exit Walk Mode</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="page-nav">
+      <a href="exporting.html" class="prev">Exporting Your Scene</a>
+      <a href="faq.html" class="next">FAQ &amp; Troubleshooting</a>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/script.js"></script>
+</body>
+</html>
