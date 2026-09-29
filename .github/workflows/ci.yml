@@ -21,10 +21,14 @@
 name: CI
 
 on:
+  # web/ is the static website, deployed by pages.yml; editing it must not
+  # rebuild and retest the C++ tree.
   push:
     branches: [ master, develop ]
+    paths-ignore: [ 'web/**' ]
   pull_request:
     branches: [ master, develop ]
+    paths-ignore: [ 'web/**' ]
 
 # Cancel superseded runs for the same ref.
 concurrency:
