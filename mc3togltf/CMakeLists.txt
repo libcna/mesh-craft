@@ -211,8 +211,14 @@ if(MESHCRAFT_FUZZ)
 endif()
 
 include(GNUInstallDirs)
+# $ORIGIN is ELF's; Mach-O spells the executable's own directory @loader_path.
+if(APPLE)
+    set(_mc3togltf_rpath_origin "@loader_path")
+else()
+    set(_mc3togltf_rpath_origin "$ORIGIN")
+endif()
 set_target_properties(mc3togltf PROPERTIES
-    INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
+    INSTALL_RPATH "${_mc3togltf_rpath_origin}/../${CMAKE_INSTALL_LIBDIR}")
 install(TARGETS mc3togltf
         RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
         COMPONENT release)

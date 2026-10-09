@@ -6,6 +6,10 @@ import sys
 
 
 def main():
+    if sys.platform == "darwin":
+        print("PASS: macOS renders through its native window server; no X display needed")
+        return 0
+
     xvfb_run = shutil.which("xvfb-run")
     xdpyinfo = shutil.which("xdpyinfo")
     if not xvfb_run or not xdpyinfo:

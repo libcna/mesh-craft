@@ -7,7 +7,7 @@ Generates a >1,000,000-triangle OBJ file on the fly (a subdivided grid --
 710x710 quads = 1,008,200 triangles, ~28MB as text; not committed as a
 static fixture to avoid repo bloat) and exports it through mc3togltf,
 measuring the subprocess's actual peak RSS via resource.getrusage()
-(Linux/macOS; ru_maxrss is in KB). The `resource` module is POSIX-only
+(Linux/macOS; ru_maxrss is in KB on Linux and in bytes on macOS). The `resource` module is POSIX-only
 (ModuleNotFoundError on Windows), so the peak-RSS assertion is skipped
 there -- the returncode/timing/output-exists checks still run
 everywhere, keeping the "doesn't crash or hang" coverage on Windows too.
@@ -90,6 +90,9 @@ if __name__ == "__main__":
             # all reaped child processes so far -- since this is the only
             # subprocess this test spawns, it's exactly this export's peak RSS.
             peak_rss_kb = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss
+            if sys.platform == "darwin":
+                # getrusage(2) on macOS reports ru_maxrss in bytes, not kilobytes.
+                peak_rss_kb //= 1024
             assert peak_rss_kb < MAX_RSS_KB, (
                 f"mc3togltf peak RSS was {peak_rss_kb / 1024:.0f}MB, expected < "
                 f"{MAX_RSS_KB / 1024:.0f}MB (STAB-0257)"

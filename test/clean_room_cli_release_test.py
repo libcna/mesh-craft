@@ -123,13 +123,14 @@ def main() -> int:
         check(False, f"clean-room conversion did not crash or fail to launch: {error}")
 
     # Missing-runtime detection: mc3togltf links libmanifold/libtinyobjloader
-    # as shared libraries via a relative ($ORIGIN/../lib) rpath (SYS-W11-05).
+    # as shared libraries via a relative ($ORIGIN/../lib, on macOS
+    # @loader_path/../lib) rpath (SYS-W11-05).
     # Removing them must produce a clean dynamic-linker failure (a real
     # process launch failure, non-zero exit), not a hang or a crash with no
     # diagnostic at all.
-    runtime_libs = [pathlib.Path(p) for p in
-                     glob.glob(str(root / "lib" / "libmanifold.so*")) +
-                     glob.glob(str(root / "lib" / "libtinyobjloader.so*"))]
+    runtime_libs = [pathlib.Path(p) for name in ("libmanifold", "libtinyobjloader")
+                    for pattern in (f"{name}.so*", f"{name}*.dylib")
+                    for p in glob.glob(str(root / "lib" / pattern))]
     if runtime_libs:
         missing_runtime_root = root.parent / "clean-room-missing-runtime"
         shutil.rmtree(missing_runtime_root, ignore_errors=True)

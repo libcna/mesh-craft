@@ -271,7 +271,7 @@ struct SceneApi {
 
     sol::object find(const std::string& key, sol::this_state ts) const {
         Mc3Object* found = findByIdOrName(*doc, key);
-        if (!found) return sol::nil;
+        if (!found) return sol::lua_nil;
         return sol::make_object(ts, ObjectHandle{found, doc});
     }
 };
@@ -318,7 +318,7 @@ std::string LuaScriptRunner::run(const std::string& source, Mc3Document& doc,
         // Mc3ScriptRunner -- no filesystem/process/module access.
         for (const char* g : {"io", "os", "debug", "package",
                                "dofile", "loadfile", "load", "collectgarbage"}) {
-            lua[g] = sol::nil;
+            lua[g] = sol::lua_nil;
         }
         lua.set_function("require", [](const std::string& name) -> sol::object {
             throw std::runtime_error(

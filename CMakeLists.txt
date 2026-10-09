@@ -147,6 +147,10 @@ elseif(MESH_CRAFT_GRAPHICS_BACKEND_UPPER STREQUAL "EASYGL")
     # family, which is the profile MeshCraft has been building all along.
     if(EMSCRIPTEN)
         set(_cna_renderer_identity "WEBGL2")
+    elseif(APPLE)
+        # macOS has no OpenGL ES. OPENGL33 is the same EasyGL family on the
+        # desktop 3.3 core profile, which Apple's 4.1 core context provides.
+        set(_cna_renderer_identity "OPENGL33")
     else()
         set(_cna_renderer_identity "OPENGLES3")
     endif()
@@ -711,7 +715,9 @@ if(EMSCRIPTEN)
         "SHELL:--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/cmake/web/pre.js"
         "SHELL:--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/test@/test"
     )
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang" AND NOT WIN32 AND NOT ANDROID)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang" AND NOT WIN32 AND NOT ANDROID AND NOT APPLE)
+    # Not on Apple: ld64 has no --start-group/--end-group (it rescans archives by itself) and
+    # refuses the options, so macOS takes the plain branch below.
     target_link_libraries(${_target} PRIVATE
         -Wl,--start-group ${MESHCRAFT_CNA_MODULES} ${_cna_backend_target} -Wl,--end-group
         ${MESHCRAFT_SHARP_RUNTIME_TARGETS}
@@ -2324,7 +2330,12 @@ if(MESH_CRAFT_BUILD_TESTING AND UNIX AND NOT ANDROID AND NOT EMSCRIPTEN)
     find_program(MESHCRAFT_XDPYINFO NAMES xdpyinfo)
     find_program(MESHCRAFT_RENDER_PREFLIGHT_PYTHON NAMES python3 python)
     set(MESHCRAFT_RENDER_DISPLAY_AVAILABLE FALSE)
-    if(MESHCRAFT_XVFB_RUN AND MESHCRAFT_XDPYINFO)
+    if(APPLE)
+        # macOS has no X server to preflight: MeshCraft opens its window on the
+        # native window server, and the test scripts run it directly when
+        # xvfb-run is absent.
+        set(MESHCRAFT_RENDER_DISPLAY_AVAILABLE TRUE)
+    elseif(MESHCRAFT_XVFB_RUN AND MESHCRAFT_XDPYINFO)
         execute_process(
             COMMAND "${MESHCRAFT_XVFB_RUN}" --auto-servernum "${MESHCRAFT_XDPYINFO}"
             RESULT_VARIABLE MESHCRAFT_RENDER_DISPLAY_RESULT
