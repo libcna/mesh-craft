@@ -1,7 +1,8 @@
 // Unit test for MeshCraft::isBackendSupportedAlg (AUD-039b, Gate C).
 //
-// The CNA ImGui renderer has no native-GL dependency, but only EASYGL has
-// passed the required real editor screenshot qualification so far.
+// The CNA ImGui renderer has no native-GL dependency. EASYGL and METAL have
+// passed the required real editor screenshot qualification; VULKAN is enabled
+// for its manual qualification run.
 
 #include "MeshCraft/GraphicsBackendCheck.hpp"
 
@@ -26,6 +27,8 @@ int main() {
           "VULKAN is enabled for the explicit manual qualification run");
     check(isBackendSupportedAlg("VULKAN", /*allowOverride=*/true),
           "VULKAN does not require the legacy override argument");
+    check(isBackendSupportedAlg("METAL", /*allowOverride=*/false),
+          "METAL passed the render-labelled screenshot suite on macOS");
 
     for (const char* backend : {"SDL_RENDERER", "BGFX", "WEBGPU"}) {
         check(!isBackendSupportedAlg(backend, /*allowOverride=*/false),
@@ -37,7 +40,7 @@ int main() {
 
     check(supportsTextShaderEffectsAlg("EASYGL"),
           "EASYGL supports MeshCraft's source-GLSL ShaderEffects");
-    for (const char* backend : {"VULKAN", "SDL_RENDERER", "BGFX", "WEBGPU"}) {
+    for (const char* backend : {"VULKAN", "SDL_RENDERER", "BGFX", "WEBGPU", "METAL"}) {
         check(!supportsTextShaderEffectsAlg(backend),
               std::string(backend) + " does not claim unsupported source-GLSL ShaderEffects");
     }

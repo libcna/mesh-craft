@@ -61,13 +61,17 @@ ninja -C cmake-build-debug
 ### Graphics backend
 
 `MESH_CRAFT_GRAPHICS_BACKEND` selects the **CNA engine** backend
-(`EASYGL` | `SDL_RENDERER` | `BGFX` | `VULKAN` | `WEBGPU`, default `EASYGL`).
+(`EASYGL` | `SDL_RENDERER` | `BGFX` | `VULKAN` | `WEBGPU` | `METAL`, default `EASYGL`).
 The editor's ImGui renderer consumes CNA draw primitives rather than native GL
 calls. `EASYGL` is the fully supported source-GLSL route; the current runtime
-gate also permits the separately qualified Vulkan editor path, while other
-backends remain deliberately rejected until they receive real screenshot
-qualification. Android and Emscripten force `EASYGL`: that selects GLES 3.0 /
-WebGL 2 rather than the non-qualified SDL renderer. The CNA-free CLI tools
+gate also permits the separately qualified Vulkan editor path and, on macOS,
+`METAL` (CNA's native renderer), while other backends remain deliberately
+rejected until they receive real screenshot qualification. Bloom, SSAO, skybox
+shading, material preview and the point/spot-light shader need source-GLSL
+ShaderEffects and therefore EASYGL; elsewhere they are off and their render
+tests are disabled. Android and Emscripten force `EASYGL`: that selects GLES
+3.0 / WebGL 2 rather than the non-qualified SDL renderer; on macOS `EASYGL`
+selects CNA's `OPENGL33` profile, since macOS has no OpenGL ES. The CNA-free CLI tools
 (`mc3togltf`, `mc3tomcb`) do not depend on the backend at all.
 
 Android is a supported target at the source-configuration level, but no APK or

@@ -98,7 +98,7 @@ endfunction()
 set(MESH_CRAFT_GRAPHICS_BACKEND "EASYGL" CACHE STRING
         "CNA engine backend used by the MeshCraft editor GUI.")
 set_property(CACHE MESH_CRAFT_GRAPHICS_BACKEND PROPERTY STRINGS
-        SDL_RENDERER EASYGL BGFX VULKAN WEBGPU)
+        SDL_RENDERER EASYGL BGFX VULKAN WEBGPU METAL)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/MeshCraftGraphicsBackend.cmake")
 meshcraft_select_graphics_backend(
@@ -116,10 +116,10 @@ if(EMSCRIPTEN)
     add_link_options(-fwasm-exceptions -sWASM_LEGACY_EXCEPTIONS=0)
 endif()
 
-if(NOT MESH_CRAFT_GRAPHICS_BACKEND_UPPER MATCHES "^(SDL_RENDERER|EASYGL|BGFX|VULKAN|WEBGPU)$")
+if(NOT MESH_CRAFT_GRAPHICS_BACKEND_UPPER MATCHES "^(SDL_RENDERER|EASYGL|BGFX|VULKAN|WEBGPU|METAL)$")
     message(FATAL_ERROR
             "Unsupported MESH_CRAFT_GRAPHICS_BACKEND='${MESH_CRAFT_GRAPHICS_BACKEND}'. "
-            "Use SDL_RENDERER, EASYGL, BGFX, VULKAN, or WEBGPU.")
+            "Use SDL_RENDERER, EASYGL, BGFX, VULKAN, WEBGPU, or METAL.")
 endif()
 
 message(STATUS "MeshCraft graphics backend (CNA engine): ${MESH_CRAFT_GRAPHICS_BACKEND_UPPER}")
@@ -164,6 +164,11 @@ elseif(MESH_CRAFT_GRAPHICS_BACKEND_UPPER STREQUAL "VULKAN")
 elseif(MESH_CRAFT_GRAPHICS_BACKEND_UPPER STREQUAL "WEBGPU")
     set(_cna_renderer_identity "WEBGPU")
     set(_cna_backend_target cna_renderer_webgpu)
+elseif(MESH_CRAFT_GRAPHICS_BACKEND_UPPER STREQUAL "METAL")
+    # CNA's native macOS renderer. It does not execute source GLSL, so the
+    # optional source-shader features stay EasyGL-only (GraphicsBackendCheck.hpp).
+    set(_cna_renderer_identity "METAL")
+    set(_cna_backend_target cna_renderer_metal)
 endif()
 
 set(CNA_GRAPHICS_RENDERER "${_cna_renderer_identity}" CACHE STRING "" FORCE)
@@ -2369,5 +2374,21 @@ if(MESH_CRAFT_BUILD_TESTING AND UNIX AND NOT ANDROID AND NOT EMSCRIPTEN)
             endif()
         endforeach()
         message(STATUS "AUD-090: render CTests disabled: xvfb-run + xdpyinfo preflight failed")
+    endif()
+
+    # These render tests measure features MeshCraft draws only with source-GLSL
+    # ShaderEffects, which it enables on EASYGL alone
+    # (MeshCraft::supportsTextShaderEffectsAlg in GraphicsBackendCheck.hpp); on
+    # any other backend the application turns them off by design, so the tests
+    # are disabled -- visibly, not passed -- rather than failed.
+    if(NOT MESH_CRAFT_GRAPHICS_BACKEND_UPPER STREQUAL "EASYGL")
+        foreach(MESHCRAFT_TEST IN ITEMS bloom_test ssao_test matpreview_test
+                                         point_spot_light_viewport_test skybox_texture_test)
+            if(TEST "${MESHCRAFT_TEST}")
+                set_tests_properties("${MESHCRAFT_TEST}" PROPERTIES DISABLED TRUE)
+            endif()
+        endforeach()
+        message(STATUS "MeshCraft: source-GLSL feature tests disabled on "
+                       "${MESH_CRAFT_GRAPHICS_BACKEND_UPPER} (EASYGL-only features)")
     endif()
 endif()

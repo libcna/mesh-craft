@@ -13,10 +13,12 @@
 namespace MeshCraft {
 
 // EASYGL is fully qualified. Vulkan is explicitly enabled for the current
-// manual SYS-W8-05 qualification run; the remaining CNA backends stay closed
-// until they receive their own real editor screenshot qualification.
+// manual SYS-W8-05 qualification run. METAL (macOS) passed the render-labelled
+// screenshot suite against EASYGL on the same machine. The remaining CNA
+// backends stay closed until they receive their own real editor screenshot
+// qualification.
 inline bool isBackendSupportedAlg(const std::string& backend, bool /*allowOverride*/) {
-    return backend == "EASYGL" || backend == "VULKAN";
+    return backend == "EASYGL" || backend == "VULKAN" || backend == "METAL";
 }
 
 // MeshCraft's optional post-processes and material-preview currently supply
